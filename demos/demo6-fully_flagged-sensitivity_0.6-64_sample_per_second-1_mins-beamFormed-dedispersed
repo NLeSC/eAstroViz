@@ -1,0 +1,3 @@
+#! /bin/bash
+
+./viz -dedisperse -maxSeqNo 6000 -integration 64 datasets/pulsar-experiment/fully_flagged-sensitivity_0.6-10_mins.beamFormed > pulse_profile-integration_64-max_seq_no_6000.dat

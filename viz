@@ -1,0 +1,10 @@
+#! /bin/bash
+
+LIBRARY="external/linux_x86"
+
+if [ `/bin/uname -i` = "x86_64" ]
+then
+    LIBRARY="external/linux_x86_64"
+fi
+
+LD_LIBRARY_PATH=$LIBRARY:$LD_LIBRARY_PATH java -Xmx2048M -classpath lib/lofar-viz.jar:external/jhdf5.jar:external/jhdf5obj.jar:external/jhdf.jar:external/jhdfobj.jar lofar.Viz $*
