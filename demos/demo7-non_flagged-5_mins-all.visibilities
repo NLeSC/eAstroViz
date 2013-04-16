@@ -1,0 +1,3 @@
+#! /bin/bash
+
+./viz datasets/pulsar-experiment/non_flagged-5_mins-all.visibilities

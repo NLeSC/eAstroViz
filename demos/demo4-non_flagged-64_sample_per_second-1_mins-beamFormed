@@ -1,0 +1,3 @@
+#! /bin/bash
+
+./viz -maxSeqNo 600 -integration 64 datasets/pulsar-experiment/non_flagged-10_mins.beamFormed

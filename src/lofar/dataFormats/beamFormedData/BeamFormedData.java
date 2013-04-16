@@ -1,0 +1,571 @@
+package lofar.dataFormats.beamFormedData;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.channels.FileChannel;
+import java.util.List;
+
+import lofar.AntennaBandpass;
+import lofar.AntennaType;
+import lofar.Viz;
+import lofar.dataFormats.DataProvider;
+import ncsa.hdf.object.Attribute;
+import ncsa.hdf.object.DataFormat;
+import ncsa.hdf.object.FileFormat;
+import ncsa.hdf.object.HObject;
+import ncsa.hdf.object.h5.H5Group;
+import ncsa.hdf.object.h5.H5ScalarDS;
+
+public final class BeamFormedData extends DataProvider {
+    static final boolean COLLAPSE_DEDISPERSED_DATA = false;
+    static final int NR_PERIODS_IN_FOLD = 1;
+    static final boolean CORRECT_ANTENNA_BANDPASS = false;
+    
+    float[][][] data; // [second][subband][channel]
+    boolean[][][] flagged;
+
+    int nrStokes;
+    int nrChannels;
+    int nrSamples;
+    int nrSubbands;
+    int nrStations;
+    double totalIntegrationTime;
+    int bitsPerSample;
+    double clockFrequency;
+    int nrBeams;
+
+    int nrSamplesPerSecond;
+    int nrSeconds;
+
+    float maxVal = -10000000.0f;
+    float minVal = 1.0E20f;
+
+    float subbandWidth; // MHz
+    float channelWidth; //MHz
+    float beamCenterFrequency; // MHz
+    
+    String rawFileName;
+    String hdf5FileName;
+    FileFormat fileFormat;
+
+    final int zoomFactor;
+    static int maximumShift;
+
+    public BeamFormedData(final String fileName, final int maxSequenceNr, final int zoomFactor) {
+        super(fileName, maxSequenceNr, new String[] { "none" });
+
+        final File[] ls = new File(fileName).listFiles(new Viz.ExtFilter("h5"));
+        if (ls.length != 1) {
+            throw new RuntimeException("more than one .h5 file");
+        }
+        hdf5FileName = ls[0].getPath();
+
+        final File[] ls2 = new File(fileName).listFiles(new Viz.ExtFilter("raw"));
+        if (ls2.length != 1) {
+            throw new RuntimeException("more than one raw file");
+        }
+        rawFileName = ls2[0].getPath();
+
+        System.err.println("hdf5 file = " + hdf5FileName + ", raw file = " + rawFileName);
+
+        this.zoomFactor = zoomFactor;
+    }
+
+    public void read() {
+        readMetaData();
+
+        totalIntegrationTime *= zoomFactor;
+        nrSamplesPerSecond = (int) (nrSamples / totalIntegrationTime);
+        nrSeconds = (int) totalIntegrationTime;
+        if (maxSequenceNr < nrSeconds) {
+            nrSeconds = maxSequenceNr;
+        }
+
+        System.err.println("nrSeconds = " + nrSeconds + ", nrSamplesPerSecond = " + nrSamplesPerSecond);
+
+        data = new float[nrSeconds][nrSubbands][nrChannels];
+        flagged = new boolean[nrSeconds][nrSubbands][nrChannels];
+        int second = 0;
+
+        final ByteBuffer bb = ByteBuffer.allocateDirect(nrSamplesPerSecond * nrSubbands * nrChannels * 4);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        final FloatBuffer fb = bb.asFloatBuffer();
+
+        FileInputStream fin = null;
+
+        try {
+            final File f = new File(rawFileName);
+            fin = new FileInputStream(f);
+
+            final FileChannel ch = fin.getChannel();
+
+            // boost::extents[nrSamples | 2][nrSubbands][nrChannels] // the | 2
+            // extra samples are not written to disk, only kept in memory!
+            for (second = 0; second < nrSeconds; second++) {
+                if (second > maxSequenceNr) {
+                    break;
+                }
+                final double size = (nrSamplesPerSecond * nrSubbands * nrChannels * 4) / (1024.0 * 1024.0);
+                System.err.print("reading second " + second + ", size = " + size + " MB");
+                final long start = System.currentTimeMillis();
+
+                bb.rewind();
+                fb.rewind();
+                final int res = ch.read(bb); // TODO can return less bytes!
+                if (res < 0) {
+                    nrSeconds = second;
+                    break;
+                }
+
+                for (int sample = 0; sample < nrSamplesPerSecond; sample++) {
+                    for (int subband = 0; subband < nrSubbands; subband++) {
+                        for (int channel = 0; channel < nrChannels; channel++) {
+                            final float val = fb.get();
+                            data[second][subband][channel] += val;
+                            //                            System.err.println("sample at time " + sample + ", subband " + subband + ", channel " + channel + " = " + val);
+
+                        }
+                    }
+                }
+                final long end = System.currentTimeMillis();
+                final double time = (end - start) / 1000.0;
+                final double speed = size / time;
+                System.err.println(", read rook " + time + " s, speed = " + speed + " MB/s, min = " + minVal + ", max = " + maxVal);
+            }
+        } catch (final Exception e) {
+            nrSeconds = second; // oops, we read less data...
+        } finally {
+            if (fin != null) {
+                try {
+                    fin.close();
+                } catch (final IOException e) {
+                    // ignore
+                }
+            }
+        }
+
+        if(CORRECT_ANTENNA_BANDPASS) {
+            AntennaBandpass bandPass = new AntennaBandpass();
+            
+            System.err.println("START correction");            
+            for (int subband = 0; subband < nrSubbands; subband++) {
+                for (int channel = 0; channel < nrChannels; channel++) {
+                    float frequency = getFrequency(subband, channel);
+                    float correctionFactor = bandPass.getBandPassCorrectionFactor(AntennaType.HBA_LOW, frequency); 
+                    System.err.println(frequency + " " + correctionFactor);
+                }
+            }
+            System.err.println("END correction");            
+
+            
+            for (int s = 0; s < nrSeconds; s++) {
+                for (int subband = 0; subband < nrSubbands; subband++) {
+                    for (int channel = 0; channel < nrChannels; channel++) {
+                        float frequency = getFrequency(subband, channel);
+                        float correctionFactor = bandPass.getBandPassCorrectionFactor(AntennaType.HBA_LOW, frequency); 
+//                        System.err.println("freq of subband " + subband + ", channel " + channel +  " = " + frequency + ", correctionFactor = " + correctionFactor);
+                        data[s][subband][channel] *= correctionFactor; 
+                    }
+                }
+            }
+        }
+        
+        calculateStatistics();
+        /*
+                System.err.println("start of beamFormed data");
+                for (second = 0; second < nrSeconds; second++) {
+                     System.err.println(data[second][29][0]);
+                }
+                System.err.println("end of beamFormed data");
+        */
+    }
+
+    public float getFrequency(int subband, int channel) {
+        float startFreq = beamCenterFrequency - (nrSubbands/2) * subbandWidth;
+        return startFreq + subband * subbandWidth + channel * channelWidth;
+    }
+    
+    private void calculateStatistics() {
+        // calc min and max for scaling
+        for (int second = 0; second < nrSeconds; second++) {
+            for (int subband = 0; subband < nrSubbands; subband++) {
+                for (int channel = 0; channel < nrChannels; channel++) {
+                    if (data[second][subband][channel] < minVal) {
+                        minVal = data[second][subband][channel];
+                    }
+                    if (data[second][subband][channel] > maxVal) {
+                        maxVal = data[second][subband][channel];
+                    }
+                }
+            }
+        }
+    }
+
+    public void readMetaData() {
+        // retrieve an instance of H5File
+        final FileFormat fileFormat1 = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF5);
+        if (fileFormat1 == null) {
+            System.err.println("Cannot find HDF5 FileFormat.");
+            System.exit(1);
+        }
+
+        try {
+            fileFormat = fileFormat1.createInstance(hdf5FileName, FileFormat.READ);
+            if (fileFormat == null) {
+                System.err.println("Cannot open HDF5 File.");
+                System.exit(1);
+            }
+
+            // open the file and retrieve the file structure
+            @SuppressWarnings("unused")
+            final int fileID = fileFormat.open();
+        } catch (final Exception e) {
+            System.err.println(e);
+        }
+
+        final H5Group root = (H5Group) ((javax.swing.tree.DefaultMutableTreeNode) fileFormat.getRootNode()).getUserObject();
+        System.err.println("root object: " + root + " type is: " + root.getClass() + " full name = " + root.getFullName());
+        final java.util.List<HObject> l = root.getMemberList();
+        for (int i = 0; i < l.size(); i++) {
+            System.err.println("member " + i + " = " + l.get(i));
+        }
+        printAttributes(root);
+
+        // Sanity check data type
+        if (!getAttribute(root, "FILETYPE").getPrimitiveStringVal().equals("bf")) {
+            throw new RuntimeException("file type is not bf!");
+        }
+
+        nrStations = getAttribute(root, "OBSERVATION_NOF_STATIONS").getPrimitiveIntVal();
+        System.err.println("nrStations = " + nrStations);
+
+        totalIntegrationTime = getAttribute(root, "TOTAL_INTEGRATION_TIME").getPrimitiveDoubleVal();
+        System.err.println("total integration time = " + totalIntegrationTime);
+
+        bitsPerSample = getAttribute(root, "OBSERVATION_NOF_BITS_PER_SAMPLE").getPrimitiveIntVal();
+        System.err.println("bits per sample = " + bitsPerSample);
+
+        clockFrequency = getAttribute(root, "CLOCK_FREQUENCY").getPrimitiveDoubleVal();
+        System.err.println("clock frequency = " + clockFrequency + " MHz");
+
+        // first member is pointing 0
+        final H5Group pointing0 = (H5Group) l.get(0);
+        System.err.println("-----");
+        printAttributes(pointing0);
+        System.err.println("-----");
+
+        nrBeams = getAttribute(pointing0, "NOF_BEAMS").getPrimitiveIntVal();
+        System.err.println("nrBeams = " + nrBeams);
+
+        // first member of the pointing is beam 0
+        final java.util.List<HObject> l2 = pointing0.getMemberList();
+        final H5Group beam0 = (H5Group) l2.get(0);
+        printAttributes(beam0);
+
+        nrSamples = getAttribute(beam0, "NOF_SAMPLES").getPrimitiveIntVal();
+        System.err.println("nrSamples = " + nrSamples);
+
+        nrChannels = getAttribute(beam0, "CHANNELS_PER_SUBBAND").getPrimitiveIntVal();
+        System.err.println("nrChannels = " + nrChannels);
+
+        nrStokes = getAttribute(beam0, "NOF_STOKES").getPrimitiveIntVal();
+        System.err.println("nrStokes = " + nrStokes);
+        if (nrStokes != 1) {
+            System.err.println("only 1 stoke supported for now.");
+            System.exit(1);
+        }
+
+        subbandWidth = (float) getAttribute(beam0, "SUBBAND_WIDTH").getPrimitiveDoubleVal() / 1000000.0f;
+        channelWidth = (float) getAttribute(beam0, "CHANNEL_WIDTH").getPrimitiveDoubleVal() / 1000000.0f;
+        beamCenterFrequency = (float) getAttribute(beam0, "BEAM_FREQUENCY_CENTER").getPrimitiveDoubleVal();
+        
+        final String stokesComponents = getAttribute(beam0, "STOKES_COMPONENTS").getPrimitiveStringVal();
+        System.err.println("Stokes components = " + stokesComponents);
+        if (!stokesComponents.equals("I")) {
+            System.err.println("only stokesI supported for now.");
+            System.exit(1);
+        }
+
+        // Third member of the beam is the first stoke. First is "COORDINATES", 2nd = PROCESS_HISTORY
+        final java.util.List<HObject> l3 = beam0.getMemberList();
+        final H5ScalarDS stoke0 = (H5ScalarDS) l3.get(2);
+        printAttributes(stoke0);
+
+        final int[] nrChannelsArray = getAttribute(stoke0, "NOF_CHANNELS").get1DIntArrayVal();
+        nrSubbands = nrChannelsArray.length;
+        System.err.println("nrSubbands = " + nrSubbands);
+    }
+
+    public void close() {
+        try {
+            fileFormat.close();
+        } catch (final Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Hdf5Attribute getAttribute(final DataFormat node, final String name) {
+        List<Attribute> l = null;
+
+        try {
+            l = node.getMetadata();
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i < l.size(); i++) {
+            final Attribute a = l.get(i);
+            if (a.getName().equals(name)) {
+                return new Hdf5Attribute(a);
+            }
+        }
+        return null;
+    }
+
+    void printAttributes(final DataFormat node) {
+        try {
+            @SuppressWarnings("unchecked")
+            final List<Attribute> metaList = node.getMetadata();
+            for (int i = 0; i < metaList.size(); i++) {
+                final Attribute a = metaList.get(i);
+                final Hdf5Attribute a2 = new Hdf5Attribute(a);
+                System.err.println("meta " + i + " = " + a.getName() + ", type = " + a.getType().getDatatypeDescription() + ", nrDims = " + a.getRank()
+                        + ", size = " + a.getType().getDatatypeSize() + ", val = " + a2.getValueString());
+            }
+        } catch (final Exception e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    public int getTotalTime() {
+        if (maxSequenceNr > 0 && maxSequenceNr < nrSeconds) {
+            return maxSequenceNr;
+        }
+        return nrSeconds;
+    }
+
+    public int getTotalFreq() {
+        return nrSubbands * nrChannels;
+    }
+
+    public int getNrStokes() {
+        return nrStokes;
+    }
+
+    public int getNrChannels() {
+        return nrChannels;
+    }
+
+    public int getNrSubbands() {
+        return nrSubbands;
+    }
+
+    public int getNrSamples() {
+        return nrSamples;
+    }
+
+    public int getNrSamplesPerSecond() {
+        return nrSamplesPerSecond;
+    }
+    
+    @Override
+    public int getSizeX() {
+        return getTotalTime();
+    }
+
+    @Override
+    public int getSizeY() {
+        return getTotalFreq();
+    }
+
+    @Override
+    public float getValue(final int x, final int y) { // TODO: maybe return other stokes
+        return (getRawValue(x, y) - minVal) / (maxVal - minVal);
+    }
+
+    @Override
+    public float getRawValue(final int x, final int y) { // TODO: maybe return other stokes
+        final int subband = y / nrChannels;
+        final int channel = y % nrChannels;
+        return data[x][subband][channel];
+    }
+
+    @Override
+    public boolean isFlagged(final int x, final int y) {
+        return false; // not stored in file format yet.
+    }
+
+    public float[][][] getData() {
+        return data;
+    }
+
+    @Override
+    public void flag() {
+        // TODO Auto-generated method stub
+    }
+
+    public void dedisperse(float lowFreq, float freqStep, float dm) {
+        dedisperse(data, flagged, zoomFactor, lowFreq, freqStep, dm);
+        calculateStatistics();
+    }
+
+    public float[] fold(float period) {
+        return fold(data, flagged, zoomFactor, period);
+    }
+
+    public static int[] computeShifts(int nrSubbands, float nrSamplesPerSecond, float lowFreq, float freqStep, float dm) {
+        int[] shifts = new int[nrSubbands];
+
+        float highFreq = (lowFreq + ((nrSubbands - 1) * freqStep));
+        float inverseHighFreq = 1.0f / (highFreq * highFreq);
+
+        float kDM = 4148.808f * dm;
+
+        for (int subband = 0; subband < nrSubbands; subband++) {
+            float inverseFreq = 1.0f / ((lowFreq + (subband * freqStep)) * (lowFreq + (subband * freqStep)));
+            float delta = kDM * (inverseFreq - inverseHighFreq);
+            shifts[subband] = (int) (delta * nrSamplesPerSecond);
+            //            System.err.println("inverseFreq = " + inverseFreq + ", delta = " + delta + ", shift = " + shifts[subband]);
+        }
+        return shifts;
+    }
+
+    public static void dedisperse(float[][][] data, boolean[][][] flagged, float nrSamplesPerSecond, float lowFreq, float freqStep, float dm) {
+        int nrTimes = data.length;
+        int nrSubbands = data[0].length;
+
+        int[] shifts = computeShifts(nrSubbands, nrSamplesPerSecond, lowFreq, freqStep, dm);
+        maximumShift = 0;
+        for (int i = 0; i < shifts.length; i++) {
+            if (shifts[i] > maximumShift) {
+                maximumShift = shifts[i];
+            }
+        }
+
+        for (int i = 0; i < shifts.length; i++) {
+            System.err.println("shift " + i + " = " + shifts[i]);
+        }
+
+        for (int time = 0; time < nrTimes; time++) {
+            for (int subband = 0; subband < nrSubbands; subband++) {
+                int posX = time + shifts[subband];
+                if (posX < nrTimes) {
+                    data[time][subband][0] = data[posX][subband][0];
+                    flagged[time][subband][0] = flagged[posX][subband][0];
+                } else {
+                    data[time][subband][0] = 0.0f;
+                    flagged[time][subband][0] = true;
+                }
+            }
+        }
+
+        if (COLLAPSE_DEDISPERSED_DATA) {
+            // collapse in subband 0
+            for (int time = 0; time < nrTimes; time++) {
+                int count = 0;
+                for (int subband = 1; subband < nrSubbands; subband++) {
+                    if (!flagged[time][subband][0]) {
+                        data[time][0][0] += data[time][subband][0];
+                        count++;
+                    }
+                }
+                if (count > 0) {
+                    data[time][0][0] /= count;
+                }
+            }
+            /*
+                        System.out.println("collapsed data:");
+                        for (int time = maximumShift; time < nrTimes-maximumShift; time++) {
+                            System.out.println(data[time][0][0]);
+                        }
+                        System.out.println("end of collapsed data");
+            */
+            // and also copy it to all other subbands, so we can see it better
+            for (int time = 0; time < nrTimes; time++) {
+                for (int subband = 1; subband < nrSubbands; subband++) {
+                    data[time][subband][0] = data[time][0][0];
+                }
+            }
+        }
+    }
+
+    public static float[] fold(float[][][] data, boolean[][][] flagged, float nrSamplesPerSecond, float period) {
+        int nrTimes = data.length;
+        int nrSubbands = data[0].length;
+        if (COLLAPSE_DEDISPERSED_DATA) {
+            nrSubbands = 1;
+        }
+
+        float nrSamplesToFold = nrSamplesPerSecond * period * NR_PERIODS_IN_FOLD;
+        float[] res = new float[(int) Math.ceil(nrSamplesToFold)];
+        int[] count = new int[res.length];
+
+        System.err.println("nrTimes = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrSamplesPerSecond = " + nrSamplesPerSecond
+                + ", length of folded output = " + res.length);
+
+        for (int time = maximumShift; time < nrTimes - maximumShift; time++) {
+            int mod = (int) Math.round(time % nrSamplesToFold);
+            if (mod >= res.length) {
+                mod = res.length - 1;
+            }
+            for (int subband = 0; subband < nrSubbands; subband++) {
+                if (!flagged[time][subband][0]) {
+                    res[mod] += data[time][subband][0];
+                    count[mod]++;
+                }
+            }
+        }
+
+        for (int i = 0; i < res.length; i++) {
+            if (count[i] > 0) {
+                res[i] /= count[i];
+            }
+        }
+        DataProvider.scale(res);
+
+        for (int i = 0; i < res.length; i++) {
+            System.out.println(res[i]);
+        }
+
+        float snr = computeSNR(res);
+        System.err.println("signal to noise ratio is: " + snr);
+        
+        return res;
+    }
+    
+    public static float computeSNR(float[] res) {
+        // SNR = (max – mean) / RMS
+        float max = -1;
+        float mean = 0;
+        float rms = 0;
+        for (int i = 0; i < res.length; i++) {
+            if (res[i] > max)
+                max = res[i];
+            mean += res[i];
+            rms += res[i] * res[i];
+        }
+        mean /= res.length;
+        rms /= res.length;
+        rms = (float) Math.sqrt(rms);
+
+        return (max - mean) / rms;
+    }
+
+    public float getSubbandWidth() {
+        return subbandWidth;
+    }
+
+    public float getChannelWidth() {
+        return channelWidth;
+    }
+
+    public float getBeamCenterFrequency() {
+        return beamCenterFrequency;
+    }
+}
