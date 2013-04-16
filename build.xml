@@ -1,0 +1,57 @@
+<project name="lofar-viz" default="build" basedir=".">
+	<description>
+      Build file for abacus
+    </description>
+
+	<!-- Global properties -->
+	<property name="src" location="src" />
+	<property name="tmp" location="tmp" />
+	<property name="lib" location="lib" />
+	<property name="external" location="external" />
+	<property name="jar" location="${lib}/lofar-viz.jar" />
+
+	<property name="java.debug.value" value="true" />
+
+	<path id="external_jars">
+		<fileset dir="${external}">
+			<include name="*.jar" />
+			<include name="*/*.jar" />
+			<include name="*/*/*.jar" />
+			<include name="*/*/*/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="init">
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${tmp}" />
+		<mkdir dir="${lib}" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source ">
+		<!-- Compile the java code from ${src} into ${tmp} -->
+		<javac srcdir="${src}" destdir="${tmp}" debug="on" deprecation="on">
+			<classpath refid="external_jars" />
+		</javac>
+	</target>
+
+	<target name="build" depends="compile" description="build the JAR file">
+		<!-- Put everything in ${tmp} into the jar file -->
+		<jar jarfile="${jar}">
+            <manifest>
+                <attribute name="Main-Class" value="lofar.Viz" />
+            </manifest>
+			<fileset dir="tmp" />
+			<fileset dir="." includes="log4j.properties" />
+			<fileset dir="src" includes="**/*.properties" />
+		</jar>
+
+		<!-- And delete the build dir -->
+		<delete dir="${tmp}" />
+	</target>
+
+	<target name="clean" description="clean up">
+		<delete dir="${lib}" />
+		<delete dir="${tmp}" />
+	</target>
+
+</project>
