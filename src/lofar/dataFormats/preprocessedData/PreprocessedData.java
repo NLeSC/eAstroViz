@@ -87,6 +87,7 @@ public abstract class PreprocessedData extends DataProvider {
                         for (int pol = 0; pol < nrPolarizations; pol++) {
                             float sample = fb.get();
                             if (sample < 0.0f) {
+//                                System.err.println("initial flagged! sample = " + sample);
                                 initialFlagged[second][sb][ch] = true;
                                 flagged[second][sb][ch] = true;
                             } else {
@@ -107,6 +108,8 @@ public abstract class PreprocessedData extends DataProvider {
         fin.close();
         din.close();
 
+        long initialFlaggedCount = 0;
+        
         // calc min and max for scaling
         // set flagged samples to 0.
         minMaxVals = new MinMaxVals(nrSubbands);
@@ -116,6 +119,7 @@ public abstract class PreprocessedData extends DataProvider {
                     for (int pol = 0; pol < nrPolarizations; pol++) {
                         if (initialFlagged[time][sb][ch]) {
                             data[time][sb][ch][pol] = 0.0f;
+                            initialFlaggedCount++;
                         } else {
                             final float sample = data[time][sb][ch][pol];
                             minMaxVals.processValue(sample, sb);
@@ -126,6 +130,7 @@ public abstract class PreprocessedData extends DataProvider {
         }
         min = minMaxVals.getMin();
         scaleValue = minMaxVals.getMax() - min;
+        System.err.println("sampled already flagged in data set: " + initialFlaggedCount);
     }
 
     @Override
