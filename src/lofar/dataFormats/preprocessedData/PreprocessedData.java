@@ -10,6 +10,7 @@ import java.nio.channels.FileChannel;
 
 import lofar.dataFormats.DataProvider;
 import lofar.dataFormats.MinMaxVals;
+import lofar.flaggers.Flagger;
 import lofar.flaggers.IntermediateFlagger;
 
 public abstract class PreprocessedData extends DataProvider {
@@ -31,8 +32,8 @@ public abstract class PreprocessedData extends DataProvider {
     private int station = 0;
     private int pol = 0;
 
-    public PreprocessedData(final String fileName, final int integrationFactor, final int maxSequenceNr) {
-        super(fileName, maxSequenceNr, new String[] { "none", "Intermediate" });
+    public PreprocessedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands) {
+        super(fileName, maxSequenceNr, maxSubbands, new String[] { "none", "Intermediate" });
         this.integrationFactor = integrationFactor;
     }
 
@@ -41,15 +42,20 @@ public abstract class PreprocessedData extends DataProvider {
         final DataInputStream din = new DataInputStream(fin);
 
         // TODO READ CORRECT STATION (Skip data)
-        
+
         nrStations = din.readInt();
         nrTimes = din.readInt() / integrationFactor;
-        nrSubbands = din.readInt();
+        final int nrSubbandsInFile = din.readInt();
         nrChannels = din.readInt();
         nrPolarizations = din.readInt();
 
-        System.err.println("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes + ", nrSubbands = " + nrSubbands
-                + ", nrChannels = " + nrChannels);
+        nrSubbands = nrSubbandsInFile;
+        if (maxSubbands < nrSubbandsInFile) {
+            nrSubbands = maxSubbands;
+        }
+
+        System.err.println("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes
+                + ", nrSubbands = " + nrSubbandsInFile + ", nrChannels = " + nrChannels);
 
         if (maxSequenceNr < nrTimes) {
             nrTimes = maxSequenceNr;
@@ -61,7 +67,7 @@ public abstract class PreprocessedData extends DataProvider {
 
         final long start = System.currentTimeMillis();
 
-        final ByteBuffer bb = ByteBuffer.allocateDirect(integrationFactor * nrSubbands * nrChannels * nrPolarizations * 4);
+        final ByteBuffer bb = ByteBuffer.allocateDirect(integrationFactor * nrSubbandsInFile * nrChannels * nrPolarizations * 4);
         bb.order(ByteOrder.BIG_ENDIAN);
         final FloatBuffer fb = bb.asFloatBuffer();
         final FileChannel channel = fin.getChannel();
@@ -82,16 +88,17 @@ public abstract class PreprocessedData extends DataProvider {
             }
 
             for (int time = 0; time < integrationFactor; time++) {
-                for (int sb = 0; sb < nrSubbands; sb++) {
+                for (int sb = 0; sb < nrSubbandsInFile; sb++) {
                     for (int ch = 0; ch < nrChannels; ch++) {
                         for (int pol = 0; pol < nrPolarizations; pol++) {
                             float sample = fb.get();
-                            if (sample < 0.0f) {
-//                                System.err.println("initial flagged! sample = " + sample);
-                                initialFlagged[second][sb][ch] = true;
-                                flagged[second][sb][ch] = true;
-                            } else {
-                                data[second][sb][ch][pol] += sample;
+                            if (sb < maxSubbands) {
+                                if (sample < 0.0f) {
+                                    initialFlagged[second][sb][ch] = true;
+                                    flagged[second][sb][ch] = true;
+                                } else {
+                                    data[second][sb][ch][pol] += sample;
+                                }
                             }
                         }
                     }
@@ -101,7 +108,7 @@ public abstract class PreprocessedData extends DataProvider {
 
         final long end = System.currentTimeMillis();
         final double iotime = (end - start) / 1000.0;
-        final double mbs = (integrationFactor * nrTimes * nrSubbands * nrChannels * 4.0) / (1024.0 * 1024.0);
+        final double mbs = (integrationFactor * nrTimes * nrSubbandsInFile * nrChannels * 4.0) / (1024.0 * 1024.0);
         final double speed = mbs / iotime;
         System.err.println("read " + mbs + "MB in " + iotime + " s, speed = " + speed + " MB/s.");
 
@@ -110,9 +117,38 @@ public abstract class PreprocessedData extends DataProvider {
 
         long initialFlaggedCount = 0;
         
+        
+        
+        
+/*        
+        // TODO remove
+        for (int time = 0; time < nrTimes; time++) {
+            for (int sb = 0; sb < nrSubbands; sb++) {
+                for (int pol = 0; pol < nrPolarizations; pol++) {
+                    float[] tmp = new float[nrChannels];
+                    for (int ch = 0; ch < nrChannels; ch++) {
+                        tmp[ch] = data[time][sb][ch][pol];
+                    }
+                    float[] tmp2 = Flagger.oneDimensionalGausConvolution(tmp, 10.0f);
+                    for (int ch = 0; ch < nrChannels; ch++) {
+                        data[time][sb][ch][pol] = (float)Math.abs(tmp2[ch] - data[time][sb][ch][pol]); 
+//                        data[time][sb][ch][pol] = tmp2[ch]; 
+                    }
+                }
+            }
+        }
+*/      
+
+        
+        
+        
+        
+        
+        
+        
         // calc min and max for scaling
         // set flagged samples to 0.
-        minMaxVals = new MinMaxVals(nrSubbands);
+        minMaxVals = new MinMaxVals(nrSubbandsInFile);
         for (int time = 0; time < nrTimes; time++) {
             for (int sb = 0; sb < nrSubbands; sb++) {
                 for (int ch = 0; ch < nrChannels; ch++) {
@@ -130,7 +166,14 @@ public abstract class PreprocessedData extends DataProvider {
         }
         min = minMaxVals.getMin();
         scaleValue = minMaxVals.getMax() - min;
+
         System.err.println("sampled already flagged in data set: " + initialFlaggedCount);
+        
+
+        
+        
+        
+
     }
 
     @Override
@@ -155,8 +198,13 @@ public abstract class PreprocessedData extends DataProvider {
 
             for (int time = 0; time < nrTimes; time++) {
                 for (int sb = 0; sb < nrSubbands; sb++) {
-                    for (int pol = 0; pol < nrPolarizations; pol++) { // TODO Check, flaggers do not understand pol yet?
-                        flaggers[sb].flag(data[time][sb][pol], flagged[time][sb]);
+                    for (int pol = 0; pol < nrPolarizations; pol++) {
+                        float[] tmp = new float[nrChannels];
+                        for(int ch=0;ch<nrChannels; ch++) {
+                            tmp[ch] = data[time][sb][ch][pol];
+                        }
+                        
+                        flaggers[sb].flag(tmp, flagged[time][sb]);
                     }
                 }
             }
@@ -177,20 +225,6 @@ public abstract class PreprocessedData extends DataProvider {
                 }
             }
         }
-    }
-
-    public final float[][][] getData() {
-        float[][][] res = new float[nrTimes][nrSubbands][nrChannels];
-
-        for (int time = 0; time < nrTimes; time++) {
-            for (int sb = 0; sb < nrSubbands; sb++) {
-                for (int ch = 0; ch < nrChannels; ch++) {
-                    res[time][sb][ch] = data[time][sb][ch][pol];
-                }
-            }
-        }
-
-        return res;
     }
 
     public final int getTotalTime() {

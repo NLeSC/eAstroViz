@@ -6,10 +6,12 @@ public abstract class DataProvider {
     protected final String[] FLAGGER_LIST;
     protected final String fileName;
     protected final int maxSequenceNr;
+    protected final int maxSubbands;
 
-    protected DataProvider(final String fileName, final int maxSequenceNr, final String[] flaggerList) {
+    protected DataProvider(final String fileName, final int maxSequenceNr, final int maxSubbands, final String[] flaggerList) {
         this.fileName = fileName;
         this.maxSequenceNr = maxSequenceNr;
+        this.maxSubbands = maxSubbands;
         this.FLAGGER_LIST = flaggerList;
         this.flaggerType = flaggerList[0];
     }
@@ -71,6 +73,10 @@ public abstract class DataProvider {
         return maxSequenceNr;
     }
 
+    public final int getMaxSubbands() {
+        return maxSubbands;
+    }
+    
     public static final void scale(final float[] in) {
         float max = -10000000.0f;
         float min = 1.0E20f;

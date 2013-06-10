@@ -27,6 +27,7 @@ public final class Viz {
     private final String dataSetName;
 
     private int maxSequenceNr = Integer.MAX_VALUE;
+    private int maxSubbands = Integer.MAX_VALUE;
 
     private final boolean batch;
     private final boolean raw;
@@ -58,7 +59,7 @@ public final class Viz {
     }
 
     public Viz(final String fileName, final boolean batch, final boolean raw, boolean visibilities, final boolean beamFormed, final boolean intermediate,
-            final boolean filtered, final boolean compressedBeamFormed, final int integrationFactor, final int maxSeqNo) {
+            final boolean filtered, final boolean compressedBeamFormed, final int integrationFactor, final int maxSeqNo, final int maxSubbands) {
         this.fileName = fileName;
         final File f = new File(fileName);
         dataSetName = f.getName();
@@ -71,6 +72,7 @@ public final class Viz {
         this.compressedBeamFormed = compressedBeamFormed;
         this.integrationFactor = integrationFactor;
         this.maxSequenceNr = maxSeqNo;
+        this.maxSubbands = maxSubbands;
     }
 
     public String getDataSetName() {
@@ -79,7 +81,7 @@ public final class Viz {
 
     public void start() throws IOException {
         if (beamFormed) {
-            final BeamFormedData beamFormedData = new BeamFormedData(fileName, maxSequenceNr, integrationFactor /* really the zoom factor in this case*/);
+            final BeamFormedData beamFormedData = new BeamFormedData(fileName, maxSequenceNr, maxSubbands, integrationFactor /* really the zoom factor in this case*/);
             beamFormedData.read();
             final BeamFormedFrame beamFormedFrame = new BeamFormedFrame(this, beamFormedData);
             beamFormedFrame.pack();
@@ -90,7 +92,7 @@ public final class Viz {
         }
 
         if (compressedBeamFormed) {
-            final CompressedBeamFormedData compressedBeamFormedData = new CompressedBeamFormedData(fileName, integrationFactor, maxSequenceNr);
+            final CompressedBeamFormedData compressedBeamFormedData = new CompressedBeamFormedData(fileName, integrationFactor, maxSequenceNr, maxSubbands);
             compressedBeamFormedData.read();
             final BeamFormedFrame beamFormedFrame = new BeamFormedFrame(this, compressedBeamFormedData);
             beamFormedFrame.pack();
@@ -101,7 +103,7 @@ public final class Viz {
         }
         
         if (intermediate) {
-            final IntermediateData intermediateData = new IntermediateData(fileName, integrationFactor, maxSequenceNr);
+            final IntermediateData intermediateData = new IntermediateData(fileName, integrationFactor, maxSequenceNr, maxSubbands);
             intermediateData.read();
 
             final IntermediateFrame IntermediateDataFrame = new IntermediateFrame(this, intermediateData);
@@ -112,7 +114,7 @@ public final class Viz {
         }
 
         if (filtered) {
-            final FilteredData filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr);
+            final FilteredData filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands);
             filteredData.read();
 
             final IntermediateFrame IntermediateDataFrame = new IntermediateFrame(this, filteredData);
@@ -142,7 +144,7 @@ public final class Viz {
         }
 
         if (visibilities) {
-            final VisibilityData visibilityData = new VisibilityData(fileName, 1/*station1*/, 0/*station2*/, maxSequenceNr);
+            final VisibilityData visibilityData = new VisibilityData(fileName, 1/*station1*/, 0/*station2*/, maxSequenceNr, maxSubbands);
             visibilityData.read();
             final VisibilityFrame vizFrame = new VisibilityFrame(this, visibilityData, 0 /*pol*/);
             vizFrame.pack();
@@ -156,7 +158,7 @@ public final class Viz {
             final int nrStations = meta.getNrStations();
             for (int station1 = 0; station1 < nrStations; station1++) {
                 for (int station2 = 0; station2 < nrStations; station2++) {
-                    final VisibilityData visibilityData = new VisibilityData(fileName, station1, station2, maxSequenceNr);
+                    final VisibilityData visibilityData = new VisibilityData(fileName, station1, station2, maxSequenceNr, maxSubbands);
                     visibilityData.read();
                     for (int pol = 0; pol < NR_POLARIZATIONS * NR_POLARIZATIONS; pol++) {
                         final VisibilityFrame vizFrame = new VisibilityFrame(this, visibilityData, pol);
@@ -168,6 +170,8 @@ public final class Viz {
                 }
             }
         }
+        
+        System.err.println("unknwon file type!");
     }
 
     public static void main(final String[] args) {
@@ -180,6 +184,7 @@ public final class Viz {
         boolean filtered = false;
         boolean compressedBeamFormed = false;
         int maxSeqNo = Integer.MAX_VALUE;
+        int maxSubbands = Integer.MAX_VALUE;
         int integrationFactor = 1;
 
         if (args.length < 1) {
@@ -195,6 +200,9 @@ public final class Viz {
             } else if (args[i].equals("-maxSeqNo")) {
                 i++;
                 maxSeqNo = Integer.parseInt(args[i]);
+            } else if (args[i].equals("-maxSubbands")) {
+                i++;
+                maxSubbands = Integer.parseInt(args[i]);
             } else if (args[i].equals("-integration")) {
                 i++;
                 integrationFactor = Integer.parseInt(args[i]);
@@ -225,7 +233,7 @@ public final class Viz {
         }
 
         try {
-            new Viz(fileName, batch, raw, visibilities, beamFormed, intermediate, filtered, compressedBeamFormed, integrationFactor, maxSeqNo).start();
+            new Viz(fileName, batch, raw, visibilities, beamFormed, intermediate, filtered, compressedBeamFormed, integrationFactor, maxSeqNo, maxSubbands).start();
         } catch (final IOException e) {
             e.printStackTrace();
             System.exit(1);

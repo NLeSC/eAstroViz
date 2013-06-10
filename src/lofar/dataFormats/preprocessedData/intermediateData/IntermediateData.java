@@ -5,8 +5,8 @@ import java.io.IOException;
 import lofar.dataFormats.preprocessedData.PreprocessedData;
 
 public final class IntermediateData extends PreprocessedData {
-    public IntermediateData(final String fileName, final int integrationFactor, final int maxSequenceNr) {
-        super(fileName, integrationFactor, maxSequenceNr);
+    public IntermediateData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands) {
+        super(fileName, integrationFactor, maxSequenceNr, maxSubbands);
     }
 
     @Override

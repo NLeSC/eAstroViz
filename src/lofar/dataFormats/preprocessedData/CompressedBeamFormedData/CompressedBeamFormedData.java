@@ -28,8 +28,8 @@ public final class CompressedBeamFormedData extends DataProvider {
     private float min;
     private float scaleValue;
 
-    public CompressedBeamFormedData(final String fileName, final int integrationFactor, final int maxSequenceNr) {
-        super(fileName, maxSequenceNr, new String[] { "none", "Intermediate" });
+    public CompressedBeamFormedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands) {
+        super(fileName, maxSequenceNr, maxSubbands, new String[] { "none", "Intermediate" });
         this.integrationFactor = integrationFactor;
     }
 
