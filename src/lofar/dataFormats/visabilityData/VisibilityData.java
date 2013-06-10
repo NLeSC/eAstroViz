@@ -34,8 +34,8 @@ public final class VisibilityData extends DataProvider {
     private final int nrCrossPolarizations;
     private final int nrSeconds;
 
-    public VisibilityData(final String fileName, final int station1, final int station2, final int maxSequenceNr) throws IOException {
-        super(fileName, maxSequenceNr,
+    public VisibilityData(final String fileName, final int station1, final int station2, final int maxSequenceNr, final int maxSubbands) throws IOException {
+        super(fileName, maxSequenceNr, maxSubbands,
                 new String[] { "none", "Threshold", "SumThreshold", "SmoothedSumThreshold", "HistorySumThreshold", "HistorySmoothedSumThreshold" });
         this.station1 = station1;
         this.station2 = station2;

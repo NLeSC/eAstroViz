@@ -90,7 +90,7 @@ public abstract class Flagger {
             }
         }
         stdDev = (float) Math.sqrt(1.54 * stdDev / unflaggedCount);
-        // System.err.println("winsorized stats: size = " + samples.length + ", count = " + count + ", mean = " + mean + ", median = " + median + ", stddev = " + stdDev);
+//        System.err.println("winsorized stats: size = " + samples.length + ", unFlaggedCount = " + unflaggedCount + ", mean = " + mean + ", median = " + median + ", stddev = " + stdDev);
     }
 
     protected final void sumThreshold1D(final float[] samples, final boolean[] flags) {
@@ -165,18 +165,23 @@ public abstract class Flagger {
         return result;
     }
 
-    protected static final float[] oneDimensionalGausConvolution(final float[] data, final float sigma) {
+    public static final float[] oneDimensionalGausConvolution(final float[] data, final float sigma) {
         int kernelSize = (int) Math.round(sigma * 3.0);
         if (kernelSize < 1) {
             kernelSize = 1;
         } else if (kernelSize > data.length) {
             kernelSize = data.length;
         }
+        
         final float[] kernel = new float[kernelSize];
+//        System.err.print("kernel size = " + kernelSize + ", kernel = ");
         for (int i = 0; i < kernel.length; ++i) {
             final float x = i - kernel.length / 2.0f;
             kernel[i] = evaluateGaussian(x, sigma);
+
+//        System.err.print(kernel[i] + " ");
         }
+//        System.err.println();
         return oneDimensionalConvolution(data, kernel);
     }
 

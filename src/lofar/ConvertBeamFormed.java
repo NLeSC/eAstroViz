@@ -8,6 +8,8 @@ import java.io.IOException;
 import lofar.dataFormats.beamFormedData.BeamFormedData;
 
 public class ConvertBeamFormed {
+    static final int MAX_TIME = 1000;
+    
     private final String fileName;
     private final String outputFileName;
 
@@ -16,14 +18,14 @@ public class ConvertBeamFormed {
     private int nrChannels;
     private int nrTimes;
     private int nrSamplesPerSecond;
-    
+
     public ConvertBeamFormed(final String fileName, final String outputFileName) {
         this.fileName = fileName;
         this.outputFileName = outputFileName;
     }
 
     void read() {
-        final BeamFormedData bfd = new BeamFormedData(fileName, Integer.MAX_VALUE, 1024 /* zoom factor */);
+        final BeamFormedData bfd = new BeamFormedData(fileName, Integer.MAX_VALUE, Integer.MAX_VALUE, 1024 /* zoom factor */);
         bfd.read();
         data = bfd.getData();
         nrSubbands = bfd.getNrSubbands();
@@ -37,6 +39,10 @@ public class ConvertBeamFormed {
         final BufferedOutputStream buf = new BufferedOutputStream(out);
         final DataOutputStream dataOut = new DataOutputStream(buf);
 
+        if(MAX_TIME > 0 ) {
+            nrTimes = MAX_TIME;
+        }
+        
         dataOut.writeInt(nrTimes);
         dataOut.writeInt(nrSubbands);
         dataOut.writeInt(nrChannels);

@@ -55,8 +55,8 @@ public final class BeamFormedData extends DataProvider {
     final int zoomFactor;
     static int maximumShift;
 
-    public BeamFormedData(final String fileName, final int maxSequenceNr, final int zoomFactor) {
-        super(fileName, maxSequenceNr, new String[] { "none" });
+    public BeamFormedData(final String fileName, final int maxSequenceNr, final int maxSubbands, final int zoomFactor) {
+        super(fileName, maxSequenceNr, maxSubbands, new String[] { "none" });
 
         final File[] ls = new File(fileName).listFiles(new Viz.ExtFilter("h5"));
         if (ls.length != 1) {
