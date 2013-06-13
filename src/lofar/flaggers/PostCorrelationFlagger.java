@@ -15,7 +15,8 @@ package lofar.flaggers;
 public abstract class PostCorrelationFlagger extends Flagger {
     int nrChannels;
 
-    public PostCorrelationFlagger(final int nrChannels) {
+    public PostCorrelationFlagger(final int nrChannels, final float sensitivity, final float SIREtaValue) {
+        super(sensitivity, SIREtaValue);
         this.nrChannels = nrChannels;
     }
 

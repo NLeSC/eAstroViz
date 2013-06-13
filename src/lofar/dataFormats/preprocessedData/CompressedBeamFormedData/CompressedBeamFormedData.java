@@ -11,7 +11,10 @@ import java.nio.channels.FileChannel;
 import lofar.dataFormats.DataProvider;
 import lofar.dataFormats.MinMaxVals;
 import lofar.dataFormats.beamFormedData.BeamFormedData;
-import lofar.flaggers.IntermediateFlagger;
+import lofar.flaggers.BeamFormedFlagger;
+
+
+// TODO make subclass of preprocessed data? seems almost identical 
 
 public final class CompressedBeamFormedData extends DataProvider {
 
@@ -137,9 +140,9 @@ public final class CompressedBeamFormedData extends DataProvider {
         }
 
         if (nrChannels > 1) {
-            final IntermediateFlagger[] flaggers = new IntermediateFlagger[nrSubbands];
+            final BeamFormedFlagger[] flaggers = new BeamFormedFlagger[nrSubbands];
             for (int i = 0; i < nrSubbands; i++) {
-                flaggers[i] = new IntermediateFlagger(flaggerSensitivity);
+                flaggers[i] = new BeamFormedFlagger(flaggerSensitivity, flaggerSIRValue);
             }
 
             for (int time = 0; time < nrTimes; time++) {
@@ -148,7 +151,7 @@ public final class CompressedBeamFormedData extends DataProvider {
                 }
             }
         } else {
-            final IntermediateFlagger flagger = new IntermediateFlagger(flaggerSensitivity);
+            final BeamFormedFlagger flagger = new BeamFormedFlagger(flaggerSensitivity, flaggerSIRValue);
                 for (int time = 0; time < nrTimes; time++) {
                     final float[] tmp = new float[nrSubbands];
                     final boolean[] tmpFlags = new boolean[nrSubbands];
