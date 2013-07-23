@@ -1,7 +1,7 @@
 package lofar.flaggers;
 
 public final class BeamFormedFlagger extends Flagger {
-    
+
     public BeamFormedFlagger(final float sensitivity, final float SIRValue) {
         super(sensitivity, SIRValue);
     }

@@ -17,7 +17,7 @@ public class PostCorrelationSumThresholdFlagger extends PostCorrelationFlagger {
         sumThreshold1D(powers, flagged);
 
         SIROperator(flagged);
-        
+
         //        printNrFlagged(flagged);
     }
 }

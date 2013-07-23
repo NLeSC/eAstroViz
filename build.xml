@@ -1,6 +1,6 @@
-<project name="lofar-viz" default="build" basedir=".">
+<project name="eAstronomy-intermediate-visualization" default="build" basedir=".">
 	<description>
-      Build file for abacus
+      Build file for eAstronomy intermediate visualization
     </description>
 
 	<!-- Global properties -->

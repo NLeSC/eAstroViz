@@ -32,14 +32,14 @@ public final class ColorMapInterpreter {
                 int key = 0;
                 while ((str = in.readLine()) != null) {
                     String[] numbers = str.split(" ");
-                    colorMap[key] = Integer.parseInt(numbers[0]) << 16 | Integer.parseInt(numbers[1]) << 8
-                            | Integer.parseInt(numbers[2]);
+                    colorMap[key] =
+                            Integer.parseInt(numbers[0]) << 16 | Integer.parseInt(numbers[1]) << 8 | Integer.parseInt(numbers[2]);
                     key++;
                 }
                 in.close();
 
                 ColorMap m = new ColorMap(fileName, colorMap);
-                
+
                 colorMapMaps.put(fileName, m);
             }
         } catch (IOException e) {
@@ -60,9 +60,9 @@ public final class ColorMapInterpreter {
 
     public ColorMap getColorMap(String colorMapName) {
         if (!colorMapMaps.containsKey(colorMapName)) {
-                System.err.println("Unregistered color map requested: " + colorMapName);
-                colorMapMaps.get("default");
-            }
+            System.err.println("Unregistered color map requested: " + colorMapName);
+            colorMapMaps.get("default");
+        }
         return colorMapMaps.get(colorMapName);
     }
 }

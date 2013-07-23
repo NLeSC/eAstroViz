@@ -4,16 +4,18 @@ public abstract class DataProvider {
     protected String flaggerType;
     protected float flaggerSensitivity = 1.0f;
     protected float flaggerSIRValue = 0.4f;
-    protected final String[] FLAGGER_LIST;
+    protected final String[] polList; // polarizations or stokes
+    protected final String[] flaggerList;
     protected final String fileName;
     protected final int maxSequenceNr;
     protected final int maxSubbands;
 
-    protected DataProvider(final String fileName, final int maxSequenceNr, final int maxSubbands, final String[] flaggerList) {
+    protected DataProvider(final String fileName, final int maxSequenceNr, final int maxSubbands, final String[] polList, final String[] flaggerList) {
         this.fileName = fileName;
         this.maxSequenceNr = maxSequenceNr;
         this.maxSubbands = maxSubbands;
-        this.FLAGGER_LIST = flaggerList;
+        this.polList = polList;
+        this.flaggerList = flaggerList;
         this.flaggerType = flaggerList[0];
     }
 
@@ -21,21 +23,39 @@ public abstract class DataProvider {
 
     public abstract int getSizeY();
 
-    public abstract float getValue(int x, int y); // Should return a value between 0 and 1
+    /**
+     * @param x X-position in the data
+     * @param y Y-position in the data
+     * @param polarization the polarization, or, in case of beam formed data, the stoke
+     * @return a value between 0 and 1
+     */
+    public abstract float getValue(int x, int y, int polarization);
 
-    public abstract float getRawValue(int x, int y); // Returns the original data
+    /**
+     * @param x X-position in the data
+     * @param y Y-position in the data
+     * @param polarization the polarization, or, in case of beam formed data, the stoke
+     * @return The original unscaled data value
+     */
+    public abstract float getRawValue(int x, int y, int polarization);
 
+    /**
+     * Flags are not kept per polarization, so we have one parameter less compared to the getValues for the data itself.
+     * @param x
+     * @param y
+     * @return
+     */
     public abstract boolean isFlagged(int x, int y);
 
+    
     public abstract void flag();
 
-    // null turns off flagging
     public void setFlagger(final String name) {
         if (name.equals(flaggerType)) {
             return;
         }
 
-        for (final String element : FLAGGER_LIST) {
+        for (final String element : flaggerList) {
             if (name.equals(element)) {
                 flaggerType = element;
                 flag();
@@ -51,7 +71,7 @@ public abstract class DataProvider {
     }
 
     public String[] getFlaggerNames() {
-        return FLAGGER_LIST;
+        return flaggerList;
     }
 
     public float getFlaggerSensitivity() {
@@ -77,7 +97,7 @@ public abstract class DataProvider {
     public final int getMaxSubbands() {
         return maxSubbands;
     }
-    
+
     public static final void scale(final float[] in) {
         float max = -10000000.0f;
         float min = 1.0E20f;

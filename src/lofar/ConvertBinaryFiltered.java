@@ -79,8 +79,8 @@ public class ConvertBinaryFiltered {
             nrTimes = maxNrTimes;
         } else {
             long totalSize = 0;
-            for (int i = 0; i < ls.length; i++) {
-                totalSize += ls[i].length();
+            for (File element : ls) {
+                totalSize += element.length();
             }
             System.err.println("totalSize = " + totalSize);
             totalSize -= ls.length * 4 * 4;
@@ -97,9 +97,9 @@ public class ConvertBinaryFiltered {
         System.err.println("nrTimes = " + nrTimes);
         data = new float[nrStations][nrTimes][nrSubbands][nrChannels][nrPolarizations];
 
-        for (int i = 0; i < ls.length; i++) {
+        for (File element : ls) {
             try {
-                readFile(ls[i]);
+                readFile(element);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -131,7 +131,7 @@ public class ConvertBinaryFiltered {
                 }
                 int station = (int) readuint32(in, false);
                 int subband = (int) readuint32(in, false);
-//                System.err.println("read block " + block + ", subband " + subband);
+                //                System.err.println("read block " + block + ", subband " + subband);
                 for (int ch = 0; ch < nrChannels; ch++) {
                     for (int pol = 0; pol < nrPolarizations; pol++) {
                         float sample = readFloat(in);

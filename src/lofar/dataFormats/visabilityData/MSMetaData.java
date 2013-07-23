@@ -26,9 +26,9 @@ public class MSMetaData {
         return (value + alignment - 1) / alignment * alignment;
     }
 
-    public MSMetaData(final int lofarStoreageManagerVersion, final int[][] stations1, final int[][] stations2, final double iONIntegrationTime,
-            final int nrChannelsPerSubband, final int nrCrossPolarizations, final int integrationTimeProd, final int alignment, final boolean isBigEndian,
-            final int nrBytesPerValidSamples) {
+    public MSMetaData(final int lofarStoreageManagerVersion, final int[][] stations1, final int[][] stations2,
+            final double iONIntegrationTime, final int nrChannelsPerSubband, final int nrCrossPolarizations,
+            final int integrationTimeProd, final int alignment, final boolean isBigEndian, final int nrBytesPerValidSamples) {
         this.lofarStoreageManagerVersion = lofarStoreageManagerVersion;
         this.nrBaselines = stations1.length;
 

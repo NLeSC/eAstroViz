@@ -13,7 +13,6 @@ import lofar.dataFormats.MinMaxVals;
 import lofar.dataFormats.beamFormedData.BeamFormedData;
 import lofar.flaggers.BeamFormedFlagger;
 
-
 // TODO make subclass of preprocessed data? seems almost identical 
 
 public final class CompressedBeamFormedData extends DataProvider {
@@ -31,8 +30,10 @@ public final class CompressedBeamFormedData extends DataProvider {
     private float min;
     private float scaleValue;
 
-    public CompressedBeamFormedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands) {
-        super(fileName, maxSequenceNr, maxSubbands, new String[] { "none", "Intermediate" });
+    public CompressedBeamFormedData(final String fileName, final int integrationFactor, final int maxSequenceNr,
+            final int maxSubbands) {
+        // for now, we only have stokes I
+        super(fileName, maxSequenceNr, maxSubbands, new String[] {"I"}, new String[] { "none", "Intermediate" });
         this.integrationFactor = integrationFactor;
     }
 
@@ -44,9 +45,10 @@ public final class CompressedBeamFormedData extends DataProvider {
         nrSubbands = din.readInt();
         nrChannels = din.readInt();
         nrSamplesPerSecond = din.readInt() * integrationFactor;
-        
-        System.err.println("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes + ", nrSubbands = " + nrSubbands
-                + ", nrChannels = " + nrChannels + ", nrSamplesPerSecond = " + nrSamplesPerSecond);
+
+        System.err.println("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes
+                + ", nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels + ", nrSamplesPerSecond = "
+                + nrSamplesPerSecond);
 
         if (maxSequenceNr < nrTimes) {
             nrTimes = maxSequenceNr;
@@ -105,26 +107,26 @@ public final class CompressedBeamFormedData extends DataProvider {
         calculateStatistics();
     }
 
-    private void calculateStatistics()  {
+    private void calculateStatistics() {
         // calc min and max for scaling
         // set flagged samples to 0.
         minMaxVals = new MinMaxVals(nrSubbands);
         for (int time = 0; time < nrTimes; time++) {
             for (int sb = 0; sb < nrSubbands; sb++) {
                 for (int ch = 0; ch < nrChannels; ch++) {
-                        if (initialFlagged[time][sb][ch]) {
-                            data[time][sb][ch] = 0.0f;
-                        } else {
-                            final float sample = data[time][sb][ch];
-                            minMaxVals.processValue(sample, sb);
-                        }
+                    if (initialFlagged[time][sb][ch]) {
+                        data[time][sb][ch] = 0.0f;
+                    } else {
+                        final float sample = data[time][sb][ch];
+                        minMaxVals.processValue(sample, sb);
+                    }
                 }
             }
         }
         min = minMaxVals.getMin();
         scaleValue = minMaxVals.getMax() - min;
     }
-    
+
     @Override
     public void flag() {
         for (int time = 0; time < nrTimes; time++) {
@@ -147,23 +149,23 @@ public final class CompressedBeamFormedData extends DataProvider {
 
             for (int time = 0; time < nrTimes; time++) {
                 for (int sb = 0; sb < nrSubbands; sb++) {
-                        flaggers[sb].flag(data[time][sb], flagged[time][sb]);
+                    flaggers[sb].flag(data[time][sb], flagged[time][sb]);
                 }
             }
         } else {
             final BeamFormedFlagger flagger = new BeamFormedFlagger(flaggerSensitivity, flaggerSIRValue);
-                for (int time = 0; time < nrTimes; time++) {
-                    final float[] tmp = new float[nrSubbands];
-                    final boolean[] tmpFlags = new boolean[nrSubbands];
-                    for (int sb = 0; sb < nrSubbands; sb++) {
-                        tmp[sb] = data[time][sb][0];
-                    }
-
-                    flagger.flag(tmp, tmpFlags);
-                    for (int sb = 0; sb < nrSubbands; sb++) {
-                        flagged[time][sb][0] = tmpFlags[sb];
-                    }
+            for (int time = 0; time < nrTimes; time++) {
+                final float[] tmp = new float[nrSubbands];
+                final boolean[] tmpFlags = new boolean[nrSubbands];
+                for (int sb = 0; sb < nrSubbands; sb++) {
+                    tmp[sb] = data[time][sb][0];
                 }
+
+                flagger.flag(tmp, tmpFlags);
+                for (int sb = 0; sb < nrSubbands; sb++) {
+                    flagged[time][sb][0] = tmpFlags[sb];
+                }
+            }
         }
     }
 
@@ -198,7 +200,7 @@ public final class CompressedBeamFormedData extends DataProvider {
     }
 
     @Override
-    public final float getRawValue(final int x, final int y) {
+    public final float getRawValue(final int x, final int y, int pol) {
         final int subband = y / nrChannels;
         final int channel = y % nrChannels;
 
@@ -206,7 +208,7 @@ public final class CompressedBeamFormedData extends DataProvider {
     }
 
     @Override
-    public final float getValue(final int x, final int y) {
+    public final float getValue(final int x, final int y, int pol) {
         final int subband = y / nrChannels;
         final int channel = y % nrChannels;
         final float sample = data[x][subband][channel];

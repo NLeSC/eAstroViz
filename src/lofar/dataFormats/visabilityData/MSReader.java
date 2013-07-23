@@ -123,7 +123,9 @@ public final class MSReader {
                     //                    System.err.println("val = (" + visData[requiredBaseline][channel][pol][Viz.REAL] + ", " + visData[requiredBaseline][channel][pol][Viz.IMAG] + ")");
                 }
             }
-            skip(in, (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4);
+            skip(in,
+                    (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels()
+                            * metaData.getNrCrossPolarizations() * 2 * 4);
 
             // System.err.println("read " + (metaData.getNrBaselines() *
             // metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2
@@ -144,14 +146,18 @@ public final class MSReader {
                 // channel + "] = " +
                 // nrValidSamples[requiredBaseline][channel]);
             }
-            skip(in, (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples());
+            skip(in,
+                    (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels()
+                            * metaData.getNrBytesPerValidSamples());
 
             // System.err.println("read " + (metaData.getNrBaselines() *
             // metaData.getNrChannels() * metaData.getNrBytesPerValidSamples())
             // + " bytes of flags");
 
-            final int toRead = metaData.getAlignment()
-                    - ((metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples()) % metaData.getAlignment());
+            final int toRead =
+                    metaData.getAlignment()
+                            - ((metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples()) % metaData
+                                    .getAlignment());
             skip(in, toRead);
 
         } catch (final IOException e) {
@@ -229,8 +235,9 @@ public final class MSReader {
 
         din.close();
 
-        metaData = new MSMetaData(version, stations1, stations2, IONIntegrationTime, nrChannels, nrCrossPolarizations, integrationTimeProd, alignment,
-                isBigEndian, nrBytesPerValidSamples);
+        metaData =
+                new MSMetaData(version, stations1, stations2, IONIntegrationTime, nrChannels, nrCrossPolarizations,
+                        integrationTimeProd, alignment, isBigEndian, nrBytesPerValidSamples);
 
         visData = new float[metaData.getNrBaselines()][nrChannels][nrCrossPolarizations][2];
         nrValidSamples = new int[metaData.getNrBaselines()][nrChannels];
@@ -242,7 +249,8 @@ public final class MSReader {
         maxSecondsOfData = (long) Math.ceil(maxFileSize / sizePerSecond);
 
         if (VERBOSE) {
-            System.err.println("maximum file size = " + maxFileSize + ", maximum number of seconds of data = " + maxSecondsOfData);
+            System.err
+                    .println("maximum file size = " + maxFileSize + ", maximum number of seconds of data = " + maxSecondsOfData);
         }
     }
 

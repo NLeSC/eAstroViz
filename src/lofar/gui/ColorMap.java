@@ -6,9 +6,9 @@ public class ColorMap {
 
     public ColorMap(String name, int[] map) {
         this.colorMap = map;
-                this.name = name;
+        this.name = name;
     }
-    
+
     public int getColor(float min, float max, float var) {
         int cmEntries = colorMap.length;
 

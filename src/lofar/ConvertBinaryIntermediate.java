@@ -73,14 +73,15 @@ public class ConvertBinaryIntermediate {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-        System.err.println("nrStations = " + nrStations + ", nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels + ", nrPols = " + nrPolarizations);
+        System.err.println("nrStations = " + nrStations + ", nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels
+                + ", nrPols = " + nrPolarizations);
 
         if (maxNrTimes > 0) {
             nrTimes = maxNrTimes;
         } else {
             long totalSize = 0;
-            for (int i = 0; i < ls.length; i++) {
-                totalSize += ls[i].length();
+            for (File element : ls) {
+                totalSize += element.length();
             }
             System.err.println("totalSize = " + totalSize);
             totalSize -= ls.length * 4 * 4;
@@ -97,9 +98,9 @@ public class ConvertBinaryIntermediate {
 
         data = new float[nrStations][nrTimes][nrSubbands][nrChannels][nrPolarizations];
 
-        for (int i = 0; i < ls.length; i++) {
+        for (File element : ls) {
             try {
-                readFile(ls[i]);
+                readFile(element);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -127,6 +128,7 @@ public class ConvertBinaryIntermediate {
         while (true) {
             try {
                 int tmp = (int) readuint32(in, false);
+                @SuppressWarnings("unused")
                 boolean flagged = tmp != 0 ? true : false;
                 int time = (int) readuint32(in, false);
                 int station = (int) readuint32(in, false);

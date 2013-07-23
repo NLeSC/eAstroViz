@@ -5,7 +5,7 @@ import java.util.Arrays;
 public abstract class Flagger {
     private static final int MAX_ITERS = 5;
     private static final float FIRST_THRESHOLD = 6.0f; // from Andre's code: 6.0f
-    
+
     protected float mean;
     protected float stdDev;
     protected float median;
@@ -17,7 +17,7 @@ public abstract class Flagger {
         this.baseSensitivity = baseSensitivity;
         this.SIREtaValue = SIRValue;
     }
-    
+
     protected final void calculateStatistics(final float[] samples, final boolean[] flags) {
         int unflaggedCount = getNrUnflaggedSamples(flags);
         if (unflaggedCount == 0) {
@@ -31,16 +31,16 @@ public abstract class Flagger {
         Arrays.sort(cleanSamples);
 
         mean = 0.0f;
-        for (int i = 0; i < cleanSamples.length; i++) {
-            mean += cleanSamples[i];
+        for (float cleanSample : cleanSamples) {
+            mean += cleanSample;
         }
         mean /= unflaggedCount;
 
         median = cleanSamples[unflaggedCount / 2];
 
         stdDev = 0.0f;
-        for (int i = 0; i < cleanSamples.length; i++) {
-            final float diff = cleanSamples[i] - mean;
+        for (float cleanSample : cleanSamples) {
+            final float diff = cleanSample - mean;
             stdDev += diff * diff;
         }
         stdDev /= unflaggedCount;
@@ -62,8 +62,9 @@ public abstract class Flagger {
 
         int lowIndex = (int) Math.floor(0.1 * unflaggedCount);
         int highIndex = (int) Math.ceil(0.9 * unflaggedCount);
-        if (highIndex > 0)
+        if (highIndex > 0) {
             highIndex--;
+        }
         float lowValue = cleanSamples[lowIndex];
         float highValue = cleanSamples[highIndex];
 
@@ -96,7 +97,7 @@ public abstract class Flagger {
             }
         }
         stdDev = (float) Math.sqrt(1.54 * stdDev / unflaggedCount);
-//        System.err.println("winsorized stats: size = " + samples.length + ", unFlaggedCount = " + unflaggedCount + ", mean = " + mean + ", median = " + median + ", stddev = " + stdDev);
+        //        System.err.println("winsorized stats: size = " + samples.length + ", unFlaggedCount = " + unflaggedCount + ", mean = " + mean + ", median = " + median + ", stddev = " + stdDev);
     }
 
     protected final void sumThreshold1D(final float[] samples, final boolean[] flags) {
@@ -178,16 +179,16 @@ public abstract class Flagger {
         } else if (kernelSize > data.length) {
             kernelSize = data.length;
         }
-        
+
         final float[] kernel = new float[kernelSize];
-//        System.err.print("kernel size = " + kernelSize + ", kernel = ");
+        //        System.err.print("kernel size = " + kernelSize + ", kernel = ");
         for (int i = 0; i < kernel.length; ++i) {
             final float x = i - kernel.length / 2.0f;
             kernel[i] = evaluateGaussian(x, sigma);
 
-//        System.err.print(kernel[i] + " ");
+            //        System.err.print(kernel[i] + " ");
         }
-//        System.err.println();
+        //        System.err.println();
         return oneDimensionalConvolution(data, kernel);
     }
 
@@ -338,11 +339,11 @@ public abstract class Flagger {
     }
 
     /**
-     * This is an experimental algorithm that might be slightly faster than
-     * the original algorithm by Andre Offringa. Jasper van de Gronde is preparing an article about it.
+     * This is an experimental algorithm that might be slightly faster than the original algorithm by Andre Offringa. Jasper van
+     * de Gronde is preparing an article about it.
+     * 
      * @param [in,out] flags The input array of flags to be dilated that will be overwritten by the dilatation of itself.
-     * @param [in] eta The η parameter that specifies the minimum number of good data
-     * that any subsequence should have.
+     * @param [in] eta The η parameter that specifies the minimum number of good data that any subsequence should have.
      */
     public void SIROperator(boolean[] flags) {
         boolean[] temp = new boolean[flags.length];

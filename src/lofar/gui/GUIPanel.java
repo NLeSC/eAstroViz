@@ -2,6 +2,7 @@ package lofar.gui;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
@@ -28,11 +29,17 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     protected float scale = START_SCALE;
     protected float percentileValLow;
     protected float percentileValHigh;
-    float[] rawData;
-    float[][] scaledData;
+    
+    private float[] rawData;
+    private float[][] scaledData;
 
     protected int zoomX = 1;
     protected int zoomY = 1;
+
+    /**
+     * The current polarization or stoke.
+     */
+    protected int currentPol = 0;
     
     int COLOR_WHITE = colorToRGB(1.0f, 1.0f, 1.0f);
     ColorMapInterpreter colorMaps;
@@ -56,13 +63,13 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     public boolean isFlagged(int x, int y) {
         return data.isFlagged(x, y);
     }
-    
+
     public static float getScaleValue(int sliderValue) {
         return LOW_SCALE + ((float) sliderValue / (HIGH_SCALE - LOW_SCALE));
     }
 
     public static int getScaleSliderValue(float scale) {
-        int res = (int) Math.round((scale - LOW_SCALE) * (HIGH_SCALE - LOW_SCALE));
+        int res = Math.round((scale - LOW_SCALE) * (HIGH_SCALE - LOW_SCALE));
         if (res < 0) {
             res = 0;
         } else if (res > 100) {
@@ -113,7 +120,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
                 if (data.isFlagged(x, y)) {
                     sampleVal = 0.0f;
                 } else {
-                    sampleVal = data.getRawValue(x, y);
+                    sampleVal = data.getRawValue(x, y, currentPol);
                 }
 
                 rawData[data.getSizeX() * y + x] = sampleVal;
@@ -131,7 +138,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     // generate a new image, assuming the underlying data itself has not changed. If it has, call setData.
     protected void generateImage() {
         System.err.print("generate image...");
-        
+
         long start = System.currentTimeMillis();
 
         int samplesFlagged = 0;
@@ -155,7 +162,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         for (int y = 0; y < data.getSizeY(); y++) {
             for (int x = 0; x < data.getSizeX(); x++) {
                 if (!data.isFlagged(x, y)) {
-                    float sampleVal = data.getRawValue(x, y);
+                    float sampleVal = data.getRawValue(x, y, currentPol);
                     sampleVal = (sampleVal - percentileValLow) / scaleFactor;
                     if (sampleVal < 0.0f) {
                         sampleVal = 0.0f;
@@ -186,10 +193,11 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     @Override
     public void paintComponent(final Graphics g) {
         super.paintComponent(g);
-        if(zoomX == 1 && zoomY == 1) {
+        if (zoomX == 1 && zoomY == 1) {
             g.drawImage(image, 0, 0, null);
         } else {
-            g.drawImage(image.getScaledInstance(data.getSizeX() * zoomX, data.getSizeY() * zoomY, BufferedImage.SCALE_DEFAULT), 0, 0, null);
+            g.drawImage(image.getScaledInstance(data.getSizeX() * zoomX, data.getSizeY() * zoomY, Image.SCALE_DEFAULT), 0, 0,
+                    null);
         }
     }
 
@@ -200,7 +208,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     @Override
     public void mouseMoved(final MouseEvent e) {
         int x = e.getX() / zoomX;
-        int y = data.getSizeY() - (e.getY()/zoomY) - 1;
+        int y = data.getSizeY() - (e.getY() / zoomY) - 1;
         float raw = 0;
         float val = 0;
 
@@ -211,8 +219,8 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
             x = 0;
             y = 0;
         } else {
-            raw = data.getRawValue(x, y);
-            val = data.getValue(x, y);
+            raw = data.getRawValue(x, y, currentPol);
+            val = data.getValue(x, y, currentPol);
         }
 
         parentFrame.setPositionText(String.format("%06d, %06d", x, y));
@@ -233,7 +241,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     }
 
     public void setScale(final float scale) {
-        if(this.scale == scale) {
+        if (this.scale == scale) {
             return;
         }
         this.scale = scale;
@@ -248,14 +256,14 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         this.zoomX = zoomX;
         repaint();
     }
-    
+
     public void setZoomY(int zoomY) {
         this.zoomY = zoomY;
         repaint();
     }
 
     public void setSensitivity(final float sensitivity) {
-        if(data.getFlaggerSensitivity() == sensitivity || data.getFlagger().equals("none")) {
+        if (data.getFlaggerSensitivity() == sensitivity || data.getFlagger().equals("none")) {
             return;
         }
         final long start = System.currentTimeMillis();

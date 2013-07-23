@@ -4,8 +4,8 @@ public final class MinMaxVals {
     private float minVal = 1.0E20f;
     private float maxVal = -10000000.0f;
 
-    float[] minVals;
-    float[] maxVals;
+    private float[] minVals;
+    private float[] maxVals;
 
     public MinMaxVals(final int size) {
         minVals = new float[size];

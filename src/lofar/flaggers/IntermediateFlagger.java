@@ -44,7 +44,7 @@ public final class IntermediateFlagger extends Flagger {
         sumThreshold1D(samples, flagged);
 
         System.err.println("samples flagged after 1st iter: " + getNrFlaggedSamples(flagged));
-        
+
         calculateWinsorizedStatistics(samples, flagged); // sets mean, median, stdDev
         sumThreshold1D(samples, flagged);
 

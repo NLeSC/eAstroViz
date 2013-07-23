@@ -24,7 +24,7 @@ public final class BeamFormedData extends DataProvider {
     static final boolean COLLAPSE_DEDISPERSED_DATA = false;
     static final int NR_PERIODS_IN_FOLD = 1;
     static final boolean CORRECT_ANTENNA_BANDPASS = false;
-    
+
     float[][][] data; // [second][subband][channel]
     boolean[][][] flagged;
 
@@ -47,7 +47,7 @@ public final class BeamFormedData extends DataProvider {
     float subbandWidth; // MHz
     float channelWidth; //MHz
     float beamCenterFrequency; // MHz
-    
+
     String rawFileName;
     String hdf5FileName;
     FileFormat fileFormat;
@@ -56,7 +56,7 @@ public final class BeamFormedData extends DataProvider {
     static int maximumShift;
 
     public BeamFormedData(final String fileName, final int maxSequenceNr, final int maxSubbands, final int zoomFactor) {
-        super(fileName, maxSequenceNr, maxSubbands, new String[] { "none" });
+        super(fileName, maxSequenceNr, maxSubbands, new String[] {"I"}, new String[] { "none" });
 
         final File[] ls = new File(fileName).listFiles(new Viz.ExtFilter("h5"));
         if (ls.length != 1) {
@@ -134,7 +134,8 @@ public final class BeamFormedData extends DataProvider {
                 final long end = System.currentTimeMillis();
                 final double time = (end - start) / 1000.0;
                 final double speed = size / time;
-                System.err.println(", read rook " + time + " s, speed = " + speed + " MB/s, min = " + minVal + ", max = " + maxVal);
+                System.err.println(", read rook " + time + " s, speed = " + speed + " MB/s, min = " + minVal + ", max = "
+                        + maxVal);
             }
         } catch (final Exception e) {
             nrSeconds = second; // oops, we read less data...
@@ -148,32 +149,31 @@ public final class BeamFormedData extends DataProvider {
             }
         }
 
-        if(CORRECT_ANTENNA_BANDPASS) {
+        if (CORRECT_ANTENNA_BANDPASS) {
             AntennaBandpass bandPass = new AntennaBandpass();
-            
-            System.err.println("START correction");            
+
+            System.err.println("START correction");
             for (int subband = 0; subband < nrSubbands; subband++) {
                 for (int channel = 0; channel < nrChannels; channel++) {
                     float frequency = getFrequency(subband, channel);
-                    float correctionFactor = bandPass.getBandPassCorrectionFactor(AntennaType.HBA_LOW, frequency); 
+                    float correctionFactor = bandPass.getBandPassCorrectionFactor(AntennaType.HBA_LOW, frequency);
                     System.err.println(frequency + " " + correctionFactor);
                 }
             }
-            System.err.println("END correction");            
+            System.err.println("END correction");
 
-            
             for (int s = 0; s < nrSeconds; s++) {
                 for (int subband = 0; subband < nrSubbands; subband++) {
                     for (int channel = 0; channel < nrChannels; channel++) {
                         float frequency = getFrequency(subband, channel);
-                        float correctionFactor = bandPass.getBandPassCorrectionFactor(AntennaType.HBA_LOW, frequency); 
-//                        System.err.println("freq of subband " + subband + ", channel " + channel +  " = " + frequency + ", correctionFactor = " + correctionFactor);
-                        data[s][subband][channel] *= correctionFactor; 
+                        float correctionFactor = bandPass.getBandPassCorrectionFactor(AntennaType.HBA_LOW, frequency);
+                        //                        System.err.println("freq of subband " + subband + ", channel " + channel +  " = " + frequency + ", correctionFactor = " + correctionFactor);
+                        data[s][subband][channel] *= correctionFactor;
                     }
                 }
             }
         }
-        
+
         calculateStatistics();
         /*
                 System.err.println("start of beamFormed data");
@@ -185,10 +185,10 @@ public final class BeamFormedData extends DataProvider {
     }
 
     public float getFrequency(int subband, int channel) {
-        float startFreq = beamCenterFrequency - (nrSubbands/2) * subbandWidth;
+        float startFreq = beamCenterFrequency - (nrSubbands / 2) * subbandWidth;
         return startFreq + subband * subbandWidth + channel * channelWidth;
     }
-    
+
     private void calculateStatistics() {
         // calc min and max for scaling
         for (int second = 0; second < nrSeconds; second++) {
@@ -282,7 +282,7 @@ public final class BeamFormedData extends DataProvider {
         subbandWidth = (float) getAttribute(beam0, "SUBBAND_WIDTH").getPrimitiveDoubleVal() / 1000000.0f;
         channelWidth = (float) getAttribute(beam0, "CHANNEL_WIDTH").getPrimitiveDoubleVal() / 1000000.0f;
         beamCenterFrequency = (float) getAttribute(beam0, "BEAM_FREQUENCY_CENTER").getPrimitiveDoubleVal();
-        
+
         final String stokesComponents = getAttribute(beam0, "STOKES_COMPONENTS").getPrimitiveStringVal();
         System.err.println("Stokes components = " + stokesComponents);
         if (!stokesComponents.equals("I")) {
@@ -335,8 +335,9 @@ public final class BeamFormedData extends DataProvider {
             for (int i = 0; i < metaList.size(); i++) {
                 final Attribute a = metaList.get(i);
                 final Hdf5Attribute a2 = new Hdf5Attribute(a);
-                System.err.println("meta " + i + " = " + a.getName() + ", type = " + a.getType().getDatatypeDescription() + ", nrDims = " + a.getRank()
-                        + ", size = " + a.getType().getDatatypeSize() + ", val = " + a2.getValueString());
+                System.err.println("meta " + i + " = " + a.getName() + ", type = " + a.getType().getDatatypeDescription()
+                        + ", nrDims = " + a.getRank() + ", size = " + a.getType().getDatatypeSize() + ", val = "
+                        + a2.getValueString());
             }
         } catch (final Exception e1) {
             e1.printStackTrace();
@@ -373,7 +374,7 @@ public final class BeamFormedData extends DataProvider {
     public int getNrSamplesPerSecond() {
         return nrSamplesPerSecond;
     }
-    
+
     @Override
     public int getSizeX() {
         return getTotalTime();
@@ -385,12 +386,12 @@ public final class BeamFormedData extends DataProvider {
     }
 
     @Override
-    public float getValue(final int x, final int y) { // TODO: maybe return other stokes
-        return (getRawValue(x, y) - minVal) / (maxVal - minVal);
+    public float getValue(final int x, final int y, int stoke) {
+        return (getRawValue(x, y, stoke) - minVal) / (maxVal - minVal);
     }
 
     @Override
-    public float getRawValue(final int x, final int y) { // TODO: maybe return other stokes
+    public float getRawValue(final int x, final int y, int stoke) { // TODO: maybe return other stokes
         final int subband = y / nrChannels;
         final int channel = y % nrChannels;
         return data[x][subband][channel];
@@ -436,15 +437,16 @@ public final class BeamFormedData extends DataProvider {
         return shifts;
     }
 
-    public static void dedisperse(float[][][] data, boolean[][][] flagged, float nrSamplesPerSecond, float lowFreq, float freqStep, float dm) {
+    public static void dedisperse(float[][][] data, boolean[][][] flagged, float nrSamplesPerSecond, float lowFreq,
+            float freqStep, float dm) {
         int nrTimes = data.length;
         int nrSubbands = data[0].length;
 
         int[] shifts = computeShifts(nrSubbands, nrSamplesPerSecond, lowFreq, freqStep, dm);
         maximumShift = 0;
-        for (int i = 0; i < shifts.length; i++) {
-            if (shifts[i] > maximumShift) {
-                maximumShift = shifts[i];
+        for (int shift : shifts) {
+            if (shift > maximumShift) {
+                maximumShift = shift;
             }
         }
 
@@ -506,11 +508,11 @@ public final class BeamFormedData extends DataProvider {
         float[] res = new float[(int) Math.ceil(nrSamplesToFold)];
         int[] count = new int[res.length];
 
-        System.err.println("nrTimes = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrSamplesPerSecond = " + nrSamplesPerSecond
-                + ", length of folded output = " + res.length);
+        System.err.println("nrTimes = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrSamplesPerSecond = "
+                + nrSamplesPerSecond + ", length of folded output = " + res.length);
 
         for (int time = maximumShift; time < nrTimes - maximumShift; time++) {
-            int mod = (int) Math.round(time % nrSamplesToFold);
+            int mod = Math.round(time % nrSamplesToFold);
             if (mod >= res.length) {
                 mod = res.length - 1;
             }
@@ -529,26 +531,27 @@ public final class BeamFormedData extends DataProvider {
         }
         DataProvider.scale(res);
 
-        for (int i = 0; i < res.length; i++) {
-            System.out.println(res[i]);
+        for (float re : res) {
+            System.out.println(re);
         }
 
         float snr = computeSNR(res);
         System.err.println("signal to noise ratio is: " + snr);
-        
+
         return res;
     }
-    
+
     public static float computeSNR(float[] res) {
         // SNR = (max – mean) / RMS
         float max = -1;
         float mean = 0;
         float rms = 0;
-        for (int i = 0; i < res.length; i++) {
-            if (res[i] > max)
-                max = res[i];
-            mean += res[i];
-            rms += res[i] * res[i];
+        for (float re : res) {
+            if (re > max) {
+                max = re;
+            }
+            mean += re;
+            rms += re * re;
         }
         mean /= res.length;
         rms /= res.length;

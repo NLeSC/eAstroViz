@@ -9,7 +9,7 @@ import lofar.dataFormats.beamFormedData.BeamFormedData;
 
 public class ConvertBeamFormed {
     static final int MAX_TIME = 1000;
-    
+
     private final String fileName;
     private final String outputFileName;
 
@@ -39,16 +39,17 @@ public class ConvertBeamFormed {
         final BufferedOutputStream buf = new BufferedOutputStream(out);
         final DataOutputStream dataOut = new DataOutputStream(buf);
 
-        if(MAX_TIME > 0 ) {
+        if (MAX_TIME > 0) {
             nrTimes = MAX_TIME;
         }
-        
+
         dataOut.writeInt(nrTimes);
         dataOut.writeInt(nrSubbands);
         dataOut.writeInt(nrChannels);
         dataOut.writeInt(nrSamplesPerSecond);
-        
-        System.err.println("Writing output, nrTimes  = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels);
+
+        System.err.println("Writing output, nrTimes  = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrChannels = "
+                + nrChannels);
 
         for (int time = 0; time < nrTimes; time++) {
             for (int sb = 0; sb < nrSubbands; sb++) {

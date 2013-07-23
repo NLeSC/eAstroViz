@@ -34,9 +34,10 @@ public final class VisibilityData extends DataProvider {
     private final int nrCrossPolarizations;
     private final int nrSeconds;
 
-    public VisibilityData(final String fileName, final int station1, final int station2, final int maxSequenceNr, final int maxSubbands) throws IOException {
-        super(fileName, maxSequenceNr, maxSubbands,
-                new String[] { "none", "Threshold", "SumThreshold", "SmoothedSumThreshold", "HistorySumThreshold", "HistorySmoothedSumThreshold" });
+    public VisibilityData(final String fileName, final int station1, final int station2, final int maxSequenceNr,
+            final int maxSubbands) throws IOException {
+        super(fileName, maxSequenceNr, maxSubbands, new String[] {"XX", "XY", "YX", "YY"}, new String[] { "none", "Threshold", "SumThreshold", "SmoothedSumThreshold",
+                "HistorySumThreshold", "HistorySmoothedSumThreshold" });
         this.station1 = station1;
         this.station2 = station2;
         this.baseline = Viz.baseline(station1, station2);
@@ -185,16 +186,17 @@ public final class VisibilityData extends DataProvider {
         final PostCorrelationFlagger[] flaggers = new PostCorrelationFlagger[nrSubbands];
 
         for (int i = 0; i < nrSubbands; i++) {
-            if (flaggerType.equals(FLAGGER_LIST[1])) {
+            if (flaggerType.equals(flaggerList[1])) {
                 flaggers[i] = new PostCorrelationThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
-            } else if (flaggerType.equals(FLAGGER_LIST[2])) {
+            } else if (flaggerType.equals(flaggerList[2])) {
                 flaggers[i] = new PostCorrelationSumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
-            } else if (flaggerType.equals(FLAGGER_LIST[3])) {
+            } else if (flaggerType.equals(flaggerList[3])) {
                 flaggers[i] = new PostCorrelationSmoothedSumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
-            } else if (flaggerType.equals(FLAGGER_LIST[4])) {
+            } else if (flaggerType.equals(flaggerList[4])) {
                 flaggers[i] = new PostCorrelationHistorySumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
-            } else if (flaggerType.equals(FLAGGER_LIST[5])) {
-                flaggers[i] = new PostCorrelationHistorySmoothedSumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
+            } else if (flaggerType.equals(flaggerList[5])) {
+                flaggers[i] =
+                        new PostCorrelationHistorySmoothedSumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
             } else {
                 System.err.println("illegal flagger selected: " + flaggerType);
                 System.exit(1);
@@ -209,7 +211,8 @@ public final class VisibilityData extends DataProvider {
         }
 
         final long end = System.currentTimeMillis();
-        System.err.println("Flagging with " + flaggerType + ", sensitivity " + flaggerSensitivity + " took " + (end - start) + " ms.");
+        System.err.println("Flagging with " + flaggerType + ", sensitivity " + flaggerSensitivity + " took " + (end - start)
+                + " ms.");
     }
 
     public int getNrSeconds() {
@@ -294,13 +297,13 @@ public final class VisibilityData extends DataProvider {
     }
 
     @Override
-    public float getValue(final int x, final int y) { // TODO SCALE
-        return getPower(x, y, 0);// TODO pol
+    public float getValue(final int x, final int y, int pol) { // TODO SCALE
+        return getPower(x, y, pol);
     }
 
     @Override
-    public float getRawValue(final int x, final int y) {
-        return getPower(x, y, 0);// TODO pol
+    public float getRawValue(final int x, final int y, int pol) {
+        return getPower(x, y, pol);
     }
 
     public int getStation1() {

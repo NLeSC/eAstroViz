@@ -7,14 +7,15 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * The Input object enables input like in Pascal. 
+ * The Input object enables input like in Pascal.
+ * 
  * @see InputStream
  * @see BufferedInputStream
  * @see System
  * @see Integer
  * @see String
- * @version     2.1 (October 28th, 1997)
- * @author    Matty Huntjens
+ * @version 2.1 (October 28th, 1997)
+ * @author Matty Huntjens
  */
 public class Input {
 
@@ -67,9 +68,11 @@ public class Input {
 
     protected static final long MAX_VALUE[] = { BYTE_MAX_VALUE, SHORT_MAX_VALUE, Integer.MAX_VALUE, Long.MAX_VALUE };
 
-    protected static final int LENGTH_MIN_VALUE[] = { LENGTH_BYTE_MIN_VALUE, LENGTH_SHORT_MIN_VALUE, LENGTH_INT_MIN_VALUE, LENGTH_LONG_MIN_VALUE };
+    protected static final int LENGTH_MIN_VALUE[] = { LENGTH_BYTE_MIN_VALUE, LENGTH_SHORT_MIN_VALUE, LENGTH_INT_MIN_VALUE,
+            LENGTH_LONG_MIN_VALUE };
 
-    protected static final int LENGTH_MAX_VALUE[] = { LENGTH_BYTE_MAX_VALUE, LENGTH_SHORT_MAX_VALUE, LENGTH_INT_MAX_VALUE, LENGTH_LONG_MAX_VALUE };
+    protected static final int LENGTH_MAX_VALUE[] = { LENGTH_BYTE_MAX_VALUE, LENGTH_SHORT_MAX_VALUE, LENGTH_INT_MAX_VALUE,
+            LENGTH_LONG_MAX_VALUE };
 
     protected static final String NAME[] = { "byte", "short", "int", "long", "float", "double" };
 

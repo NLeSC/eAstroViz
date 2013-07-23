@@ -13,13 +13,17 @@ import lofar.dataFormats.MinMaxVals;
 import lofar.flaggers.Flagger;
 import lofar.flaggers.IntermediateFlagger;
 
+/**
+ * A data container for pre-processed data. Note that this class holds the data for a time series, for all frequencies and polarizations, but for one station only.
+ * Otherwise, the data would be too large.
+ * @author rob
+ */
 public abstract class PreprocessedData extends DataProvider {
 
     private static final boolean SHOW_SMOOTH = false;
     private static final boolean SHOW_SMOOTH_DIFF = false;
 
     protected float[][][][] data; // [time][nrSubbands][nrPolarizations][nrChannels]
-    //    protected float[][][][] data; // [time][nrSubbands][nrChannels][nrPolarizations]
     protected boolean[][][] initialFlagged; // [time][nrSubbands][nrChannels]
     protected boolean[][][] flagged; // [time][nrSubbands][nrChannels]
     protected int nrStations;
@@ -32,20 +36,18 @@ public abstract class PreprocessedData extends DataProvider {
     private static final boolean SCALE_PER_SUBBAND = false;
     private float min;
     private float scaleValue;
+    private final int station;
 
-    private int station = 0;
-    private int pol = 0;
-
-    public PreprocessedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands) {
-        super(fileName, maxSequenceNr, maxSubbands, new String[] { "none", "Intermediate" });
+    public PreprocessedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands, final String[] polList, final int station) {
+        super(fileName, maxSequenceNr, maxSubbands, polList, new String[] { "none", "Intermediate" });
         this.integrationFactor = integrationFactor;
+        this.station = station;
     }
 
+    @SuppressWarnings("unused")
     public void read() throws IOException {
         final FileInputStream fin = new FileInputStream(fileName);
         final DataInputStream din = new DataInputStream(fin);
-
-        // TODO READ CORRECT STATION (Skip data)
 
         nrStations = din.readInt();
         nrTimes = din.readInt() / integrationFactor;
@@ -69,13 +71,17 @@ public abstract class PreprocessedData extends DataProvider {
         flagged = new boolean[nrTimes][nrSubbands][nrChannels];
         initialFlagged = new boolean[nrTimes][nrSubbands][nrChannels];
 
-        final long start = System.currentTimeMillis();
+        int stationBlockSize = integrationFactor * nrSubbandsInFile * nrChannels * nrPolarizations * 4;
 
-        final ByteBuffer bb = ByteBuffer.allocateDirect(integrationFactor * nrSubbandsInFile * nrChannels * nrPolarizations * 4);
+        fin.skip(stationBlockSize * station);
+        
+        final ByteBuffer bb = ByteBuffer.allocateDirect(stationBlockSize);
         bb.order(ByteOrder.BIG_ENDIAN);
         final FloatBuffer fb = bb.asFloatBuffer();
         final FileChannel channel = fin.getChannel();
 
+        final long start = System.currentTimeMillis();
+        
         for (int second = 0; second < nrTimes; second++) {
             if (second > maxSequenceNr) {
                 break;
@@ -83,12 +89,12 @@ public abstract class PreprocessedData extends DataProvider {
 
             bb.rewind();
             fb.rewind();
-            final int res = channel.read(bb); // TODO can return less bytes!
-            if (res != bb.capacity()) {
-                System.err.println("read less bytes! Expected " + bb.capacity() + ", got " + res);
-            }
+            final int res = channel.read(bb);
             if (res < 0) {
                 break;
+            }
+            if (res != bb.capacity()) {
+                System.err.println("read less bytes! Expected " + bb.capacity() + ", got " + res + "; continuing...");
             }
 
             for (int time = 0; time < integrationFactor; time++) {
@@ -119,32 +125,43 @@ public abstract class PreprocessedData extends DataProvider {
         fin.close();
         din.close();
 
-        long initialFlaggedCount = 0;
 
         if (SHOW_SMOOTH || SHOW_SMOOTH_DIFF) {
-            for (int time = 0; time < nrTimes; time++) {
-                for (int sb = 0; sb < nrSubbands; sb++) {
-                    for (int pol = 0; pol < nrPolarizations; pol++) {
-                        float[] tmp = new float[nrChannels];
-                        for (int ch = 0; ch < nrChannels; ch++) {
-                            tmp[ch] = data[time][sb][pol][ch];
-                        }
-                        float[] tmp2 = Flagger.oneDimensionalGausConvolution(tmp, 10.0f);
-                        for (int ch = 0; ch < nrChannels; ch++) {
-                            if (SHOW_SMOOTH) {
-                                data[time][sb][pol][ch] = tmp2[ch];
-                            } else if (SHOW_SMOOTH_DIFF) {
-                                data[time][sb][pol][ch] = (float) Math.abs(tmp2[ch] - data[time][sb][ch][pol]);
-                            }
+            calcSmoothedIntermediate();
+        }
+
+        calcMinMax();
+    }
+
+
+    private void calcSmoothedIntermediate() {
+        for (int time = 0; time < nrTimes; time++) {
+            for (int sb = 0; sb < nrSubbands; sb++) {
+                for (int pol = 0; pol < nrPolarizations; pol++) {
+                    float[] tmp = new float[nrChannels];
+                    for (int ch = 0; ch < nrChannels; ch++) {
+                        tmp[ch] = data[time][sb][pol][ch];
+                    }
+                    float[] tmp2 = Flagger.oneDimensionalGausConvolution(tmp, 10.0f);
+                    for (int ch = 0; ch < nrChannels; ch++) {
+                        if (SHOW_SMOOTH) {
+                            data[time][sb][pol][ch] = tmp2[ch];
+                        } else if (SHOW_SMOOTH_DIFF) {
+                            data[time][sb][pol][ch] = Math.abs(tmp2[ch] - data[time][sb][ch][pol]);
                         }
                     }
                 }
             }
         }
-
-        // calc min and max for scaling
-        // set flagged samples to 0.
-        minMaxVals = new MinMaxVals(nrSubbandsInFile);
+    }
+    
+    /**
+     * calc min and max for scaling
+       set flagged samples to 0.
+     */
+    private void calcMinMax() {
+        long initialFlaggedCount = 0;
+        minMaxVals = new MinMaxVals(nrSubbands);
         for (int time = 0; time < nrTimes; time++) {
             for (int sb = 0; sb < nrSubbands; sb++) {
                 for (int ch = 0; ch < nrChannels; ch++) {
@@ -164,9 +181,8 @@ public abstract class PreprocessedData extends DataProvider {
         scaleValue = minMaxVals.getMax() - min;
 
         System.err.println("sampled already flagged in data set: " + initialFlaggedCount);
-
     }
-
+    
     @Override
     public void flag() {
         for (int time = 0; time < nrTimes; time++) {
@@ -238,7 +254,7 @@ public abstract class PreprocessedData extends DataProvider {
     }
 
     @Override
-    public final float getRawValue(final int x, final int y) {
+    public final float getRawValue(final int x, final int y, int pol) {
         final int subband = y / nrChannels;
         final int channel = y % nrChannels;
 
@@ -246,7 +262,7 @@ public abstract class PreprocessedData extends DataProvider {
     }
 
     @Override
-    public final float getValue(final int x, final int y) {
+    public final float getValue(final int x, final int y, int pol) {
         final int subband = y / nrChannels;
         final int channel = y % nrChannels;
         final float sample = data[x][subband][pol][channel];

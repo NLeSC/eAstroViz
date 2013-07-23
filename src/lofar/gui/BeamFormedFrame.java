@@ -15,7 +15,7 @@ import lofar.dataFormats.preprocessedData.CompressedBeamFormedData.CompressedBea
 public final class BeamFormedFrame extends GUIFrame {
     BeamFormedInnerPanel innerPanel;
     JFrame fr;
-    
+
     public BeamFormedFrame(final Viz viz, final DataProvider data) {
         super(viz, data);
     }
@@ -30,7 +30,7 @@ public final class BeamFormedFrame extends GUIFrame {
         super.paintComponents(g);
         fr.repaint();
     }
-    
+
     @Override
     protected JPanel createAdditionalControlsPanel() {
         // for some reason, the inner panel does not work, so lets just create a new frame for now.
@@ -53,9 +53,9 @@ public final class BeamFormedFrame extends GUIFrame {
             // pulsar parameters.
             float dm = 12.455f;
             float period = 1.3373f;
-            
+
             float[] folded = null;
-            
+
             if (data instanceof BeamFormedData) {
                 BeamFormedData bf = (BeamFormedData) data;
                 bf.dedisperse(lowFreq, freqStep, dm);
