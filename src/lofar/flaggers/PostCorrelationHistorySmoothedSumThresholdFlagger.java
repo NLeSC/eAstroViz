@@ -6,8 +6,8 @@ public class PostCorrelationHistorySmoothedSumThresholdFlagger extends PostCorre
     final PostCorrelationFlaggerHistory history;
     final float historyFlaggingThreshold = 7.0f;
 
-    public PostCorrelationHistorySmoothedSumThresholdFlagger(final int nrChannels, final float sensitivity) {
-        super(nrChannels, sensitivity);
+    public PostCorrelationHistorySmoothedSumThresholdFlagger(final int nrChannels, final float sensitivity, final float SIREtaValue) {
+        super(nrChannels, sensitivity, SIREtaValue);
         history = new PostCorrelationFlaggerHistory(nrChannels);
     }
 
@@ -15,13 +15,13 @@ public class PostCorrelationHistorySmoothedSumThresholdFlagger extends PostCorre
     // if one of the polarizations exceeds the threshold, flag them all.
     @Override
     protected void flag(final float[] powers, final boolean[] flagged, final int pol) {
-        final float originalSensitivity = baseSensitivity;
+        final float originalSensitivity = getBaseSensitivity();
         calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
 
         //System.err.println("mean = " + mean + ", median = " + median + ", stdDev = " + stdDev);
 
         // first do an insensitive sumthreshold
-        baseSensitivity = originalSensitivity * 1.0f; // higher number is less sensitive!
+        setBaseSensitivity(originalSensitivity * 1.0f); // higher number is less sensitive!
         sumThreshold1D(powers, flagged); // sets flags, and replaces flagged samples with threshold
 
         // smooth
@@ -35,14 +35,14 @@ public class PostCorrelationHistorySmoothedSumThresholdFlagger extends PostCorre
 
         // flag based on difference
         calculateWinsorizedStatistics(diff, flagged); // sets mean, median, stdDev                
-        baseSensitivity = originalSensitivity * 1.0f; // higher number is less sensitive!
+        setBaseSensitivity(originalSensitivity * 1.0f); // higher number is less sensitive!
         sumThreshold1D(diff, flagged);
 
         // and one final pass on the flagged power
         calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
-        baseSensitivity = originalSensitivity * 0.90f; // higher number is less sensitive!
+        setBaseSensitivity(originalSensitivity * 0.90f); // higher number is less sensitive!
         sumThreshold1D(powers, flagged);
-        baseSensitivity = originalSensitivity;
+        setBaseSensitivity(originalSensitivity);
 
         calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
 

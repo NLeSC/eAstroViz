@@ -186,15 +186,15 @@ public final class VisibilityData extends DataProvider {
 
         for (int i = 0; i < nrSubbands; i++) {
             if (flaggerType.equals(FLAGGER_LIST[1])) {
-                flaggers[i] = new PostCorrelationThresholdFlagger(nrChannels, flaggerSensitivity);
+                flaggers[i] = new PostCorrelationThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
             } else if (flaggerType.equals(FLAGGER_LIST[2])) {
-                flaggers[i] = new PostCorrelationSumThresholdFlagger(nrChannels, flaggerSensitivity);
+                flaggers[i] = new PostCorrelationSumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
             } else if (flaggerType.equals(FLAGGER_LIST[3])) {
-                flaggers[i] = new PostCorrelationSmoothedSumThresholdFlagger(nrChannels, flaggerSensitivity);
+                flaggers[i] = new PostCorrelationSmoothedSumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
             } else if (flaggerType.equals(FLAGGER_LIST[4])) {
-                flaggers[i] = new PostCorrelationHistorySumThresholdFlagger(nrChannels, flaggerSensitivity);
+                flaggers[i] = new PostCorrelationHistorySumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
             } else if (flaggerType.equals(FLAGGER_LIST[5])) {
-                flaggers[i] = new PostCorrelationHistorySmoothedSumThresholdFlagger(nrChannels, flaggerSensitivity);
+                flaggers[i] = new PostCorrelationHistorySmoothedSumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
             } else {
                 System.err.println("illegal flagger selected: " + flaggerType);
                 System.exit(1);

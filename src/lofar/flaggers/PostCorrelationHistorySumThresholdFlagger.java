@@ -5,8 +5,8 @@ public class PostCorrelationHistorySumThresholdFlagger extends PostCorrelationSu
     final PostCorrelationFlaggerHistory history;
     final float historyFlaggingThreshold = 7.0f;
 
-    public PostCorrelationHistorySumThresholdFlagger(final int nrChannels, final float sensitivity) {
-        super(nrChannels, sensitivity);
+    public PostCorrelationHistorySumThresholdFlagger(final int nrChannels, final float sensitivity, final float SIREtaValue) {
+        super(nrChannels, sensitivity, SIREtaValue);
         history = new PostCorrelationFlaggerHistory(nrChannels);
     }
 

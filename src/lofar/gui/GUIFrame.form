@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
-<Form version="1.3" maxVersion="1.8" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+<Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
     <Menu class="javax.swing.JMenuBar" name="jMenuBar1">
       <SubComponents>
@@ -55,8 +55,8 @@
           <Component id="StatusBar" max="32767" attributes="0"/>
           <Group type="102" attributes="0">
               <Component id="leftPanel" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
-              <Component id="scrollPane" min="-2" pref="1701" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="scrollPane" pref="1701" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -65,9 +65,9 @@
           <Group type="102" alignment="1" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="leftPanel" max="32767" attributes="0"/>
-                  <Component id="scrollPane" max="32767" attributes="0"/>
+                  <Component id="scrollPane" pref="922" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="StatusBar" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -79,10 +79,10 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
-                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="standardControlsPanel" max="32767" attributes="0"/>
-                      <Component id="additionalControlsPanel" pref="317" max="32767" attributes="0"/>
+              <Group type="102" alignment="0" attributes="0">
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Component id="additionalControlsPanel" alignment="0" pref="317" max="32767" attributes="0"/>
+                      <Component id="standardControlsPanel" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
               </Group>
@@ -93,7 +93,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <Component id="standardControlsPanel" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="additionalControlsPanel" min="-2" max="-2" attributes="0"/>
+                  <Component id="additionalControlsPanel" max="32767" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -150,7 +150,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="313" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -182,7 +182,7 @@
                               </Group>
                               <Component id="scaleSlider" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace pref="101" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -243,7 +243,7 @@
                                       <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="colorMapComboBox" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="213" max="32767" attributes="0"/>
                               </Group>
                               <Component id="colorMapLegendPanel" max="32767" attributes="0"/>
                           </Group>
@@ -291,7 +291,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="289" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
@@ -322,7 +322,7 @@
                               <Component id="histogramInnerPanel" alignment="0" max="32767" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="211" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -347,7 +347,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="289" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
@@ -404,7 +404,7 @@
                                   <Component id="label1" min="-2" pref="166" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace pref="132" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -486,30 +486,21 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="label5" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="sensitivitySlider" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Component id="label6" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="sensitivityLabel" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                  </Group>
-                                  <EmptySpace max="32767" attributes="0"/>
+                              <Component id="label5" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="sensitivitySlider" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="label6" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="sensitivityLabel" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="flaggerTypeComboBox" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Component id="label7" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
-                                          <Component id="flaggedLabel" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                  </Group>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              <Component id="flaggerTypeComboBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="label7" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
+                                  <Component id="flaggedLabel" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
+                          <EmptySpace pref="101" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -680,7 +671,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="317" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -706,7 +697,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <Component id="statusBarLabel" max="32767" attributes="0"/>
-                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="1910" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

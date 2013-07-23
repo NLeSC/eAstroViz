@@ -17,8 +17,8 @@ maar het is een idee. Het is niet zoo zwaar om dit te doen.
  */
 public class PostCorrelationSmoothedSumThresholdFlagger extends PostCorrelationSumThresholdFlagger {
 
-    public PostCorrelationSmoothedSumThresholdFlagger(final int nrChannels, final float baseSensitivity) {
-        super(nrChannels, baseSensitivity);
+    public PostCorrelationSmoothedSumThresholdFlagger(final int nrChannels, final float baseSensitivity, final float SIREtaValue) {
+        super(nrChannels, baseSensitivity, SIREtaValue);
     }
 
     // we have the data for one second, all frequencies in a subband.
@@ -31,8 +31,8 @@ public class PostCorrelationSmoothedSumThresholdFlagger extends PostCorrelationS
         //System.err.println("mean = " + mean + ", median = " + median + ", stdDev = " + stdDev);
 
         // first do an insensitive sumthreshold
-        final float originalSensitivity = baseSensitivity;
-        baseSensitivity = originalSensitivity * 1.0f; // higher number is less sensitive!
+        final float originalSensitivity = getBaseSensitivity();
+        setBaseSensitivity(originalSensitivity * 1.0f); // higher number is less sensitive!
         sumThreshold1D(powers, flagged); // sets flags, and replaces flagged samples with threshold
 
         //                int flagged1 = getNrFlags(flagged);
@@ -52,13 +52,13 @@ public class PostCorrelationSmoothedSumThresholdFlagger extends PostCorrelationS
 
         // flag based on difference
         calculateWinsorizedStatistics(diff, flagged); // sets mean, median, stdDev                
-        baseSensitivity = originalSensitivity * 1.0f; // higher number is less sensitive!
+        setBaseSensitivity(originalSensitivity * 1.0f); // higher number is less sensitive!
         sumThreshold1D(diff, flagged);
         //                int flagged2 = getNrFlags(flagged);
 
         // and one final pass on the flagged power
         calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
-        baseSensitivity = originalSensitivity * 0.80f; // higher number is less sensitive!
+        setBaseSensitivity(originalSensitivity * 0.80f); // higher number is less sensitive!
         sumThreshold1D(powers, flagged);
         //                int flagged3 = getNrFlags(flagged);
         /*
@@ -69,6 +69,6 @@ public class PostCorrelationSmoothedSumThresholdFlagger extends PostCorrelationS
                             System.err.println("B flagged1 = " + flagged1 + ", flagged2 = " + flagged2 + ", flagged3 = " + flagged3);
                         }
         */
-        baseSensitivity = originalSensitivity;
+        setBaseSensitivity(originalSensitivity);
     }
 }

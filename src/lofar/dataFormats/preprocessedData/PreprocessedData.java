@@ -15,7 +15,11 @@ import lofar.flaggers.IntermediateFlagger;
 
 public abstract class PreprocessedData extends DataProvider {
 
-    protected float[][][][] data; // [time][nrSubbands][nrChannels][nrPolarizations]
+    private static final boolean SHOW_SMOOTH = false;
+    private static final boolean SHOW_SMOOTH_DIFF = false;
+
+    protected float[][][][] data; // [time][nrSubbands][nrPolarizations][nrChannels]
+    //    protected float[][][][] data; // [time][nrSubbands][nrChannels][nrPolarizations]
     protected boolean[][][] initialFlagged; // [time][nrSubbands][nrChannels]
     protected boolean[][][] flagged; // [time][nrSubbands][nrChannels]
     protected int nrStations;
@@ -61,7 +65,7 @@ public abstract class PreprocessedData extends DataProvider {
             nrTimes = maxSequenceNr;
         }
 
-        data = new float[nrTimes][nrSubbands][nrChannels][nrPolarizations];
+        data = new float[nrTimes][nrSubbands][nrPolarizations][nrChannels];
         flagged = new boolean[nrTimes][nrSubbands][nrChannels];
         initialFlagged = new boolean[nrTimes][nrSubbands][nrChannels];
 
@@ -97,7 +101,7 @@ public abstract class PreprocessedData extends DataProvider {
                                     initialFlagged[second][sb][ch] = true;
                                     flagged[second][sb][ch] = true;
                                 } else {
-                                    data[second][sb][ch][pol] += sample;
+                                    data[second][sb][pol][ch] += sample;
                                 }
                             }
                         }
@@ -116,36 +120,28 @@ public abstract class PreprocessedData extends DataProvider {
         din.close();
 
         long initialFlaggedCount = 0;
-        
-        
-        
-        
-/*        
-        // TODO remove
-        for (int time = 0; time < nrTimes; time++) {
-            for (int sb = 0; sb < nrSubbands; sb++) {
-                for (int pol = 0; pol < nrPolarizations; pol++) {
-                    float[] tmp = new float[nrChannels];
-                    for (int ch = 0; ch < nrChannels; ch++) {
-                        tmp[ch] = data[time][sb][ch][pol];
-                    }
-                    float[] tmp2 = Flagger.oneDimensionalGausConvolution(tmp, 10.0f);
-                    for (int ch = 0; ch < nrChannels; ch++) {
-                        data[time][sb][ch][pol] = (float)Math.abs(tmp2[ch] - data[time][sb][ch][pol]); 
-//                        data[time][sb][ch][pol] = tmp2[ch]; 
+
+        if (SHOW_SMOOTH || SHOW_SMOOTH_DIFF) {
+            for (int time = 0; time < nrTimes; time++) {
+                for (int sb = 0; sb < nrSubbands; sb++) {
+                    for (int pol = 0; pol < nrPolarizations; pol++) {
+                        float[] tmp = new float[nrChannels];
+                        for (int ch = 0; ch < nrChannels; ch++) {
+                            tmp[ch] = data[time][sb][pol][ch];
+                        }
+                        float[] tmp2 = Flagger.oneDimensionalGausConvolution(tmp, 10.0f);
+                        for (int ch = 0; ch < nrChannels; ch++) {
+                            if (SHOW_SMOOTH) {
+                                data[time][sb][pol][ch] = tmp2[ch];
+                            } else if (SHOW_SMOOTH_DIFF) {
+                                data[time][sb][pol][ch] = (float) Math.abs(tmp2[ch] - data[time][sb][ch][pol]);
+                            }
+                        }
                     }
                 }
             }
         }
-*/      
 
-        
-        
-        
-        
-        
-        
-        
         // calc min and max for scaling
         // set flagged samples to 0.
         minMaxVals = new MinMaxVals(nrSubbandsInFile);
@@ -154,10 +150,10 @@ public abstract class PreprocessedData extends DataProvider {
                 for (int ch = 0; ch < nrChannels; ch++) {
                     for (int pol = 0; pol < nrPolarizations; pol++) {
                         if (initialFlagged[time][sb][ch]) {
-                            data[time][sb][ch][pol] = 0.0f;
+                            data[time][sb][pol][ch] = 0.0f;
                             initialFlaggedCount++;
                         } else {
-                            final float sample = data[time][sb][ch][pol];
+                            final float sample = data[time][sb][pol][ch];
                             minMaxVals.processValue(sample, sb);
                         }
                     }
@@ -168,11 +164,6 @@ public abstract class PreprocessedData extends DataProvider {
         scaleValue = minMaxVals.getMax() - min;
 
         System.err.println("sampled already flagged in data set: " + initialFlaggedCount);
-        
-
-        
-        
-        
 
     }
 
@@ -193,35 +184,28 @@ public abstract class PreprocessedData extends DataProvider {
         if (nrChannels > 1) {
             final IntermediateFlagger[] flaggers = new IntermediateFlagger[nrSubbands];
             for (int i = 0; i < nrSubbands; i++) {
-                flaggers[i] = new IntermediateFlagger(flaggerSensitivity);
+                flaggers[i] = new IntermediateFlagger(flaggerSensitivity, flaggerSIRValue);
             }
 
             for (int time = 0; time < nrTimes; time++) {
                 for (int sb = 0; sb < nrSubbands; sb++) {
-                    for (int pol = 0; pol < nrPolarizations; pol++) {
-                        float[] tmp = new float[nrChannels];
-                        for(int ch=0;ch<nrChannels; ch++) {
-                            tmp[ch] = data[time][sb][ch][pol];
-                        }
-                        
-                        flaggers[sb].flag(tmp, flagged[time][sb]);
-                    }
+                    flaggers[sb].flag(data[time][sb], flagged[time][sb]);
                 }
             }
         } else {
-            final IntermediateFlagger flagger = new IntermediateFlagger(flaggerSensitivity);
-            for (int pol = 0; pol < nrPolarizations; pol++) {
-                for (int time = 0; time < nrTimes; time++) {
-                    final float[] tmp = new float[nrSubbands];
-                    final boolean[] tmpFlags = new boolean[nrSubbands];
-                    for (int sb = 0; sb < nrSubbands; sb++) {
-                        tmp[sb] = data[time][sb][0][pol];
-                    }
+            final IntermediateFlagger flagger = new IntermediateFlagger(flaggerSensitivity, flaggerSIRValue);
+            for (int time = 0; time < nrTimes; time++) {
+                final boolean[] tmpFlags = new boolean[nrSubbands];
+                final float[][] tmp = new float[nrPolarizations][nrSubbands];
 
-                    flagger.flag(tmp, tmpFlags);
+                for (int pol = 0; pol < nrPolarizations; pol++) {
                     for (int sb = 0; sb < nrSubbands; sb++) {
-                        flagged[time][sb][0] = tmpFlags[sb];
+                        tmp[pol][sb] = data[time][sb][pol][0];
                     }
+                }
+                flagger.flag(tmp, tmpFlags);
+                for (int sb = 0; sb < nrSubbands; sb++) {
+                    flagged[time][sb][0] = tmpFlags[sb];
                 }
             }
         }
@@ -258,14 +242,14 @@ public abstract class PreprocessedData extends DataProvider {
         final int subband = y / nrChannels;
         final int channel = y % nrChannels;
 
-        return data[x][subband][channel][pol];
+        return data[x][subband][pol][channel];
     }
 
     @Override
     public final float getValue(final int x, final int y) {
         final int subband = y / nrChannels;
         final int channel = y % nrChannels;
-        final float sample = data[x][subband][channel][pol];
+        final float sample = data[x][subband][pol][channel];
 
         if (SCALE_PER_SUBBAND) {
             return (sample - minMaxVals.getMin(subband)) / (minMaxVals.getMax(subband) - minMaxVals.getMin(subband));

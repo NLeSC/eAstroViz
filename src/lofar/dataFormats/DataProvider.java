@@ -3,6 +3,7 @@ package lofar.dataFormats;
 public abstract class DataProvider {
     protected String flaggerType;
     protected float flaggerSensitivity = 1.0f;
+    protected float flaggerSIRValue = 0.4f;
     protected final String[] FLAGGER_LIST;
     protected final String fileName;
     protected final int maxSequenceNr;

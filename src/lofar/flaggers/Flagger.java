@@ -4,14 +4,20 @@ import java.util.Arrays;
 
 public abstract class Flagger {
     private static final int MAX_ITERS = 5;
-
+    private static final float FIRST_THRESHOLD = 6.0f; // from Andre's code: 6.0f
+    
     protected float mean;
     protected float stdDev;
     protected float median;
 
-    protected float baseSensitivity;
-    private final float firstThreshold = 6.0f; // from Andre's code: 6.0f
+    private float baseSensitivity;
+    private float SIREtaValue;
 
+    public Flagger(float baseSensitivity, float SIRValue) {
+        this.baseSensitivity = baseSensitivity;
+        this.SIREtaValue = SIRValue;
+    }
+    
     protected final void calculateStatistics(final float[] samples, final boolean[] flags) {
         int unflaggedCount = getNrUnflaggedSamples(flags);
         if (unflaggedCount == 0) {
@@ -104,7 +110,7 @@ public abstract class Flagger {
 
         int window = 1;
         for (int iter = 1; iter <= MAX_ITERS; iter++) {
-            final float thresholdI = median + calcThresholdI(firstThreshold, iter, 1.5f) * factor;
+            final float thresholdI = median + calcThresholdI(FIRST_THRESHOLD, iter, 1.5f) * factor;
 
             sumThreshold(samples, flags, window, thresholdI);
             window *= 2;
@@ -336,14 +342,14 @@ public abstract class Flagger {
      * the original algorithm by Andre Offringa. Jasper van de Gronde is preparing an article about it.
      * @param [in,out] flags The input array of flags to be dilated that will be overwritten by the dilatation of itself.
      * @param [in] eta The η parameter that specifies the minimum number of good data
-     * that any subsequence should have (see class description for the definition).
+     * that any subsequence should have.
      */
-    public void SIROperator(boolean[] flags, float eta) {
+    public void SIROperator(boolean[] flags) {
         boolean[] temp = new boolean[flags.length];
         float credit = 0.0f;
         for (int i = 0; i < flags.length; ++i) {
             // credit ← max(0, credit) + w(f [i])
-            final float w = flags[i] ? eta : eta - 1.0f;
+            final float w = flags[i] ? SIREtaValue : SIREtaValue - 1.0f;
             final float maxcredit0 = credit > 0.0f ? credit : 0.0f;
             credit = maxcredit0 + w;
             temp[i] = (credit >= 0.0f);
@@ -352,10 +358,18 @@ public abstract class Flagger {
         // The same iteration, but now backwards
         credit = 0.0f;
         for (int i = flags.length - 1; i >= 0; i--) {
-            final float w = flags[i] ? eta : eta - 1.0f;
+            final float w = flags[i] ? SIREtaValue : SIREtaValue - 1.0f;
             final float maxcredit0 = credit > 0.0f ? credit : 0.0f;
             credit = maxcredit0 + w;
             flags[i] = (credit >= 0.0f) || temp[i];
         }
+    }
+
+    public float getBaseSensitivity() {
+        return baseSensitivity;
+    }
+
+    public void setBaseSensitivity(float baseSensitivity) {
+        this.baseSensitivity = baseSensitivity;
     }
 }
