@@ -6,7 +6,7 @@ public final class IntermediateFlagger extends Flagger {
         this.baseSensitivity = sensitivity;
     }
 
-    public void flagOrig(final float[] samples, final boolean[] flagged) {
+    public void flag(final float[] samples, final boolean[] flagged) {
       calculateWinsorizedStatistics(samples, flagged); // sets mean, median, stdDev
       sumThreshold1D(samples, flagged);
 
@@ -18,15 +18,19 @@ public final class IntermediateFlagger extends Flagger {
 //      printNrFlagged(flagged);
   }
 
-    public void flag(final float[] samples, final boolean[] flagged) {
+    public void flagSmooth(final float[] samples, final boolean[] flagged) {
         
 //      float[] tmp = new float[samples.length];
       
         calculateWinsorizedStatistics(samples, flagged); // sets mean, median, stdDev
         sumThreshold1D(samples, flagged);
 
+        System.err.println("samples flagged after 1st iter: " + getNrFlaggedSamples(flagged));
+        
         calculateWinsorizedStatistics(samples, flagged); // sets mean, median, stdDev
         sumThreshold1D(samples, flagged);
+
+        System.err.println("samples flagged after 2nd iter: " + getNrFlaggedSamples(flagged));
 
         float[] tmp = samples.clone();
         for(int i=0; i<samples.length; i++) {
@@ -34,7 +38,7 @@ public final class IntermediateFlagger extends Flagger {
                 tmp[i] = 0.0f;
             }
         }
-        float[] smoothed = oneDimensionalGausConvolution(tmp, 3.0f);
+        float[] smoothed = oneDimensionalGausConvolution(tmp, 2.0f);
         float[] diff = new float[samples.length];
         for(int i=0; i<samples.length; i++) {
             diff[i] = samples[i] - smoothed[i];
@@ -43,8 +47,12 @@ public final class IntermediateFlagger extends Flagger {
       calculateWinsorizedStatistics(diff, flagged); // sets mean, median, stdDev
       sumThreshold1D(diff, flagged);
 
+      System.err.println("samples flagged after smooth: " + getNrFlaggedSamples(flagged));
+
       SIROperator(flagged, 0.4f);
       
+      System.err.println("samples flagged after SIR: " + getNrFlaggedSamples(flagged));
+
 //      printNrFlagged(flagged);
   }
 }
