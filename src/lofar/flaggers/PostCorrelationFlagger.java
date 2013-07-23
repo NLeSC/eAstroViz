@@ -21,12 +21,24 @@ public abstract class PostCorrelationFlagger extends Flagger {
     }
 
     public void flag(final float[][] samples, final int[] nrValidSamples, final boolean[] flagged) {// copy is [nrChannels][nrCrossPolasrizations];
-        initFlags(nrValidSamples, flagged);
 
+        boolean[][] flags = new boolean[samples[0].length][samples.length];
+        
         for (int pol = 0; pol < samples[0].length; pol++) {
+            initFlags(nrValidSamples, flags[pol]);
+
             final float[] powers = calculatePowers(samples, pol);
-            flag(powers, flagged, pol);
+            flag(powers, flags[pol], pol);
         }
+        
+        // calculate union of flags
+        for (int pol = 0; pol < samples[0].length; pol++) {
+            for(int i=0; i< samples.length; i++) {
+                flagged[i] = flags[pol][i];
+            }
+        }
+        
+        SIROperator(flagged);
     }
 
     protected abstract void flag(final float[] powers, boolean[] flagged, int pol);
