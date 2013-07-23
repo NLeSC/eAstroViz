@@ -22,6 +22,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     public static final int HIGH_SCALE = 100;
 
     private static final long serialVersionUID = 1L;
+    
     protected Viz viz;
     protected GUIFrame parentFrame;
     protected BufferedImage image;
@@ -314,5 +315,18 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
 
     public String[] getColorMapNames() {
         return colorMaps.getColorMaps();
+    }
+
+    public int getCurrentPol() {
+        return currentPol;
+    }
+
+    public void setCurrentPol(int pol) {
+        if(this.currentPol == pol) {
+            return;
+        }
+        
+        this.currentPol = pol;
+        setData(data);
     }
 }
