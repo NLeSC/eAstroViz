@@ -5,7 +5,7 @@ public class ColorMap {
     String name;
 
     public ColorMap(String name, int[] map) {
-        this.colorMap = map;
+        this.colorMap = map.clone();
         this.name = name;
     }
 

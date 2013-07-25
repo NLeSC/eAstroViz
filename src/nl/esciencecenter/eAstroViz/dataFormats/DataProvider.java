@@ -14,9 +14,9 @@ public abstract class DataProvider {
         this.fileName = fileName;
         this.maxSequenceNr = maxSequenceNr;
         this.maxSubbands = maxSubbands;
-        this.polList = polList;
-        this.flaggerList = flaggerList;
-        this.flaggerType = flaggerList[0];
+        this.polList = polList.clone();
+        this.flaggerList = flaggerList.clone();
+        this.flaggerType = this.flaggerList[0];
     }
 
     public abstract int getSizeX();

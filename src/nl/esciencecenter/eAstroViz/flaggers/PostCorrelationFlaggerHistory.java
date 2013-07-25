@@ -21,7 +21,7 @@ public class PostCorrelationFlaggerHistory {
             this.mean = mean;
             this.median = median;
             this.stdDev = stdDev;
-            this.freqData = freqData;
+            this.freqData = freqData.clone();
         }
     }
 
@@ -39,7 +39,7 @@ public class PostCorrelationFlaggerHistory {
         }
     }
 
-    void add(final int pol, final int second, final float mean, final float median, final float stdDev, final float[] freqData) {
+    public void add(final int pol, final int second, final float mean, final float median, final float stdDev, final float[] freqData) {
         if (second % HISTORY_STEP_SIZE != 0) {
             return;
         }
