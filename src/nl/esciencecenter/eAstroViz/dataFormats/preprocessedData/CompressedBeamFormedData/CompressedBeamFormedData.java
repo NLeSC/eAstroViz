@@ -8,15 +8,18 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.channels.FileChannel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
 import nl.esciencecenter.eAstroViz.dataFormats.MinMaxVals;
 import nl.esciencecenter.eAstroViz.dataFormats.beamFormedData.BeamFormedData;
 import nl.esciencecenter.eAstroViz.flaggers.BeamFormedFlagger;
 
-
 // TODO make subclass of preprocessed data? seems almost identical 
 
 public final class CompressedBeamFormedData extends DataProvider {
+    private static final Logger logger = LoggerFactory.getLogger(CompressedBeamFormedData.class);
 
     protected float[][][] data; // [time][nrSubbands][nrChannels]
     protected boolean[][][] initialFlagged; // [time][nrSubbands][nrChannels]
@@ -31,10 +34,9 @@ public final class CompressedBeamFormedData extends DataProvider {
     private float min;
     private float scaleValue;
 
-    public CompressedBeamFormedData(final String fileName, final int integrationFactor, final int maxSequenceNr,
-            final int maxSubbands) {
+    public CompressedBeamFormedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands) {
         // for now, we only have stokes I
-        super(fileName, maxSequenceNr, maxSubbands, new String[] {"I"}, new String[] { "none", "Intermediate" });
+        super(fileName, maxSequenceNr, maxSubbands, new String[] { "I" }, new String[] { "none", "Intermediate" });
         this.integrationFactor = integrationFactor;
     }
 
@@ -47,9 +49,8 @@ public final class CompressedBeamFormedData extends DataProvider {
         nrChannels = din.readInt();
         nrSamplesPerSecond = din.readInt() * integrationFactor;
 
-        System.err.println("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes
-                + ", nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels + ", nrSamplesPerSecond = "
-                + nrSamplesPerSecond);
+        logger.info("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrChannels = "
+                + nrChannels + ", nrSamplesPerSecond = " + nrSamplesPerSecond);
 
         if (maxSequenceNr < nrTimes) {
             nrTimes = maxSequenceNr;
@@ -75,7 +76,7 @@ public final class CompressedBeamFormedData extends DataProvider {
             fb.rewind();
             final int res = channel.read(bb); // TODO can return less bytes!
             if (res != bb.capacity()) {
-                System.err.println("read less bytes! Expected " + bb.capacity() + ", got " + res);
+                logger.warn("read less bytes! Expected " + bb.capacity() + ", got " + res);
             }
             if (res < 0) {
                 break;
@@ -100,7 +101,7 @@ public final class CompressedBeamFormedData extends DataProvider {
         final double iotime = (end - start) / 1000.0;
         final double mbs = (integrationFactor * nrTimes * nrSubbands * nrChannels * 4.0) / (1024.0 * 1024.0);
         final double speed = mbs / iotime;
-        System.err.println("read " + mbs + "MB in " + iotime + " s, speed = " + speed + " MB/s.");
+        logger.info("read " + mbs + "MB in " + iotime + " s, speed = " + speed + " MB/s.");
 
         fin.close();
         din.close();

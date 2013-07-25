@@ -1,13 +1,16 @@
 package nl.esciencecenter.eAstroViz.flaggers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class PostCorrelationHistorySmoothedSumThresholdFlagger extends PostCorrelationSumThresholdFlagger {
+    private static final Logger logger = LoggerFactory.getLogger(PostCorrelationSumThresholdFlagger.class);
 
     int second;
     final PostCorrelationFlaggerHistory history;
     final float historyFlaggingThreshold = 7.0f;
 
-    public PostCorrelationHistorySmoothedSumThresholdFlagger(final int nrChannels, final float sensitivity,
-            final float SIREtaValue) {
+    public PostCorrelationHistorySmoothedSumThresholdFlagger(final int nrChannels, final float sensitivity, final float SIREtaValue) {
         super(nrChannels, sensitivity, SIREtaValue);
         history = new PostCorrelationFlaggerHistory(nrChannels);
     }
@@ -19,7 +22,7 @@ public class PostCorrelationHistorySmoothedSumThresholdFlagger extends PostCorre
         final float originalSensitivity = getBaseSensitivity();
         calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
 
-        //System.err.println("mean = " + mean + ", median = " + median + ", stdDev = " + stdDev);
+        logger.trace("mean = " + mean + ", median = " + median + ", stdDev = " + stdDev);
 
         // first do an insensitive sumthreshold
         setBaseSensitivity(originalSensitivity * 1.0f); // higher number is less sensitive!
@@ -52,7 +55,8 @@ public class PostCorrelationHistorySmoothedSumThresholdFlagger extends PostCorre
             final float stdDevOfMedians = history.getStdDevOfMedians(pol);
             final boolean flagSecond = median > (meanMedian + historyFlaggingThreshold * stdDevOfMedians);
 
-            // System.err.println("median = " + median + ", meanMedian = " + meanMedian + ", factor = " + (median / meanMedian) + ", stddev = " + stdDevOfMedians + (flagSecond ? " FLAGGED" : ""));
+            logger.trace("median = " + median + ", meanMedian = " + meanMedian + ", factor = " + (median / meanMedian) + ", stddev = " + stdDevOfMedians
+                    + (flagSecond ? " FLAGGED" : ""));
             if (flagSecond) {
                 for (int i = 0; i < nrChannels; i++) {
                     flagged[i] = true;

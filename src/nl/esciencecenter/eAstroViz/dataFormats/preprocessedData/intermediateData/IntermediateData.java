@@ -4,10 +4,9 @@ import java.io.IOException;
 
 import nl.esciencecenter.eAstroViz.dataFormats.preprocessedData.PreprocessedData;
 
-
 public final class IntermediateData extends PreprocessedData {
     public IntermediateData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands, final int station) {
-        super(fileName, integrationFactor, maxSequenceNr, maxSubbands, new String[] {"X", "Y"}, station);
+        super(fileName, integrationFactor, maxSequenceNr, maxSubbands, new String[] { "X", "Y" }, station);
     }
 
     @Override

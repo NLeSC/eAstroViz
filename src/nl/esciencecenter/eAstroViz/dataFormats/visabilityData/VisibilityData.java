@@ -2,6 +2,9 @@ package nl.esciencecenter.eAstroViz.dataFormats.visabilityData;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.eAstroViz.Viz;
 import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
 import nl.esciencecenter.eAstroViz.flaggers.PostCorrelationFlagger;
@@ -11,13 +14,14 @@ import nl.esciencecenter.eAstroViz.flaggers.PostCorrelationSmoothedSumThresholdF
 import nl.esciencecenter.eAstroViz.flaggers.PostCorrelationSumThresholdFlagger;
 import nl.esciencecenter.eAstroViz.flaggers.PostCorrelationThresholdFlagger;
 
-
 /**
  * Represents all time samples and frequencies of a given baseline.
  */
 public final class VisibilityData extends DataProvider {
     static final boolean PRINT_STATS = false;
     static final boolean REMOVE_CHANNEL_0_FROM_VIEW = true;
+
+    private static final Logger logger = LoggerFactory.getLogger(VisibilityData.class);
 
     final private MSReader r;
 
@@ -35,10 +39,9 @@ public final class VisibilityData extends DataProvider {
     private final int nrCrossPolarizations;
     private final int nrSeconds;
 
-    public VisibilityData(final String fileName, final int station1, final int station2, final int maxSequenceNr,
-            final int maxSubbands) throws IOException {
-        super(fileName, maxSequenceNr, maxSubbands, new String[] {"XX", "XY", "YX", "YY"}, new String[] { "none", "Threshold", "SumThreshold", "SmoothedSumThreshold",
-                "HistorySumThreshold", "HistorySmoothedSumThreshold" });
+    public VisibilityData(final String fileName, final int station1, final int station2, final int maxSequenceNr, final int maxSubbands) throws IOException {
+        super(fileName, maxSequenceNr, maxSubbands, new String[] { "XX", "XY", "YX", "YY" }, new String[] { "none", "Threshold", "SumThreshold",
+                "SmoothedSumThreshold", "HistorySumThreshold", "HistorySmoothedSumThreshold" });
         this.station1 = station1;
         this.station2 = station2;
         this.baseline = Viz.baseline(station1, station2);
@@ -61,8 +64,7 @@ public final class VisibilityData extends DataProvider {
         flagged = new boolean[nrSeconds][nrSubbands][nrChannels];
 
         if (baseline >= nrBaselines) {
-            System.err.println("illegal baseline");
-            System.exit(1);
+            throw new IOException("illegal baseline");
         }
     }
 
@@ -101,10 +103,8 @@ public final class VisibilityData extends DataProvider {
             e.printStackTrace();
         }
 
-        // System.err.println("Reading data for stations (" + station1 + ", " +
-        // station2 + "), baseline " + baseline + ", subband " + subband +
-        // "...");
-        // long start = System.currentTimeMillis();
+        logger.debug("Reading data for stations (" + station1 + ", " + station2 + "), baseline " + baseline + ", subband " + subband + "...");
+        long start = System.currentTimeMillis();
 
         long sequenceNr = 0;
         int timeIndex = 0;
@@ -117,10 +117,8 @@ public final class VisibilityData extends DataProvider {
         } catch (final IOException e) {
             e.printStackTrace();
         }
-        // long end = System.currentTimeMillis();
-        // System.err.println("Read " + getNrSeconds() +
-        // " time samples of data. Read took " + ((end - start) / 1000.0) +
-        // " seconds.");
+        long end = System.currentTimeMillis();
+        logger.debug("Read " + getNrSeconds() + " time samples of data. Read took " + ((end - start) / 1000.0) + " seconds.");
     }
 
     private long readSecond(final int subband, final int timeIndex) {
@@ -141,16 +139,13 @@ public final class VisibilityData extends DataProvider {
 
         // for now, we assume there are no seconds missing...
         if (sequenceNr != timeIndex) {
-            System.err.println("WARNING, DATA WAS DROPPED, seq no = " + sequenceNr + " expected = " + timeIndex);
+            logger.warn("WARNING, DATA WAS DROPPED, seq no = " + sequenceNr + " expected = " + timeIndex);
         }
 
         for (int channel = 1; channel < nrChannels; channel++) {
             if (nrValidSamplesIn[channel] != integrationTime) {
-                // System.err.println("WARNING, DATA WAS FLAGGED, sequenceNr = "
-                // + sequenceNr + ", baseline = " + baseline + ", channel = " +
-                // channel
-                // + ", samples is only " + nrValidSamplesIn[channel][minortime]
-                // + ", expected " + integrationTime);
+                logger.warn("WARNING, DATA WAS FLAGGED, sequenceNr = " + sequenceNr + ", baseline = " + baseline + ", channel = " + channel
+                        + ", samples is only " + nrValidSamplesIn[channel] + ", expected " + integrationTime);
             }
         }
 
@@ -163,9 +158,6 @@ public final class VisibilityData extends DataProvider {
             }
             nrValidSamples[timeIndex][subband][channel] = nrValidSamplesIn[channel];
         }
-
-        //        System.err.println("time = " + timeIndex + ", subband = " + subband);
-
     }
 
     @Override
@@ -196,14 +188,12 @@ public final class VisibilityData extends DataProvider {
             } else if (flaggerType.equals(flaggerList[4])) {
                 flaggers[i] = new PostCorrelationHistorySumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
             } else if (flaggerType.equals(flaggerList[5])) {
-                flaggers[i] =
-                        new PostCorrelationHistorySmoothedSumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
+                flaggers[i] = new PostCorrelationHistorySmoothedSumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
             } else {
-                System.err.println("illegal flagger selected: " + flaggerType);
-                System.exit(1);
+                throw new RuntimeException("illegal flagger selected: " + flaggerType);
             }
         }
-        //        System.err.println("Selected " + getFlaggerName(flaggers[0]));
+        logger.info("Selected " + flaggerType.getClass().getName());
 
         for (int time = 0; time < nrSeconds; time++) {
             for (int subband = 0; subband < nrSubbands; subband++) {
@@ -212,8 +202,7 @@ public final class VisibilityData extends DataProvider {
         }
 
         final long end = System.currentTimeMillis();
-        System.err.println("Flagging with " + flaggerType + ", sensitivity " + flaggerSensitivity + " took " + (end - start)
-                + " ms.");
+        logger.info("Flagging with " + flaggerType + ", sensitivity " + flaggerSensitivity + " took " + (end - start) + " ms.");
     }
 
     public int getNrSeconds() {

@@ -10,7 +10,6 @@ import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
 import nl.esciencecenter.eAstroViz.dataFormats.beamFormedData.BeamFormedData;
 import nl.esciencecenter.eAstroViz.dataFormats.preprocessedData.CompressedBeamFormedData.CompressedBeamFormedData;
 
-
 @SuppressWarnings("serial")
 public final class BeamFormedFrame extends GUIFrame {
     private float[] folded;
@@ -37,7 +36,7 @@ public final class BeamFormedFrame extends GUIFrame {
 
         return new JPanel();
 
-//        return new BeamFormedInnerPanel(viz, data, this);
+        //        return new BeamFormedInnerPanel(viz, data, this);
     }
 
     protected void dedisperse(boolean enabled) {
@@ -79,12 +78,12 @@ public final class BeamFormedFrame extends GUIFrame {
                 e.printStackTrace();
             }
         } else {
-            System.err.println("illegal data type");
+            throw new RuntimeException("illegal data type");
         }
         samplePanel.setData(data);
         repaint();
     }
-    
+
     public float[] getFoldedData() {
         return folded;
     }

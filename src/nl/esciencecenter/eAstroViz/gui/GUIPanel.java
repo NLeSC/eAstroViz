@@ -16,6 +16,8 @@ import javax.swing.JPanel;
 import nl.esciencecenter.eAstroViz.Viz;
 import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     public static final int LOW_SCALE = 90;
@@ -23,7 +25,9 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     public static final int HIGH_SCALE = 100;
 
     private static final long serialVersionUID = 1L;
-    
+
+    private static final Logger logger = LoggerFactory.getLogger(GUIPanel.class);
+
     protected Viz viz;
     protected GUIFrame parentFrame;
     protected BufferedImage image;
@@ -31,7 +35,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     protected float scale = START_SCALE;
     protected float percentileValLow;
     protected float percentileValHigh;
-    
+
     private float[] rawData;
     private float[][] scaledData;
 
@@ -42,7 +46,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
      * The current polarization or stoke.
      */
     protected int currentPol = 0;
-    
+
     int COLOR_WHITE = colorToRGB(1.0f, 1.0f, 1.0f);
     ColorMapInterpreter colorMaps;
     ColorMap colorMap;
@@ -139,7 +143,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
 
     // generate a new image, assuming the underlying data itself has not changed. If it has, call setData.
     protected void generateImage() {
-        System.err.print("generate image...");
+        logger.info("generate image...");
 
         long start = System.currentTimeMillis();
 
@@ -157,7 +161,8 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         } else {
             percentileValHigh = rawData[rawData.length - 1];
         }
-        //        System.err.println("index of " + scale + "th percentile low = " + lowIndex + ", high = " + highIndex + ", low val = " + percentileValLow + ", high val = "+ percentileValHigh);
+        logger.trace("index of " + scale + "th percentile low = " + lowIndex + ", high = " + highIndex + ", low val = " + percentileValLow + ", high val = "
+                + percentileValHigh);
 
         final float scaleFactor = percentileValHigh - percentileValLow;
 
@@ -189,7 +194,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
 
         long end = System.currentTimeMillis();
 
-        System.err.println("DONE in " + (end - start) + " ms.");
+        logger.info("DONE in " + (end - start) + " ms.");
     }
 
     @Override
@@ -198,8 +203,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         if (zoomX == 1 && zoomY == 1) {
             g.drawImage(image, 0, 0, null);
         } else {
-            g.drawImage(image.getScaledInstance(data.getSizeX() * zoomX, data.getSizeY() * zoomY, Image.SCALE_DEFAULT), 0, 0,
-                    null);
+            g.drawImage(image.getScaledInstance(data.getSizeX() * zoomX, data.getSizeY() * zoomY, Image.SCALE_DEFAULT), 0, 0, null);
         }
     }
 
@@ -272,8 +276,8 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         data.setFlaggerSensitivity(sensitivity);
         final long end = System.currentTimeMillis();
 
-        parentFrame.setStatusBarText("Flagging with " + data.getFlagger() + ", sensitivity " + data.getFlaggerSensitivity()
-                + ", took " + (end - start) + " ms.");
+        parentFrame.setStatusBarText("Flagging with " + data.getFlagger() + ", sensitivity " + data.getFlaggerSensitivity() + ", took " + (end - start)
+                + " ms.");
 
         generateImage();
     }
@@ -293,8 +297,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         final long end = System.currentTimeMillis();
 
         if (!flagger.equals("none")) {
-            parentFrame.setStatusBarText("Flagging with " + flagger + ", sensitivity " + data.getFlaggerSensitivity() + ", took "
-                    + (end - start) + " ms.");
+            parentFrame.setStatusBarText("Flagging with " + flagger + ", sensitivity " + data.getFlaggerSensitivity() + ", took " + (end - start) + " ms.");
         }
 
         generateImage();
@@ -323,10 +326,10 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     }
 
     public void setCurrentPol(int pol) {
-        if(this.currentPol == pol) {
+        if (this.currentPol == pol) {
             return;
         }
-        
+
         this.currentPol = pol;
         setData(data);
     }

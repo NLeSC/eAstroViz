@@ -13,16 +13,21 @@ import nl.esciencecenter.eAstroViz.dataFormats.MinMaxVals;
 import nl.esciencecenter.eAstroViz.flaggers.Flagger;
 import nl.esciencecenter.eAstroViz.flaggers.IntermediateFlagger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * A data container for pre-processed data. Note that this class holds the data for a time series, for all frequencies and polarizations, but for one station only.
- * Otherwise, the data would be too large.
+ * A data container for pre-processed data. Note that this class holds the data for a time series, for all frequencies and
+ * polarizations, but for one station only. Otherwise, the data would be too large.
+ * 
  * @author rob
  */
 public abstract class PreprocessedData extends DataProvider {
 
     private static final boolean SHOW_SMOOTH = false;
     private static final boolean SHOW_SMOOTH_DIFF = false;
+
+    private static final Logger logger = LoggerFactory.getLogger(PreprocessedData.class);
 
     protected float[][][][] data; // [time][nrSubbands][nrPolarizations][nrChannels]
     protected boolean[][][] initialFlagged; // [time][nrSubbands][nrChannels]
@@ -39,7 +44,8 @@ public abstract class PreprocessedData extends DataProvider {
     private float scaleValue;
     private final int station;
 
-    public PreprocessedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands, final String[] polList, final int station) {
+    public PreprocessedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands, final String[] polList,
+            final int station) {
         super(fileName, maxSequenceNr, maxSubbands, polList, new String[] { "none", "Intermediate" });
         this.integrationFactor = integrationFactor;
         this.station = station;
@@ -61,8 +67,8 @@ public abstract class PreprocessedData extends DataProvider {
             nrSubbands = maxSubbands;
         }
 
-        System.err.println("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes
-                + ", nrSubbands = " + nrSubbandsInFile + ", nrChannels = " + nrChannels);
+        logger.info("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes + ", nrSubbands = " + nrSubbandsInFile
+                + ", nrChannels = " + nrChannels);
 
         if (maxSequenceNr < nrTimes) {
             nrTimes = maxSequenceNr;
@@ -75,14 +81,14 @@ public abstract class PreprocessedData extends DataProvider {
         int stationBlockSize = integrationFactor * nrSubbandsInFile * nrChannels * nrPolarizations * 4;
 
         fin.skip(stationBlockSize * station);
-        
+
         final ByteBuffer bb = ByteBuffer.allocateDirect(stationBlockSize);
         bb.order(ByteOrder.BIG_ENDIAN);
         final FloatBuffer fb = bb.asFloatBuffer();
         final FileChannel channel = fin.getChannel();
 
         final long start = System.currentTimeMillis();
-        
+
         for (int second = 0; second < nrTimes; second++) {
             if (second > maxSequenceNr) {
                 break;
@@ -95,7 +101,7 @@ public abstract class PreprocessedData extends DataProvider {
                 break;
             }
             if (res != bb.capacity()) {
-                System.err.println("read less bytes! Expected " + bb.capacity() + ", got " + res + "; continuing...");
+                logger.warn("read less bytes! Expected " + bb.capacity() + ", got " + res + "; continuing...");
             }
 
             for (int time = 0; time < integrationFactor; time++) {
@@ -121,11 +127,10 @@ public abstract class PreprocessedData extends DataProvider {
         final double iotime = (end - start) / 1000.0;
         final double mbs = (integrationFactor * nrTimes * nrSubbandsInFile * nrChannels * 4.0) / (1024.0 * 1024.0);
         final double speed = mbs / iotime;
-        System.err.println("read " + mbs + "MB in " + iotime + " s, speed = " + speed + " MB/s.");
+        logger.info("read " + mbs + "MB in " + iotime + " s, speed = " + speed + " MB/s.");
 
         fin.close();
         din.close();
-
 
         if (SHOW_SMOOTH || SHOW_SMOOTH_DIFF) {
             calcSmoothedIntermediate();
@@ -133,7 +138,6 @@ public abstract class PreprocessedData extends DataProvider {
 
         calcMinMax();
     }
-
 
     private void calcSmoothedIntermediate() {
         for (int time = 0; time < nrTimes; time++) {
@@ -155,10 +159,9 @@ public abstract class PreprocessedData extends DataProvider {
             }
         }
     }
-    
+
     /**
-     * calc min and max for scaling
-       set flagged samples to 0.
+     * calc min and max for scaling set flagged samples to 0.
      */
     private void calcMinMax() {
         long initialFlaggedCount = 0;
@@ -181,9 +184,9 @@ public abstract class PreprocessedData extends DataProvider {
         min = minMaxVals.getMin();
         scaleValue = minMaxVals.getMax() - min;
 
-        System.err.println("sampled already flagged in data set: " + initialFlaggedCount);
+        logger.info("sampled already flagged in data set: " + initialFlaggedCount);
     }
-    
+
     @Override
     public void flag() {
         for (int time = 0; time < nrTimes; time++) {

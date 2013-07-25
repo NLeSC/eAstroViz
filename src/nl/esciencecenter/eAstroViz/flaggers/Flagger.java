@@ -2,9 +2,14 @@ package nl.esciencecenter.eAstroViz.flaggers;
 
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class Flagger {
     private static final int MAX_ITERS = 5;
     private static final float FIRST_THRESHOLD = 6.0f; // from Andre's code: 6.0f
+
+    private static final Logger logger = LoggerFactory.getLogger(Flagger.class);
 
     protected float mean;
     protected float stdDev;
@@ -97,7 +102,11 @@ public abstract class Flagger {
             }
         }
         stdDev = (float) Math.sqrt(1.54 * stdDev / unflaggedCount);
-        //        System.err.println("winsorized stats: size = " + samples.length + ", unFlaggedCount = " + unflaggedCount + ", mean = " + mean + ", median = " + median + ", stddev = " + stdDev);
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("winsorized stats: size = " + samples.length + ", unFlaggedCount = " + unflaggedCount + ", mean = " + mean + ", median = " + median
+                    + ", stddev = " + stdDev);
+        }
     }
 
     protected final void sumThreshold1D(final float[] samples, final boolean[] flags) {
@@ -119,7 +128,7 @@ public abstract class Flagger {
     }
 
     private final void sumThreshold(final float[] samples, final boolean[] flags, final int window, final float threshold) {
-        //         System.err.println("sumthreshold window = " + window + ", threshold = " + threshold);
+        logger.trace("sumthreshold window = " + window + ", threshold = " + threshold);
 
         for (int base = 1; base + window < samples.length; base++) {
             float sum = 0.0f;
@@ -181,14 +190,10 @@ public abstract class Flagger {
         }
 
         final float[] kernel = new float[kernelSize];
-        //        System.err.print("kernel size = " + kernelSize + ", kernel = ");
         for (int i = 0; i < kernel.length; ++i) {
             final float x = i - kernel.length / 2.0f;
             kernel[i] = evaluateGaussian(x, sigma);
-
-            //        System.err.print(kernel[i] + " ");
         }
-        //        System.err.println();
         return oneDimensionalConvolution(data, kernel);
     }
 
@@ -228,7 +233,7 @@ public abstract class Flagger {
 
     protected static final void printNrFlagged(final boolean[] flags) {
         final int flagCount = getNrFlaggedSamples(flags);
-        System.err.println("Flagger: flagged samples for this second: " + flagCount);
+        logger.info("Flagger: flagged samples for this second: " + flagCount);
     }
 
     private final float calcThresholdI(final float threshold1, final int window, float p) {
@@ -342,8 +347,9 @@ public abstract class Flagger {
      * This is an experimental algorithm that might be slightly faster than the original algorithm by Andre Offringa. Jasper van
      * de Gronde is preparing an article about it.
      * 
-     * @param [in,out] flags The input array of flags to be dilated that will be overwritten by the dilatation of itself.
-     * @param [in] eta The η parameter that specifies the minimum number of good data that any subsequence should have.
+     * @param flags
+     *            The input array of flags to be dilated that will be overwritten by the dilatation of itself. SIREtaValue is the
+     *            η parameter that specifies the minimum number of good data that any subsequence should have.
      */
     public void SIROperator(boolean[] flags) {
         boolean[] temp = new boolean[flags.length];

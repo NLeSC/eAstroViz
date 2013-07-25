@@ -2,8 +2,15 @@ package nl.esciencecenter.eAstroViz.dataFormats.rawData;
 
 import java.util.ArrayList;
 
+import nl.esciencecenter.eAstroViz.dataFormats.beamFormedData.BeamFormedData;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class RawData {
     static final float PI = (float) Math.PI;
+
+    private static final Logger logger = LoggerFactory.getLogger(BeamFormedData.class);
 
     private final int nrSubbands;
 
@@ -47,7 +54,7 @@ public class RawData {
                 dataYI.add(subbandDataXR);
             }
         }
-        System.err.println("time samples: " + dataXR.size());
+        logger.info("time samples: " + dataXR.size());
     }
 
     public float getData(final int time, final int subband, final int polarization, final int realOrComplex) {

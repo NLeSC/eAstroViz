@@ -1,5 +1,8 @@
 package nl.esciencecenter.eAstroViz.flaggers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /*
 Wanneer je informatie hebt in frequentierichting zou je ook kunnen
 overwegen om (iteratief?) te "smoothen" in die richting: dus eerst een
@@ -16,6 +19,7 @@ thresholder en vast niet het eerste algoritme wat je wilt implementeren
 maar het is een idee. Het is niet zoo zwaar om dit te doen.
  */
 public class PostCorrelationSmoothedSumThresholdFlagger extends PostCorrelationSumThresholdFlagger {
+    private static final Logger logger = LoggerFactory.getLogger(PostCorrelationSumThresholdFlagger.class);
 
     public PostCorrelationSmoothedSumThresholdFlagger(final int nrChannels, final float baseSensitivity, final float SIREtaValue) {
         super(nrChannels, baseSensitivity, SIREtaValue);
@@ -28,14 +32,12 @@ public class PostCorrelationSmoothedSumThresholdFlagger extends PostCorrelationS
 
         calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
 
-        //System.err.println("mean = " + mean + ", median = " + median + ", stdDev = " + stdDev);
+        logger.trace("mean = " + mean + ", median = " + median + ", stdDev = " + stdDev);
 
         // first do an insensitive sumthreshold
         final float originalSensitivity = getBaseSensitivity();
         setBaseSensitivity(originalSensitivity * 1.0f); // higher number is less sensitive!
         sumThreshold1D(powers, flagged); // sets flags, and replaces flagged samples with threshold
-
-        //                int flagged1 = getNrFlags(flagged);
 
         // smooth
         final float[] smoothedPower = oneDimensionalGausConvolution(powers, 0.5f); // 2nd param is sigma, heigth of the gauss curve
@@ -46,29 +48,16 @@ public class PostCorrelationSmoothedSumThresholdFlagger extends PostCorrelationS
             diff[i] = powers[i] - smoothedPower[i];
         }
 
-        //                for (int i = 0; i < nrChannels; i++) {
-        //                    System.err.println("power i = " + power[i] + ", smoothed = " + smoothedPower[i] + ", diff = " + diff[i]);
-        //                }
-
         // flag based on difference
         calculateWinsorizedStatistics(diff, flagged); // sets mean, median, stdDev                
         setBaseSensitivity(originalSensitivity * 1.0f); // higher number is less sensitive!
         sumThreshold1D(diff, flagged);
-        //                int flagged2 = getNrFlags(flagged);
 
         // and one final pass on the flagged power
         calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
         setBaseSensitivity(originalSensitivity * 0.80f); // higher number is less sensitive!
         sumThreshold1D(powers, flagged);
-        //                int flagged3 = getNrFlags(flagged);
-        /*
-                        if (flagged1 != flagged2) {
-                            System.err.println("A flagged1 = " + flagged1 + ", flagged2 = " + flagged2 + ", flagged3 = " + flagged3);
-                        }
-                        if (flagged2 != flagged3) {
-                            System.err.println("B flagged1 = " + flagged1 + ", flagged2 = " + flagged2 + ", flagged3 = " + flagged3);
-                        }
-        */
+
         setBaseSensitivity(originalSensitivity);
     }
 }

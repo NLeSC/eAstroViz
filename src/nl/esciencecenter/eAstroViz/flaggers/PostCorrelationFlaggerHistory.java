@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import nl.esciencecenter.eAstroViz.Viz;
 
-
 public class PostCorrelationFlaggerHistory {
     static final int HISTORY_SIZE = 16;
     static final int HISTORY_STEP_SIZE = 1;

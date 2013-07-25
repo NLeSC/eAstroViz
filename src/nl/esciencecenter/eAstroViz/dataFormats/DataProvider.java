@@ -24,30 +24,36 @@ public abstract class DataProvider {
     public abstract int getSizeY();
 
     /**
-     * @param x X-position in the data
-     * @param y Y-position in the data
-     * @param polarization the polarization, or, in case of beam formed data, the stoke
+     * @param x
+     *            X-position in the data
+     * @param y
+     *            Y-position in the data
+     * @param polarization
+     *            the polarization, or, in case of beam formed data, the stoke
      * @return a value between 0 and 1
      */
     public abstract float getValue(int x, int y, int polarization);
 
     /**
-     * @param x X-position in the data
-     * @param y Y-position in the data
-     * @param polarization the polarization, or, in case of beam formed data, the stoke
+     * @param x
+     *            X-position in the data
+     * @param y
+     *            Y-position in the data
+     * @param polarization
+     *            the polarization, or, in case of beam formed data, the stoke
      * @return The original unscaled data value
      */
     public abstract float getRawValue(int x, int y, int polarization);
 
     /**
      * Flags are not kept per polarization, so we have one parameter less compared to the getValues for the data itself.
+     * 
      * @param x
      * @param y
      * @return
      */
     public abstract boolean isFlagged(int x, int y);
 
-    
     public abstract void flag();
 
     public void setFlagger(final String name) {

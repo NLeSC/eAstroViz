@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import nl.esciencecenter.eAstroViz.dataFormats.beamFormedData.BeamFormedData;
 
-
 public class ConvertBeamFormed {
     static final int MAX_TIME = 1000;
 
@@ -49,8 +48,7 @@ public class ConvertBeamFormed {
         dataOut.writeInt(nrChannels);
         dataOut.writeInt(nrSamplesPerSecond);
 
-        System.err.println("Writing output, nrTimes  = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrChannels = "
-                + nrChannels);
+        System.err.println("Writing output, nrTimes  = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels);
 
         for (int time = 0; time < nrTimes; time++) {
             for (int sb = 0; sb < nrSubbands; sb++) {

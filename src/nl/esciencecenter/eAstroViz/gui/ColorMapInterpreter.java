@@ -8,10 +8,14 @@ import java.util.HashMap;
 
 import nl.esciencecenter.eAstroViz.Viz;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ColorMapInterpreter {
 
     static final int COLOR_MAP_SIZE = 256;
+
+    private static final Logger logger = LoggerFactory.getLogger(ColorMapInterpreter.class);
 
     private HashMap<String, ColorMap> colorMapMaps;
 
@@ -33,8 +37,7 @@ public final class ColorMapInterpreter {
                 int key = 0;
                 while ((str = in.readLine()) != null) {
                     String[] numbers = str.split(" ");
-                    colorMap[key] =
-                            Integer.parseInt(numbers[0]) << 16 | Integer.parseInt(numbers[1]) << 8 | Integer.parseInt(numbers[2]);
+                    colorMap[key] = Integer.parseInt(numbers[0]) << 16 | Integer.parseInt(numbers[1]) << 8 | Integer.parseInt(numbers[2]);
                     key++;
                 }
                 in.close();
@@ -44,7 +47,7 @@ public final class ColorMapInterpreter {
                 colorMapMaps.put(fileName, m);
             }
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            logger.warn(e.getMessage());
         }
     }
 
@@ -61,7 +64,7 @@ public final class ColorMapInterpreter {
 
     public ColorMap getColorMap(String colorMapName) {
         if (!colorMapMaps.containsKey(colorMapName)) {
-            System.err.println("Unregistered color map requested: " + colorMapName);
+            logger.warn("Unregistered color map requested: " + colorMapName);
             colorMapMaps.get("default");
         }
         return colorMapMaps.get(colorMapName);

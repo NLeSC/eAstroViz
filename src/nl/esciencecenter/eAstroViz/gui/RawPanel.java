@@ -8,9 +8,12 @@ import javax.swing.JPanel;
 
 import nl.esciencecenter.eAstroViz.dataFormats.rawData.RawData;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
 public final class RawPanel extends JPanel {
+    private static final Logger logger = LoggerFactory.getLogger(RawPanel.class);
     RawFrame parent;
     private BufferedImage image;
     RawData rawData;
@@ -19,7 +22,7 @@ public final class RawPanel extends JPanel {
         this.parent = parent;
         this.rawData = rawData;
 
-        System.err.println("time = " + rawData.getNrTimesTime() + ", subbands = " + rawData.getNrSubbands());
+        logger.info("time = " + rawData.getNrTimesTime() + ", subbands = " + rawData.getNrSubbands());
 
         generateImage();
     }

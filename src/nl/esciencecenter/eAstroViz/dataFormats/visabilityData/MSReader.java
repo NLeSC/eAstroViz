@@ -9,14 +9,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import nl.esciencecenter.eAstroViz.Viz;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.eAstroViz.Viz;
 
 @SuppressWarnings("unused")
 public final class MSReader {
     private static boolean NEW_FORMAT = true;
-
     private static boolean VERBOSE = true;
+
+    private static final Logger logger = LoggerFactory.getLogger(MSReader.class);
 
     private final String filename;
     private final int nrSubbands;
@@ -65,14 +68,14 @@ public final class MSReader {
 
         final String dirName = filename + File.separator + "SB" + subbandString + ".MS";
 
-        System.err.println("reading subband dir: " + dirName);
+        logger.info("reading subband dir: " + dirName);
 
         readMeta(dirName);
 
         final File f = new File(dirName + File.separator + "table.f0data");
 
         if (VERBOSE) {
-            System.err.println("reading file: " + f.getCanonicalPath());
+            logger.info("reading file: " + f.getCanonicalPath());
         }
         final FileInputStream fin = new FileInputStream(f);
         final BufferedInputStream bin = new BufferedInputStream(fin, 512);
@@ -94,20 +97,16 @@ public final class MSReader {
         try {
             if (NEW_FORMAT) {
                 final long magic = readuint32(in, false);
-                // System.err.printf("MAGIC: %x\n", magic);
                 if (magic != 0x0000DA7A) {
-                    System.err.println("data corrupted!");
+                    logger.info("data corrupted!");
                     sequenceNr = -1;
-                    System.exit(1);
-                    return;
+                    throw new RuntimeException("data corrupted!");
                 }
 
                 sequenceNr = readuint32(in, false);
-                // System.err.println("sequenceNr = " + sequenceNr);
                 skip(in, metaData.getAlignment() - 8);
             } else {
                 sequenceNr = readuint32(in, true);
-                // System.err.println("sequenceNr = " + sequenceNr);
                 skip(in, metaData.getAlignment() - 4);
             }
 
@@ -120,17 +119,9 @@ public final class MSReader {
                 for (int pol = 0; pol < metaData.getNrCrossPolarizations(); pol++) {
                     visData[requiredBaseline][channel][pol][Viz.REAL] = readFloat(in);
                     visData[requiredBaseline][channel][pol][Viz.IMAG] = readFloat(in);
-
-                    //                    System.err.println("val = (" + visData[requiredBaseline][channel][pol][Viz.REAL] + ", " + visData[requiredBaseline][channel][pol][Viz.IMAG] + ")");
                 }
             }
-            skip(in,
-                    (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels()
-                            * metaData.getNrCrossPolarizations() * 2 * 4);
-
-            // System.err.println("read " + (metaData.getNrBaselines() *
-            // metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2
-            // * 4) + " bytes of samples");
+            skip(in, (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4);
 
             skip(in, requiredBaseline * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples());
             for (int channel = 0; channel < metaData.getNrChannels(); channel++) {
@@ -139,26 +130,15 @@ public final class MSReader {
                 if (metaData.getNrBytesPerValidSamples() == 2) {
                     nr = readuint16(in);
                 } else {
-                    System.err.println("unsupported nr bytes per nrValidsamples: " + metaData.getNrBytesPerValidSamples());
-                    System.exit(1);
+                    throw new RuntimeException("unsupported nr bytes per nrValidsamples: " + metaData.getNrBytesPerValidSamples());
                 }
                 nrValidSamples[requiredBaseline][channel] = nr;
-                // System.out.println("valid[" + requiredBaseline + "][" +
-                // channel + "] = " +
-                // nrValidSamples[requiredBaseline][channel]);
             }
-            skip(in,
-                    (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels()
-                            * metaData.getNrBytesPerValidSamples());
-
-            // System.err.println("read " + (metaData.getNrBaselines() *
-            // metaData.getNrChannels() * metaData.getNrBytesPerValidSamples())
-            // + " bytes of flags");
+            skip(in, (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples());
 
             final int toRead =
                     metaData.getAlignment()
-                            - ((metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples()) % metaData
-                                    .getAlignment());
+                            - ((metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples()) % metaData.getAlignment());
             skip(in, toRead);
 
         } catch (final IOException e) {
@@ -170,7 +150,7 @@ public final class MSReader {
     private void readMeta(final String dirName) throws IOException {
         final File m = new File(dirName + File.separator + "table.f0meta");
         if (VERBOSE) {
-            System.err.println("reading META file: " + m.getCanonicalPath());
+            logger.info("reading META file: " + m.getCanonicalPath());
         }
 
         final FileInputStream fin = new FileInputStream(m);
@@ -189,7 +169,7 @@ public final class MSReader {
 
         final int version = (int) readuint32(din, true);
         if (VERBOSE) {
-            System.err.println("Lofar storage manager version: " + version);
+            logger.info("Lofar storage manager version: " + version);
         }
         // Now, two blocks, indicating the antenna orders.
         skip(din, 4);
@@ -201,44 +181,44 @@ public final class MSReader {
         skip(din, 8);
         final double IONIntegrationTime = din.readDouble();
         if (VERBOSE) {
-            System.err.println("ION integration time = " + IONIntegrationTime);
+            logger.info("ION integration time = " + IONIntegrationTime);
         }
 
         final int nrChannels = (int) readuint32(din, true);
         if (VERBOSE) {
-            System.err.println("channels per subband: " + nrChannels);
+            logger.info("channels per subband: " + nrChannels);
         }
 
         final int nrCrossPolarizations = (int) readuint32(din, true);
         if (VERBOSE) {
-            System.err.println("nr cross polarizations : " + nrCrossPolarizations);
+            logger.info("nr cross polarizations : " + nrCrossPolarizations);
         }
 
         final int integrationTimeProd = (int) din.readDouble();
         if (VERBOSE) {
-            System.err.println("CN * ION integration time = " + integrationTimeProd);
+            logger.info("CN * ION integration time = " + integrationTimeProd);
         }
 
         final int alignment = (int) readuint32(din, true);
         if (VERBOSE) {
-            System.err.println("alignment : " + alignment);
+            logger.info("alignment : " + alignment);
         }
 
         final boolean isBigEndian = din.readByte() == 0 ? true : false;
         if (VERBOSE) {
-            System.err.println("big endian = " + isBigEndian);
+            logger.info("big endian = " + isBigEndian);
         }
 
         final int nrBytesPerValidSamples = (int) readuint32(din, true);
         if (VERBOSE) {
-            System.err.println("nrBytesPerValidSamples : " + nrBytesPerValidSamples);
+            logger.info("nrBytesPerValidSamples : " + nrBytesPerValidSamples);
         }
 
         din.close();
 
         metaData =
-                new MSMetaData(version, stations1, stations2, IONIntegrationTime, nrChannels, nrCrossPolarizations,
-                        integrationTimeProd, alignment, isBigEndian, nrBytesPerValidSamples);
+                new MSMetaData(version, stations1, stations2, IONIntegrationTime, nrChannels, nrCrossPolarizations, integrationTimeProd, alignment,
+                        isBigEndian, nrBytesPerValidSamples);
 
         visData = new float[metaData.getNrBaselines()][nrChannels][nrCrossPolarizations][2];
         nrValidSamples = new int[metaData.getNrBaselines()][nrChannels];
@@ -250,8 +230,7 @@ public final class MSReader {
         maxSecondsOfData = (long) Math.ceil(maxFileSize / sizePerSecond);
 
         if (VERBOSE) {
-            System.err
-                    .println("maximum file size = " + maxFileSize + ", maximum number of seconds of data = " + maxSecondsOfData);
+            logger.info("maximum file size = " + maxFileSize + ", maximum number of seconds of data = " + maxSecondsOfData);
         }
     }
 

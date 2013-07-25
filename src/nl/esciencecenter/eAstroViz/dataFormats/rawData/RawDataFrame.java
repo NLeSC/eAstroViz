@@ -32,8 +32,6 @@ public class RawDataFrame {
                         // convert 16 bit unsigned to float between -1 and 1
                         data[subband][time][pol][0] = din.readUnsignedShort() / MAX_VAL - 1;
                         data[subband][time][pol][1] = din.readUnsignedShort() / MAX_VAL - 1;
-
-                        //                        System.out.println("data val = " + data[subband][time][pol][0] + ", " + data[subband][time][pol][1]);
                     } catch (final IOException e) {
                         return false;
                     }

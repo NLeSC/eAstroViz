@@ -4,8 +4,13 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 class RawDataFrameHeader {
     public static final int FRAME_HEADER_SIZE = 16; // bytes
+
+    private static final Logger logger = LoggerFactory.getLogger(RawDataFrameHeader.class);
 
     int versionId;
     int sourceInfo;
@@ -46,13 +51,13 @@ class RawDataFrameHeader {
     }
 
     void print() {
-        System.out.println("versionId = " + versionId);
-        System.out.println("sourceInfo = " + sourceInfo);
-        System.out.println("configurationId = " + configurationId);
-        System.out.println("stationId = " + stationId);
-        System.out.println("nofBeamlets = " + nofBeamlets);
-        System.out.println("nofBlocks = " + nofBlocks);
-        System.out.println("timestamp = " + timestamp);
-        System.out.println("blockSequenceNumber = " + blockSequenceNumber);
+        logger.debug("versionId = " + versionId);
+        logger.debug("sourceInfo = " + sourceInfo);
+        logger.debug("configurationId = " + configurationId);
+        logger.debug("stationId = " + stationId);
+        logger.debug("nofBeamlets = " + nofBeamlets);
+        logger.debug("nofBlocks = " + nofBlocks);
+        logger.debug("timestamp = " + timestamp);
+        logger.debug("blockSequenceNumber = " + blockSequenceNumber);
     }
 }

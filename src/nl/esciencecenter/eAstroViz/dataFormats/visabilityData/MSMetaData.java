@@ -1,6 +1,11 @@
 package nl.esciencecenter.eAstroViz.dataFormats.visabilityData;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class MSMetaData {
+    private static final Logger logger = LoggerFactory.getLogger(MSMetaData.class);
+
     private final int lofarStoreageManagerVersion;
     private final int[] stations1;
     private final int[] stations2;
@@ -26,9 +31,9 @@ public class MSMetaData {
         return (value + alignment - 1) / alignment * alignment;
     }
 
-    public MSMetaData(final int lofarStoreageManagerVersion, final int[][] stations1, final int[][] stations2,
-            final double iONIntegrationTime, final int nrChannelsPerSubband, final int nrCrossPolarizations,
-            final int integrationTimeProd, final int alignment, final boolean isBigEndian, final int nrBytesPerValidSamples) {
+    public MSMetaData(final int lofarStoreageManagerVersion, final int[][] stations1, final int[][] stations2, final double iONIntegrationTime,
+            final int nrChannelsPerSubband, final int nrCrossPolarizations, final int integrationTimeProd, final int alignment, final boolean isBigEndian,
+            final int nrBytesPerValidSamples) {
         this.lofarStoreageManagerVersion = lofarStoreageManagerVersion;
         this.nrBaselines = stations1.length;
 
@@ -48,7 +53,7 @@ public class MSMetaData {
         for (int i = 0; i < nrBaselines; i++) {
             this.stations1[i] = stations1[i][0];
             this.stations2[i] = stations2[i][0];
-            //         System.err.println("baseline " + i + " is stations " + this.stations1[i] + " and " + this.stations2[i]);
+            logger.trace("baseline " + i + " is stations " + this.stations1[i] + " and " + this.stations2[i]);
         }
 
         this.IONIntegrationTime = iONIntegrationTime;
@@ -66,13 +71,13 @@ public class MSMetaData {
         alignedVisibilitiesSize = align(visibilitiesSize, alignment);
         nrValidSamplesSize = nrBaselines * nrChannels * 2;
         alignedNrValidSamplesSize = align(nrValidSamplesSize, alignment);
-        /*
-                System.err.println("nrStations: " + nrStations + ", nrBaseLines: " + nrBaselines + ", nrChannels: " + nrChannels + ", nrVisibilities = " + nrVisibilities);
-                System.err.println("vis size of 1 subband = " + visibilitiesSize + " bytes");
-                System.err.println("aligned vis size = " + alignedVisibilitiesSize + " bytes");
-                System.err.println("nrValidSamples buf size of 1 subband = " + nrValidSamplesSize + " bytes");
-                System.err.println("aligned nrValidSamples buf size of 1 subband = " + alignedNrValidSamplesSize + " bytes");
-        */
+
+        logger.info("nrStations: " + nrStations + ", nrBaseLines: " + nrBaselines + ", nrChannels: " + nrChannels + ", nrVisibilities = " + nrVisibilities);
+        logger.info("vis size of 1 subband = " + visibilitiesSize + " bytes");
+        logger.info("aligned vis size = " + alignedVisibilitiesSize + " bytes");
+        logger.info("nrValidSamples buf size of 1 subband = " + nrValidSamplesSize + " bytes");
+        logger.info("aligned nrValidSamples buf size of 1 subband = " + alignedNrValidSamplesSize + " bytes");
+
     }
 
     public int getLofarStoreageManagerVersion() {

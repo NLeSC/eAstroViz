@@ -18,7 +18,6 @@ public class PostCorrelationThresholdFlagger extends PostCorrelationFlagger {
 
         // if one of the polarizations exceeds the threshold, flag them all.
         for (int channel = 0; channel < nrChannels; channel++) {
-            //                    System.err.println("median = " + median + ", stddev = " + stdDev + ", threshold = " + threshold + ", sample = " + power[channel]);
             if (powers[channel] >= threshold) {
                 flagged[channel] = true;
             }

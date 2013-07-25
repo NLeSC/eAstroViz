@@ -1,6 +1,10 @@
 package nl.esciencecenter.eAstroViz.flaggers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class PostCorrelationHistorySumThresholdFlagger extends PostCorrelationSumThresholdFlagger {
+    private static final Logger logger = LoggerFactory.getLogger(PostCorrelationSumThresholdFlagger.class);
     int second;
     final PostCorrelationFlaggerHistory history;
     final float historyFlaggingThreshold = 7.0f;
@@ -17,7 +21,7 @@ public class PostCorrelationHistorySumThresholdFlagger extends PostCorrelationSu
 
         calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
 
-        //System.err.println("mean = " + mean + ", median = " + median + ", stdDev = " + stdDev);
+        logger.trace("mean = " + mean + ", median = " + median + ", stdDev = " + stdDev);
 
         sumThreshold1D(powers, flagged); // sets flags, and replaces flagged samples with threshold
 
@@ -25,9 +29,6 @@ public class PostCorrelationHistorySumThresholdFlagger extends PostCorrelationSu
 
         if (history.getSize(pol) >= PostCorrelationFlaggerHistory.MIN_HISTORY_SIZE) {
             final float[] integratedPowers = history.getIntegratedPowers(pol);
-            //                for (int i = 0; i < integratedPowers.length; i++) {
-            //                    System.out.println("integrated [" + i + "] = " + integratedPowers[i]);
-            //                }
             integratedHistoryFlagger(integratedPowers, flagged);
             // we screwed up the stats, just recalculate :-)
             calculateWinsorizedStatistics(powers, flagged);
@@ -38,7 +39,8 @@ public class PostCorrelationHistorySumThresholdFlagger extends PostCorrelationSu
             final float stdDevOfMedians = history.getStdDevOfMedians(pol);
             final boolean flagSecond = median > (meanMedian + historyFlaggingThreshold * stdDevOfMedians);
 
-            // System.err.println("median = " + median + ", meanMedian = " + meanMedian + ", factor = " + (median / meanMedian) + ", stddev = " + stdDevOfMedians + (flagSecond ? " FLAGGED" : ""));
+            logger.trace("median = " + median + ", meanMedian = " + meanMedian + ", factor = " + (median / meanMedian) + ", stddev = " + stdDevOfMedians
+                    + (flagSecond ? " FLAGGED" : ""));
             if (flagSecond) {
                 for (int i = 0; i < nrChannels; i++) {
                     flagged[i] = true;
