@@ -1,7 +1,10 @@
 package lofar.gui;
 
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
+
+import javax.swing.JFrame;
 
 import lofar.Viz;
 import lofar.dataFormats.DataProvider;
@@ -16,9 +19,9 @@ public class BeamFormedInnerPanel extends javax.swing.JPanel {
     private Viz viz;
     @SuppressWarnings("unused")
     private DataProvider data;
-    private BeamFormedFrame frame;
+    private BeamFormedFrame mainGUIFrame;
     private float[] foldedData;
-
+    
     /**
      * Creates new form BeamFormedInnerPanel
      */
@@ -26,7 +29,7 @@ public class BeamFormedInnerPanel extends javax.swing.JPanel {
         System.err.println("ctor!");
         this.viz = viz;
         this.data = data;
-        this.frame = frame;
+        this.mainGUIFrame = frame;
         initComponents();
     }
 
@@ -37,23 +40,17 @@ public class BeamFormedInnerPanel extends javax.swing.JPanel {
     }
 
     private void drawProfile() {
-        System.err.println("draw profile, profile = " + foldedData);
-        int height = getHeight();
-        int width = getWidth();
-        BufferedImage profileImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        int background = getBackground().getRGB();
+        int height = pulseProfilePanel.getHeight();
+        int width = pulseProfilePanel.getWidth();
 
         if (foldedData == null) {
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    profileImage.setRGB(x, y, background);
-                }
-            }
-            pulseProfilePanel.getGraphics().drawImage(profileImage, 0, 0, null);
+            pulseProfilePanel.getGraphics().clearRect(0, 0, width, height);
             return;
         }
 
-        // calc scale
+        int background = pulseProfilePanel.getBackground().getRGB();
+
+        // calculate min and max, so we can scale
         float max = -1;
         float min = Float.MAX_VALUE;
         for (float element : foldedData) {
@@ -65,23 +62,23 @@ public class BeamFormedInnerPanel extends javax.swing.JPanel {
             }
         }
 
+        BufferedImage profileImage = new BufferedImage(foldedData.length, height, BufferedImage.TYPE_INT_RGB);
+
         for (int i = 0; i < foldedData.length; i++) {
             int lineHeight = (int) (((foldedData[i] - min) / (max - min)) * height);
-            System.err.println("height = " + height + ", h = " + lineHeight);
             for (int y = 0; y < height - lineHeight; y++) {
                 profileImage.setRGB(i, y, background);
             }
+
             for (int y = height - lineHeight; y < height; y++) {
-                profileImage.setRGB(i, y, 0);
+                profileImage.setRGB(i, y, 100);
             }
         }
 
-        pulseProfilePanel.getGraphics().drawImage(profileImage, 0, 0, null);
+        pulseProfilePanel.getGraphics().drawImage(profileImage.getScaledInstance(width, height, Image.SCALE_DEFAULT), 0, 0, null);
     }
 
     void setFoldedData(float[] data) {
-        foldedData = data;
-        repaint();
     }
 
     /**
@@ -184,7 +181,9 @@ public class BeamFormedInnerPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void dedisperseCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dedisperseCheckBoxActionPerformed
-        frame.dedisperse(dedisperseCheckBox.isSelected());
+        mainGUIFrame.dedisperse(dedisperseCheckBox.isSelected());
+        foldedData = mainGUIFrame.getFoldedData();
+        repaint();
     }//GEN-LAST:event_dedisperseCheckBoxActionPerformed
 
     private void foldingCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foldingCheckBoxActionPerformed

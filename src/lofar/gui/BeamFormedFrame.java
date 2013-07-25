@@ -1,6 +1,5 @@
 package lofar.gui;
 
-import java.awt.Graphics;
 import java.io.IOException;
 
 import javax.swing.JFrame;
@@ -13,8 +12,7 @@ import lofar.dataFormats.preprocessedData.CompressedBeamFormedData.CompressedBea
 
 @SuppressWarnings("serial")
 public final class BeamFormedFrame extends GUIFrame {
-    BeamFormedInnerPanel innerPanel;
-    JFrame fr;
+    private float[] folded;
 
     public BeamFormedFrame(final Viz viz, final DataProvider data) {
         super(viz, data);
@@ -26,22 +24,19 @@ public final class BeamFormedFrame extends GUIFrame {
     }
 
     @Override
-    public void paintComponents(Graphics g) {
-        super.paintComponents(g);
-        fr.repaint();
-    }
-
-    @Override
     protected JPanel createAdditionalControlsPanel() {
         // for some reason, the inner panel does not work, so lets just create a new frame for now.
-        fr = new JFrame();
-        innerPanel = new BeamFormedInnerPanel(viz, data, this);
+        JFrame fr = new JFrame();
+        BeamFormedInnerPanel innerPanel = new BeamFormedInnerPanel(viz, data, this);
+        fr.setTitle("LOFAR visualizer dedispersion");
+        fr.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         fr.add(innerPanel);
         fr.pack();
         fr.setVisible(true);
 
-        // return new BeamFormedInnerPanel(viz, data, this);
         return new JPanel();
+
+//        return new BeamFormedInnerPanel(viz, data, this);
     }
 
     protected void dedisperse(boolean enabled) {
@@ -53,8 +48,6 @@ public final class BeamFormedFrame extends GUIFrame {
             // pulsar parameters.
             float dm = 12.455f;
             float period = 1.3373f;
-
-            float[] folded = null;
 
             if (data instanceof BeamFormedData) {
                 BeamFormedData bf = (BeamFormedData) data;
@@ -69,7 +62,6 @@ public final class BeamFormedFrame extends GUIFrame {
                 throw new RuntimeException("illegal data type");
             }
             samplePanel.setData(data);
-            innerPanel.setFoldedData(folded);
             repaint();
             return;
         }
@@ -89,7 +81,10 @@ public final class BeamFormedFrame extends GUIFrame {
             System.err.println("illegal data type");
         }
         samplePanel.setData(data);
-        innerPanel.setFoldedData(null);
         repaint();
+    }
+    
+    public float[] getFoldedData() {
+        return folded;
     }
 }
