@@ -63,11 +63,6 @@ public class Hdf5Attribute {
         return (int[]) a.getValue();
     }
 
-    @Override
-    public boolean equals(final Object obj) {
-        return a.equals(obj);
-    }
-
     public long[] getDataDims() {
         return a.getDataDims();
     }
@@ -86,11 +81,6 @@ public class Hdf5Attribute {
 
     public Object getValue() {
         return a.getValue();
-    }
-
-    @Override
-    public int hashCode() {
-        return a.hashCode();
     }
 
     public boolean isUnsigned() {

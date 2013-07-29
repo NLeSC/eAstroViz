@@ -227,7 +227,7 @@ public final class MSReader {
         sizePerSecond += metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4; // samples
         sizePerSecond += metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples(); // flags
 
-        maxSecondsOfData = (long) Math.ceil(maxFileSize / sizePerSecond);
+        maxSecondsOfData = (long) Math.ceil((double)maxFileSize / sizePerSecond);
 
         if (VERBOSE) {
             logger.info("maximum file size = " + maxFileSize + ", maximum number of seconds of data = " + maxSecondsOfData);

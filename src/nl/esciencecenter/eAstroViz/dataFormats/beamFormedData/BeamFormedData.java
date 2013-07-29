@@ -141,7 +141,7 @@ public final class BeamFormedData extends DataProvider {
                 final double speed = size / time;
                 logger.info(", read rook " + time + " s, speed = " + speed + " MB/s, min = " + minVal + ", max = " + maxVal);
             }
-        } catch (final Exception e) {
+        } catch (final IOException e) {
             nrSeconds = second; // oops, we read less data...
         } finally {
             if (fin != null) {
@@ -320,7 +320,7 @@ public final class BeamFormedData extends DataProvider {
         try {
             l = node.getMetadata();
         } catch (final Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         for (int i = 0; i < l.size(); i++) {
