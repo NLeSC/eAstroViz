@@ -11,7 +11,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ConvertBinaryIntermediate {
+    private static final Logger logger = LoggerFactory.getLogger(ConvertBinaryIntermediate.class);
     private final String fileName;
     private final String outputFileName;
     private final String extension;
@@ -73,7 +77,7 @@ public class ConvertBinaryIntermediate {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-        System.err.println("nrStations = " + nrStations + ", nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels + ", nrPols = " + nrPolarizations);
+        logger.info("nrStations = " + nrStations + ", nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels + ", nrPols = " + nrPolarizations);
 
         if (maxNrTimes > 0) {
             nrTimes = maxNrTimes;
@@ -82,18 +86,18 @@ public class ConvertBinaryIntermediate {
             for (File element : ls) {
                 totalSize += element.length();
             }
-            System.err.println("totalSize = " + totalSize);
+            logger.info("totalSize = " + totalSize);
             totalSize -= ls.length * 4 * 4;
-            System.err.println("totalSize - headers = " + totalSize);
+            logger.info("totalSize - headers = " + totalSize);
 
             nrTimes = (int) (totalSize / (((5 + nrChannels) * nrSubbands * nrPolarizations * nrStations) * 4));
             int rem = (int) (totalSize % (((5 + nrChannels) * nrSubbands * nrPolarizations * nrStations) * 4));
             if (rem != 0) {
-                System.err.println("internal error, size wrong, leftover = " + rem);
+                logger.info("internal error, size wrong, leftover = " + rem);
             }
 
         }
-        System.err.println("nrTimes = " + nrTimes);
+        logger.info("nrTimes = " + nrTimes);
 
         data = new float[nrStations][nrTimes][nrSubbands][nrChannels][nrPolarizations];
 
@@ -122,7 +126,7 @@ public class ConvertBinaryIntermediate {
             return;
         }
 
-        System.err.println("Reading file: " + f + ", nrTimes = " + nrTimes);
+        logger.info("Reading file: " + f + ", nrTimes = " + nrTimes);
 
         while (true) {
             try {
@@ -142,7 +146,7 @@ public class ConvertBinaryIntermediate {
                 // ignore
                 break;
             } catch (IOException e) {
-                System.err.println(e);
+                logger.info("" + e);
                 break;
             }
         }
@@ -186,7 +190,7 @@ public class ConvertBinaryIntermediate {
     public static void main(final String[] args) throws IOException {
         final ConvertBinaryIntermediate cm = new ConvertBinaryIntermediate(args[0], args[1], args[2], Integer.parseInt(args[3]));
         cm.read();
-        System.err.println("Read done");
+        logger.info("Read done");
         cm.write();
     }
 }

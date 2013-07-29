@@ -9,10 +9,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import nl.esciencecenter.eAstroViz.Viz;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import nl.esciencecenter.eAstroViz.Viz;
 
 @SuppressWarnings("unused")
 public final class MSReader {
@@ -227,7 +227,7 @@ public final class MSReader {
         sizePerSecond += metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4; // samples
         sizePerSecond += metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples(); // flags
 
-        maxSecondsOfData = (long) Math.ceil((double)maxFileSize / sizePerSecond);
+        maxSecondsOfData = (long) Math.ceil((double) maxFileSize / sizePerSecond);
 
         if (VERBOSE) {
             logger.info("maximum file size = " + maxFileSize + ", maximum number of seconds of data = " + maxSecondsOfData);

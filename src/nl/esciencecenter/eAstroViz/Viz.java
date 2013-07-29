@@ -18,13 +18,17 @@ import nl.esciencecenter.eAstroViz.gui.IntermediateFrame;
 import nl.esciencecenter.eAstroViz.gui.RawFrame;
 import nl.esciencecenter.eAstroViz.gui.VisibilityFrame;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public final class Viz {
+    private static final Logger logger = LoggerFactory.getLogger(Viz.class);
+
     public static final int REAL = 0;
     public static final int IMAG = 1;
     public static final int NR_POLARIZATIONS = 2;
 
     private final String fileName;
-    private final String dataSetName;
 
     private int maxSequenceNr = Integer.MAX_VALUE;
     private int maxSubbands = Integer.MAX_VALUE;
@@ -61,8 +65,6 @@ public final class Viz {
     public Viz(final String fileName, final boolean batch, final boolean raw, boolean visibilities, final boolean beamFormed, final boolean intermediate,
             final boolean filtered, final boolean compressedBeamFormed, final int integrationFactor, final int maxSeqNo, final int maxSubbands) {
         this.fileName = fileName;
-        final File f = new File(fileName);
-        dataSetName = f.getName();
         this.batch = batch;
         this.raw = raw;
         this.visibilities = visibilities;
@@ -75,10 +77,6 @@ public final class Viz {
         this.maxSubbands = maxSubbands;
     }
 
-    public String getDataSetName() {
-        return dataSetName;
-    }
-
     public void start() throws IOException {
         final int station = 0;
 
@@ -86,7 +84,7 @@ public final class Viz {
             final BeamFormedData beamFormedData =
                     new BeamFormedData(fileName, maxSequenceNr, maxSubbands, integrationFactor /* really the zoom factor in this case*/);
             beamFormedData.read();
-            final BeamFormedFrame beamFormedFrame = new BeamFormedFrame(this, beamFormedData);
+            final BeamFormedFrame beamFormedFrame = new BeamFormedFrame(beamFormedData);
             beamFormedFrame.pack();
             beamFormedFrame.setVisible(true);
             //            beamFormedFrame.save("outputHDF5.bmp");
@@ -97,7 +95,7 @@ public final class Viz {
         if (compressedBeamFormed) {
             final CompressedBeamFormedData compressedBeamFormedData = new CompressedBeamFormedData(fileName, integrationFactor, maxSequenceNr, maxSubbands);
             compressedBeamFormedData.read();
-            final BeamFormedFrame beamFormedFrame = new BeamFormedFrame(this, compressedBeamFormedData);
+            final BeamFormedFrame beamFormedFrame = new BeamFormedFrame(compressedBeamFormedData);
             beamFormedFrame.pack();
             beamFormedFrame.setVisible(true);
             //            IntermediateDataFrame.save("outputCompressedBeamFormed.bmp");
@@ -109,7 +107,7 @@ public final class Viz {
             final IntermediateData intermediateData = new IntermediateData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station);
             intermediateData.read();
 
-            final IntermediateFrame IntermediateDataFrame = new IntermediateFrame(this, intermediateData);
+            final IntermediateFrame IntermediateDataFrame = new IntermediateFrame(intermediateData);
             IntermediateDataFrame.pack();
             IntermediateDataFrame.setVisible(true);
             //            IntermediateDataFrame.save("outputIntermediate.bmp");
@@ -120,7 +118,7 @@ public final class Viz {
             final FilteredData filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station);
             filteredData.read();
 
-            final IntermediateFrame IntermediateDataFrame = new IntermediateFrame(this, filteredData);
+            final IntermediateFrame IntermediateDataFrame = new IntermediateFrame(filteredData);
             IntermediateDataFrame.pack();
             IntermediateDataFrame.setVisible(true);
             //            IntermediateDataFrame.save("outputFiltered.bmp");
@@ -166,7 +164,7 @@ public final class Viz {
                     for (int pol = 0; pol < NR_POLARIZATIONS * NR_POLARIZATIONS; pol++) {
                         final VisibilityFrame vizFrame = new VisibilityFrame(this, visibilityData, pol);
                         final String fileName = "baseline-" + station1 + "-" + station2 + "-polarization-" + VisibilityFrame.polarizationToString(pol) + ".bmp";
-                        System.err.println("writing file: " + fileName);
+                        logger.info("writing file: " + fileName);
                         vizFrame.save(fileName);
                         vizFrame.dispose();
                     }
@@ -174,7 +172,7 @@ public final class Viz {
             }
         }
 
-        System.err.println("unknwon file type!");
+        logger.info("unknwon file type!");
     }
 
     public static void main(final String[] args) {
@@ -191,7 +189,7 @@ public final class Viz {
         int integrationFactor = 1;
 
         if (args.length < 1) {
-            System.err.println("Usage: Viz [-batch] [-maxSeqNo] [-data format] <dataset directory or raw file>");
+            logger.info("Usage: Viz [-batch] [-maxSeqNo] [-data format] <dataset directory or raw file>");
             System.exit(1);
         }
 
@@ -212,7 +210,7 @@ public final class Viz {
             } else {
                 // it must be the filename
                 if (fileName != null) {
-                    System.err.println("You cannot specify the file name twice. The first one was: " + fileName + ", the second one was: " + args[i]);
+                    logger.info("You cannot specify the file name twice. The first one was: " + fileName + ", the second one was: " + args[i]);
                     System.exit(1);
                 }
 

@@ -7,7 +7,11 @@ import java.io.IOException;
 
 import nl.esciencecenter.eAstroViz.dataFormats.beamFormedData.BeamFormedData;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ConvertBeamFormed {
+    private static final Logger logger = LoggerFactory.getLogger(ConvertBeamFormed.class);
     static final int MAX_TIME = 1000;
 
     private final String fileName;
@@ -48,7 +52,7 @@ public class ConvertBeamFormed {
         dataOut.writeInt(nrChannels);
         dataOut.writeInt(nrSamplesPerSecond);
 
-        System.err.println("Writing output, nrTimes  = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels);
+        logger.info("Writing output, nrTimes  = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels);
 
         for (int time = 0; time < nrTimes; time++) {
             for (int sb = 0; sb < nrSubbands; sb++) {

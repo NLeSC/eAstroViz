@@ -189,7 +189,7 @@ public final class BeamFormedData extends DataProvider {
     }
 
     public float getFrequency(int subband, int channel) {
-        float startFreq = beamCenterFrequency - (float)Math.floor(nrSubbands / 2.0) * subbandWidth;
+        float startFreq = beamCenterFrequency - (float) Math.floor(nrSubbands / 2.0) * subbandWidth;
         return startFreq + subband * subbandWidth + channel * channelWidth;
     }
 
@@ -534,10 +534,6 @@ public final class BeamFormedData extends DataProvider {
             }
         }
         DataProvider.scale(res);
-
-        for (float re : res) {
-            System.out.println(re);
-        }
 
         float snr = computeSNR(res);
         logger.info("signal to noise ratio is: " + snr);

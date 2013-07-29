@@ -151,8 +151,8 @@ public class AntennaBandpass {
 
         if (logger.isDebugEnabled()) {
             logger.debug("START HBA LOW");
-            for (int i = 0; i < HBA_LOW.length; i++) {
-                logger.debug("" + HBA_LOW[i]);
+            for (float element : HBA_LOW) {
+                logger.debug("" + element);
             }
             logger.debug("END HBA LOW");
         }

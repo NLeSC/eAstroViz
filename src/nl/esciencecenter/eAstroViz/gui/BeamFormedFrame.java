@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import nl.esciencecenter.eAstroViz.Viz;
 import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
 import nl.esciencecenter.eAstroViz.dataFormats.beamFormedData.BeamFormedData;
 import nl.esciencecenter.eAstroViz.dataFormats.preprocessedData.CompressedBeamFormedData.CompressedBeamFormedData;
@@ -14,20 +13,20 @@ import nl.esciencecenter.eAstroViz.dataFormats.preprocessedData.CompressedBeamFo
 public final class BeamFormedFrame extends GUIFrame {
     private float[] folded;
 
-    public BeamFormedFrame(final Viz viz, final DataProvider data) {
-        super(viz, data);
+    public BeamFormedFrame(final DataProvider data) {
+        super(data);
     }
 
     @Override
     protected GUIPanel createPanel() {
-        return new BeamFormedPanel(viz, data, this);
+        return new BeamFormedPanel(data, this);
     }
 
     @Override
     protected JPanel createAdditionalControlsPanel() {
         // for some reason, the inner panel does not work, so lets just create a new frame for now.
         JFrame fr = new JFrame();
-        BeamFormedInnerPanel innerPanel = new BeamFormedInnerPanel(viz, data, this);
+        BeamFormedInnerPanel innerPanel = new BeamFormedInnerPanel(data, this);
         fr.setTitle("LOFAR visualizer dedispersion");
         fr.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         fr.add(innerPanel);

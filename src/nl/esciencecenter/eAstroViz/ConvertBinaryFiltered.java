@@ -11,7 +11,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ConvertBinaryFiltered {
+    private static final Logger logger = LoggerFactory.getLogger(ConvertBinaryFiltered.class);
+
     private final String fileName;
     private final String outputFileName;
     private final int maxNrTimes;
@@ -73,7 +78,7 @@ public class ConvertBinaryFiltered {
             e.printStackTrace();
             return;
         }
-        System.err.println("nrStations = " + nrStations + ", nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels);
+        logger.info("nrStations = " + nrStations + ", nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels);
 
         if (maxNrTimes > 0) {
             nrTimes = maxNrTimes;
@@ -82,19 +87,19 @@ public class ConvertBinaryFiltered {
             for (File element : ls) {
                 totalSize += element.length();
             }
-            System.err.println("totalSize = " + totalSize);
+            logger.info("totalSize = " + totalSize);
             totalSize -= ls.length * 4 * 4;
-            System.err.println("totalSize - headers = " + totalSize);
+            logger.info("totalSize - headers = " + totalSize);
 
             nrTimes = (int) (totalSize / (nrSubbands * nrStations * (3 + nrChannels * nrPolarizations) * 4));
             int rem = (int) (totalSize % (nrSubbands * nrStations * (3 + nrChannels * nrPolarizations) * 4));
 
             if (rem != 0) {
-                System.err.println("internal error, size wrong, leftover = " + rem);
+                logger.info("internal error, size wrong, leftover = " + rem);
             }
         }
 
-        System.err.println("nrTimes = " + nrTimes);
+        logger.info("nrTimes = " + nrTimes);
         data = new float[nrStations][nrTimes][nrSubbands][nrChannels][nrPolarizations];
 
         for (File element : ls) {
@@ -121,7 +126,7 @@ public class ConvertBinaryFiltered {
             return;
         }
 
-        System.err.println("Reading file: " + f + ", nrBlocks = " + nrTimes);
+        logger.info("Reading file: " + f + ", nrBlocks = " + nrTimes);
 
         while (true) {
             try {
@@ -131,7 +136,7 @@ public class ConvertBinaryFiltered {
                 }
                 int station = (int) readuint32(in, false);
                 int subband = (int) readuint32(in, false);
-                //                System.err.println("read block " + block + ", subband " + subband);
+                logger.debug("read block " + block + ", subband " + subband);
                 for (int ch = 0; ch < nrChannels; ch++) {
                     for (int pol = 0; pol < nrPolarizations; pol++) {
                         float sample = readFloat(in);

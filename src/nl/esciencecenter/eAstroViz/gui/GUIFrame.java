@@ -9,7 +9,6 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 
-import nl.esciencecenter.eAstroViz.Viz;
 import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
 
 import org.slf4j.Logger;
@@ -23,16 +22,14 @@ import org.slf4j.LoggerFactory;
 public abstract class GUIFrame extends javax.swing.JFrame {
     private static final Logger logger = LoggerFactory.getLogger(GUIFrame.class);
     private static final long serialVersionUID = 1L;
-    protected Viz viz;
     protected DataProvider data;
     protected GUIPanel samplePanel;
     protected String flaggerType = "none";
     int[] histogram;
 
-    public GUIFrame(final Viz viz, final DataProvider data) {
-        this.viz = viz;
+    public GUIFrame(final DataProvider data) {
         this.data = data;
-        setTitle("LOFAR visualizer on dataset " + viz.getDataSetName());
+        setTitle("eAstronomy visualizer");
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         initComponents();
@@ -738,7 +735,7 @@ public abstract class GUIFrame extends javax.swing.JFrame {
 
     private void sensitivitySliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sensitivitySliderStateChanged
         final float newSensitivity = sensitivitySlider.getValue() / 100.0f;
-        if ( Math.abs(newSensitivity - samplePanel.getSensitivity()) < .0000001) {
+        if (Math.abs(newSensitivity - samplePanel.getSensitivity()) < .0000001) {
             samplePanel.setSensitivity(newSensitivity);
             sensitivityLabel.setText(String.format("%2.2f", newSensitivity));
             repaint();
@@ -749,7 +746,7 @@ public abstract class GUIFrame extends javax.swing.JFrame {
         final String newFlaggerType = (String) flaggerTypeComboBox.getSelectedItem();
         if (!newFlaggerType.equals(samplePanel.getFlagger())) {
             final float newSensitivity = sensitivitySlider.getValue() / 100.0f;
-            if ( Math.abs(newSensitivity - samplePanel.getSensitivity()) < .0000001) {
+            if (Math.abs(newSensitivity - samplePanel.getSensitivity()) < .0000001) {
                 samplePanel.setSensitivity(newSensitivity);
             }
 

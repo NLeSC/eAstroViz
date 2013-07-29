@@ -32,7 +32,7 @@ public final class VisibilityFrame extends GUIFrame {
     VisibilityData visibilityData;
 
     public VisibilityFrame(final Viz viz, final DataProvider data, final int pol) {
-        super(viz, data);
+        super(data);
         this.visibilityData = (VisibilityData) data;
         this.nrStations = visibilityData.getNrStations();
         this.station1 = visibilityData.getStation1();
@@ -93,7 +93,7 @@ public final class VisibilityFrame extends GUIFrame {
 
     @Override
     protected GUIPanel createPanel() {
-        return new VisibilityPanel(viz, data, this);
+        return new VisibilityPanel(data, this);
     }
 
     public static String polarizationToString(final int pol) {

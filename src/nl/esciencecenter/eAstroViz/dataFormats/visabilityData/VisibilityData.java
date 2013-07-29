@@ -2,9 +2,6 @@ package nl.esciencecenter.eAstroViz.dataFormats.visabilityData;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import nl.esciencecenter.eAstroViz.Viz;
 import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
 import nl.esciencecenter.eAstroViz.flaggers.PostCorrelationFlagger;
@@ -13,6 +10,9 @@ import nl.esciencecenter.eAstroViz.flaggers.PostCorrelationHistorySumThresholdFl
 import nl.esciencecenter.eAstroViz.flaggers.PostCorrelationSmoothedSumThresholdFlagger;
 import nl.esciencecenter.eAstroViz.flaggers.PostCorrelationSumThresholdFlagger;
 import nl.esciencecenter.eAstroViz.flaggers.PostCorrelationThresholdFlagger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents all time samples and frequencies of a given baseline.

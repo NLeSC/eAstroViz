@@ -8,13 +8,13 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.channels.FileChannel;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
 import nl.esciencecenter.eAstroViz.dataFormats.MinMaxVals;
 import nl.esciencecenter.eAstroViz.dataFormats.beamFormedData.BeamFormedData;
 import nl.esciencecenter.eAstroViz.flaggers.BeamFormedFlagger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // TODO make subclass of preprocessed data? seems almost identical 
 

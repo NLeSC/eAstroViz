@@ -4,7 +4,6 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 
-import nl.esciencecenter.eAstroViz.Viz;
 import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
 
 /**
@@ -14,8 +13,6 @@ import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
 public class BeamFormedInnerPanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
-    private Viz viz;
-    @SuppressWarnings("unused")
     private DataProvider data;
     private BeamFormedFrame mainGUIFrame;
     private float[] foldedData;
@@ -23,8 +20,7 @@ public class BeamFormedInnerPanel extends javax.swing.JPanel {
     /**
      * Creates new form BeamFormedInnerPanel
      */
-    public BeamFormedInnerPanel(final Viz viz, final DataProvider data, final BeamFormedFrame frame) {
-        this.viz = viz;
+    public BeamFormedInnerPanel(final DataProvider data, final BeamFormedFrame frame) {
         this.data = data;
         this.mainGUIFrame = frame;
         initComponents();

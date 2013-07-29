@@ -13,7 +13,6 @@ import java.util.Arrays;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import nl.esciencecenter.eAstroViz.Viz;
 import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
 
 import org.slf4j.Logger;
@@ -28,32 +27,30 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
 
     private static final Logger logger = LoggerFactory.getLogger(GUIPanel.class);
 
-    protected Viz viz;
-    protected GUIFrame parentFrame;
-    protected BufferedImage image;
-    protected DataProvider data;
-    protected float scale = START_SCALE;
-    protected float percentileValLow;
-    protected float percentileValHigh;
+    private GUIFrame parentFrame;
+    private BufferedImage image;
+    private DataProvider data;
+    private float scale = START_SCALE;
+    private float percentileValLow;
+    private float percentileValHigh;
 
     private float[] rawData;
     private float[][] scaledData;
 
-    protected int zoomX = 1;
-    protected int zoomY = 1;
+    private int zoomX = 1;
+    private int zoomY = 1;
 
     /**
      * The current polarization or stoke.
      */
-    protected int currentPol = 0;
+    private int currentPol = 0;
 
     int COLOR_WHITE = colorToRGB(1.0f, 1.0f, 1.0f);
     ColorMapInterpreter colorMaps;
     ColorMap colorMap;
     String colorMapName = "default";
 
-    GUIPanel(final Viz viz, final GUIFrame parentFrame, final DataProvider data) {
-        this.viz = viz;
+    GUIPanel(final GUIFrame parentFrame, final DataProvider data) {
         this.parentFrame = parentFrame;
         colorMaps = new ColorMapInterpreter();
         colorMap = colorMaps.getColorMap(colorMapName);
