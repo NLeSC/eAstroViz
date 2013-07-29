@@ -189,7 +189,7 @@ public final class BeamFormedData extends DataProvider {
     }
 
     public float getFrequency(int subband, int channel) {
-        float startFreq = beamCenterFrequency - (nrSubbands / 2) * subbandWidth;
+        float startFreq = beamCenterFrequency - (float)Math.floor(nrSubbands / 2.0) * subbandWidth;
         return startFreq + subband * subbandWidth + channel * channelWidth;
     }
 

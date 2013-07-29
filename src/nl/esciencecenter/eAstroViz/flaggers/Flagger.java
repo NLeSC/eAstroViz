@@ -286,7 +286,7 @@ public abstract class Flagger {
             }
 
             /* Find median of low, middle and high items; swap into position low */
-            middle = (low + high) / 2;
+            middle = (low + high) >>> 1;
             if (a[middle] > a[high]) {
                 swap(a, middle, high);
             }

@@ -40,9 +40,11 @@ public class PostCorrelationFlaggerHistory {
     }
 
     
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings(
+            value="INT_BAD_REM_BY_1", 
+            justification="ignore find bugs warning if HISTORY_STEP_SIZE happens to be 1")
     public void add(final int pol, final int second, final float mean, final float median, final float stdDev, final float[] freqData) {
-        // ignore find bugs warning if HISTORY_STEP_SIZE happens to be 1.   
-        if (second % HISTORY_STEP_SIZE != 0) { // NOSONAR
+        if (second % HISTORY_STEP_SIZE != 0) {
             return;
         }
 

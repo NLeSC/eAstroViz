@@ -264,13 +264,13 @@ public final class MSReader {
     }
 
     private String readByteString(final DataInputStream in, final int len) throws IOException {
-        String res = "";
+        StringBuffer res = new StringBuffer();
         for (int i = 0; i < len; i++) {
             final byte b = in.readByte();
-            res += (char) b;
+            res.append((char) b);
         }
 
-        return res;
+        return res.toString();
     }
 
     void skip(final DataInputStream in, final int bytes) throws IOException {
