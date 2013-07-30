@@ -128,6 +128,8 @@ public final class MSReader {
 
             int processed = metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4;
             int toSkip = metaData.getAlignment() - (processed % metaData.getAlignment());
+            
+            logger.debug("processed is: " + processed + ", toSkip = " + toSkip);
             skip(in, toSkip);
 
             skip(in, requiredBaseline * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples());
