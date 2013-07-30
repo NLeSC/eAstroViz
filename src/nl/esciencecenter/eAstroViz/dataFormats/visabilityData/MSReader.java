@@ -148,6 +148,8 @@ public final class MSReader {
             final int toRead =
                     metaData.getAlignment()
                             - ((metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples()) % metaData.getAlignment());
+            logger.debug("toRead = " + toRead);
+            
             skip(in, toRead);
 
         } catch (final IOException e) {
