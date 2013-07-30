@@ -132,7 +132,7 @@ public final class MSReader {
                 toSkip = 0;
             }
             
-            logger.debug("processed is: " + processed + ", toSkip = " + toSkip);
+//            logger.debug("processed is: " + processed + ", toSkip = " + toSkip);
             skip(in, toSkip);
 
             skip(in, requiredBaseline * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples());
