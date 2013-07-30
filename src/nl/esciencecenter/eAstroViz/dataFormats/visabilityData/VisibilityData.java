@@ -37,7 +37,7 @@ public final class VisibilityData extends DataProvider {
     private final int nrBaselines;
     private final int nrSubbands;
     private final int nrCrossPolarizations;
-    private final int nrSeconds;
+    private int nrSeconds;
 
     public VisibilityData(final String fileName, final int station1, final int station2, final int maxSequenceNr, final int maxSubbands) throws IOException {
         super(fileName, maxSequenceNr, maxSubbands, new String[] { "XX", "XY", "YX", "YY" }, new String[] { "none", "Threshold", "SumThreshold",
@@ -56,7 +56,7 @@ public final class VisibilityData extends DataProvider {
         this.integrationTime = r.getMetaData().getIntegrationTimeProd();
         this.nrCrossPolarizations = r.getMetaData().getNrCrossPolarizations();
         this.nrStations = r.getMetaData().getNrStations();
-        this.nrSeconds = r.getNrSecondsOfData();
+        this.nrSeconds = r.getMaxNrSecondsOfData();
         r.close();
 
         powers = new float[nrSeconds][nrSubbands][nrChannels][nrCrossPolarizations];
@@ -96,6 +96,8 @@ public final class VisibilityData extends DataProvider {
         for (int i = 0; i < nrSubbands; i++) {
             readSubband(i);
         }
+
+        nrSeconds = r.getNrSecondsOfData();
     }
 
     private void readSubband(final int subband) {

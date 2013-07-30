@@ -144,12 +144,12 @@ public final class MSReader {
                             - ((metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples()) % metaData.getAlignment());
 
             skip(in, toRead);
+            nrSeconds++;
 
         } catch (final IOException e) {
             sequenceNr = -1;
             return;
         }
-        nrSeconds++;
     }
 
     private void readMeta(final String dirName) throws IOException {
@@ -350,7 +350,11 @@ public final class MSReader {
         return metaData;
     }
 
+    public int getMaxNrSecondsOfData() {
+        return (int) maxSecondsOfData;
+    }
+
     public int getNrSecondsOfData() {
-        return (int) nrSeconds; // maxSecondsOfData;
+        return (int) nrSeconds;
     }
 }
