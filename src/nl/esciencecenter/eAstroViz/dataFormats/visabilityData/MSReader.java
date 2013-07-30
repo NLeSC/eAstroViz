@@ -93,6 +93,7 @@ public final class MSReader {
      */
     public void readSecond(final int requiredBaseline) {
 
+        logger.debug("read second");
         // 32 bit sequence number
         try {
             if (NEW_FORMAT) {
