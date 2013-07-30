@@ -123,7 +123,7 @@ public final class VisibilityData extends DataProvider {
             e.printStackTrace();
         }
         long end = System.currentTimeMillis();
-        logger.debug("Read " + getNrSeconds() + " time samples of data. Read took " + ((end - start) / 1000.0) + " seconds.");
+        logger.debug("Read " + r.getNrSecondsOfData() + " time samples of data. Read took " + ((end - start) / 1000.0) + " seconds.");
     }
 
     private long readSecond(final int subband, final int timeIndex) {
@@ -210,10 +210,6 @@ public final class VisibilityData extends DataProvider {
         logger.info("Flagging with " + flaggerType + ", sensitivity " + flaggerSensitivity + " took " + (end - start) + " ms.");
     }
 
-    public int getNrSeconds() {
-        return nrSeconds;
-    }
-
     public int getNrFrequencies() {
         if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
             return nrSubbands * (nrChannels - 1);
@@ -283,7 +279,7 @@ public final class VisibilityData extends DataProvider {
 
     @Override
     public int getSizeX() {
-        return getNrSeconds();
+        return nrSeconds;
     }
 
     @Override
