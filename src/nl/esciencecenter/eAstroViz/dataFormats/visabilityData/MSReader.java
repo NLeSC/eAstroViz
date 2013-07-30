@@ -129,7 +129,9 @@ public final class MSReader {
             for (int channel = 0; channel < metaData.getNrChannels(); channel++) {
                 int nr = 0;
 
-                if (metaData.getNrBytesPerValidSamples() == 2) {
+                if (metaData.getNrBytesPerValidSamples() == 1) {
+                    nr = readuint8(in);
+                } else if (metaData.getNrBytesPerValidSamples() == 2) {
                     nr = readuint16(in);
                 } else {
                     throw new RuntimeException("unsupported nr bytes per nrValidsamples: " + metaData.getNrBytesPerValidSamples());
@@ -323,6 +325,15 @@ public final class MSReader {
         return res;
     }
 
+    private int readuint8(final DataInputStream in) throws IOException {
+        final int ch0 = in.read();
+        if ((ch0) < 0) {
+            throw new EOFException();
+        }
+
+        return ch0;
+    }
+    
     public float[][][] getVisibilities(final int baseline) {
         return visData[baseline];
     }
