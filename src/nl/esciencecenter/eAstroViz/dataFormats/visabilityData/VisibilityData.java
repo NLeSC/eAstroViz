@@ -213,7 +213,7 @@ public final class VisibilityData extends DataProvider {
     }
 
     public int getNrFrequencies() {
-        if (REMOVE_CHANNEL_0_FROM_VIEW) {
+        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
             return nrSubbands * (nrChannels - 1);
         } else {
             return nrSubbands * nrChannels;
@@ -223,7 +223,7 @@ public final class VisibilityData extends DataProvider {
     public float getPower(final int time, final int frequency, final int pol) {
         int subband;
         int channel;
-        if (REMOVE_CHANNEL_0_FROM_VIEW) {
+        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
             subband = frequency / (nrChannels - 1);
             channel = frequency % (nrChannels - 1) + 1;
         } else {
@@ -242,7 +242,7 @@ public final class VisibilityData extends DataProvider {
 
         int subband;
         int channel;
-        if (REMOVE_CHANNEL_0_FROM_VIEW) {
+        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
             subband = frequency / (nrChannels - 1);
             channel = frequency % (nrChannels - 1) + 1;
         } else {
@@ -256,7 +256,7 @@ public final class VisibilityData extends DataProvider {
     public int getNrValidSamples(final int time, final int frequency) {
         int subband;
         int channel;
-        if (REMOVE_CHANNEL_0_FROM_VIEW) {
+        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
             subband = frequency / (nrChannels - 1);
             channel = frequency % (nrChannels - 1) + 1;
         } else {
