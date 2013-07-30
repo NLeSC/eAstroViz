@@ -1,7 +1,5 @@
 package nl.esciencecenter.eAstroViz.dataFormats.visabilityData;
 
-// TODO size per second should use alignement!
-
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -93,7 +91,6 @@ public final class MSReader {
      */
     public void readSecond(final int requiredBaseline) {
 
-        logger.debug("read second");
         // 32 bit sequence number
         try {
             if (NEW_FORMAT) {
@@ -101,12 +98,6 @@ public final class MSReader {
                 if (magic != 0x0000DA7A) {
                     logger.info("data corrupted, magic is wrong! val = " + magic);
                     sequenceNr = -1;
-
-                    for (int i = 0; i < 100; i++) {
-                        long tmp = readuint32(in, false);
-                        System.out.printf("%x\n", tmp);
-                    }
-
                     throw new RuntimeException("data corrupted, magic is wrong!");
                 }
 
@@ -132,8 +123,6 @@ public final class MSReader {
 
             int processed = metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4;
             int toSkip = metaData.getAlignment() - (processed % metaData.getAlignment());
-            logger.debug("processed = " + processed + ", to skip = " + toSkip);
-
             skip(in, toSkip);
 
             skip(in, requiredBaseline * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples());
@@ -152,7 +141,6 @@ public final class MSReader {
             final int toRead =
                     metaData.getAlignment()
                             - ((metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples()) % metaData.getAlignment());
-            logger.debug("toRead = " + toRead);
 
             skip(in, toRead);
 
