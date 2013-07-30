@@ -96,8 +96,6 @@ public final class VisibilityData extends DataProvider {
         for (int i = 0; i < nrSubbands; i++) {
             readSubband(i);
         }
-
-        nrSeconds = r.getNrSecondsOfData();
     }
 
     private void readSubband(final int subband) {
@@ -123,7 +121,8 @@ public final class VisibilityData extends DataProvider {
             e.printStackTrace();
         }
         long end = System.currentTimeMillis();
-        logger.debug("Read " + r.getNrSecondsOfData() + " time samples of data. Read took " + ((end - start) / 1000.0) + " seconds.");
+        nrSeconds = timeIndex;
+        logger.debug("Read " + nrSeconds + " time samples of data. Read took " + ((end - start) / 1000.0) + " seconds.");
     }
 
     private long readSecond(final int subband, final int timeIndex) {

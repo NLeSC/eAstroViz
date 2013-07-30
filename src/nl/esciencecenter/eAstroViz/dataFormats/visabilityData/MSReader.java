@@ -31,7 +31,6 @@ public final class MSReader {
     private long maxFileSize;
     private long maxSecondsOfData;
     private int sizePerSecond;
-    private int nrSeconds;
     
     public MSReader(final String filename) throws IOException {
         this.filename = filename;
@@ -144,8 +143,6 @@ public final class MSReader {
                             - ((metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples()) % metaData.getAlignment());
 
             skip(in, toRead);
-            nrSeconds++;
-
         } catch (final IOException e) {
             sequenceNr = -1;
             return;
@@ -352,9 +349,5 @@ public final class MSReader {
 
     public int getMaxNrSecondsOfData() {
         return (int) maxSecondsOfData;
-    }
-
-    public int getNrSecondsOfData() {
-        return (int) nrSeconds;
     }
 }
