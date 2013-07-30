@@ -101,14 +101,12 @@ public final class MSReader {
                 if (magic != 0x0000DA7A) {
                     logger.info("data corrupted, magic is wrong! val = " + magic);
                     sequenceNr = -1;
-                    
-                    
-                    for(int i=0; i<100; i++) {
+
+                    for (int i = 0; i < 100; i++) {
                         long tmp = readuint32(in, false);
                         System.out.printf("%x\n", tmp);
                     }
-                    
-                    
+
                     throw new RuntimeException("data corrupted, magic is wrong!");
                 }
 
@@ -133,11 +131,11 @@ public final class MSReader {
             skip(in, (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4);
 
             int processed = metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4;
-            int toSkip = processed % metaData.getAlignment(); 
+            int toSkip = metaData.getAlignment() - (processed % metaData.getAlignment());
             logger.debug("processed = " + processed + ", to skip = " + toSkip);
-            
+
             skip(in, toSkip);
-            
+
             skip(in, requiredBaseline * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples());
             for (int channel = 0; channel < metaData.getNrChannels(); channel++) {
                 int nr = 0;
@@ -155,7 +153,7 @@ public final class MSReader {
                     metaData.getAlignment()
                             - ((metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples()) % metaData.getAlignment());
             logger.debug("toRead = " + toRead);
-            
+
             skip(in, toRead);
 
         } catch (final IOException e) {
