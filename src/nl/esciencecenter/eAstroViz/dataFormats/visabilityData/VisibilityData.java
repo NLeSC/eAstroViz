@@ -148,8 +148,8 @@ public final class VisibilityData extends DataProvider {
 
         for (int channel = 1; channel < nrChannels; channel++) {
             if (nrValidSamplesIn[channel] != integrationTime) {
-                logger.warn("WARNING, DATA WAS FLAGGED, sequenceNr = " + sequenceNr + ", baseline = " + baseline + ", channel = " + channel
-                        + ", samples is only " + nrValidSamplesIn[channel] + ", expected " + integrationTime);
+//                logger.warn("WARNING, DATA WAS FLAGGED, sequenceNr = " + sequenceNr + ", baseline = " + baseline + ", channel = " + channel
+//                        + ", samples is only " + nrValidSamplesIn[channel] + ", expected " + integrationTime);
             }
         }
 
