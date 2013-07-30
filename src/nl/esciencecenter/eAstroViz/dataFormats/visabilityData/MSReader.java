@@ -99,7 +99,7 @@ public final class MSReader {
                     logger.info("data corrupted, magic is wrong! val = " + magic);
                     sequenceNr = -1;
                     
-                    for(int i=0; i<100; i++) {
+                    for(int i=0; i<200; i++) {
                        System.out.printf("%x\n", readuint32(in, false));
                     }
                     
