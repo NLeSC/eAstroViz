@@ -100,7 +100,7 @@ public final class MSReader {
                     sequenceNr = -1;
                     
                     for(int i=0; i<100; i++) {
-                        logger.debug("" + readuint32(in, false));
+                       System.out.printf("%x\n", readuint32(in, false));
                     }
                     
                     throw new RuntimeException("data corrupted, magic is wrong!");
