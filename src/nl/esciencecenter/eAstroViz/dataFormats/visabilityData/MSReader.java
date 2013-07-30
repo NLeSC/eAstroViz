@@ -31,7 +31,8 @@ public final class MSReader {
     private long maxFileSize;
     private long maxSecondsOfData;
     private int sizePerSecond;
-
+    private int nrSeconds;
+    
     public MSReader(final String filename) throws IOException {
         this.filename = filename;
 
@@ -93,7 +94,6 @@ public final class MSReader {
 
         // 32 bit sequence number
         try {
-            long tmpSequenceNr;
             if (NEW_FORMAT) {
                 final long magic = readuint32(in, false);
                 if (magic != 0x0000DA7A) {
@@ -102,17 +102,16 @@ public final class MSReader {
                     throw new RuntimeException("data corrupted, magic is wrong!");
                 }
 
-                tmpSequenceNr = readuint32(in, false);
+                sequenceNr = readuint32(in, false);
                 skip(in, metaData.getAlignment() - 8);
             } else {
-                tmpSequenceNr = readuint32(in, true);
+                sequenceNr = readuint32(in, true);
                 skip(in, metaData.getAlignment() - 4);
             }
 
-            if (tmpSequenceNr < 0) {
+            if (sequenceNr < 0) {
                 return;
             }
-            sequenceNr = tmpSequenceNr;
 
             skip(in, requiredBaseline * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4);
             for (int channel = 0; channel < metaData.getNrChannels(); channel++) {
@@ -150,6 +149,7 @@ public final class MSReader {
             sequenceNr = -1;
             return;
         }
+        nrSeconds++;
     }
 
     private void readMeta(final String dirName) throws IOException {
@@ -351,6 +351,6 @@ public final class MSReader {
     }
 
     public int getNrSecondsOfData() {
-        return (int) sequenceNr + 1; // maxSecondsOfData;
+        return (int) nrSeconds; // maxSecondsOfData;
     }
 }
