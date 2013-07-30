@@ -93,6 +93,7 @@ public final class MSReader {
 
         // 32 bit sequence number
         try {
+            long tmpSequenceNr;
             if (NEW_FORMAT) {
                 final long magic = readuint32(in, false);
                 if (magic != 0x0000DA7A) {
@@ -101,16 +102,17 @@ public final class MSReader {
                     throw new RuntimeException("data corrupted, magic is wrong!");
                 }
 
-                sequenceNr = readuint32(in, false);
+                tmpSequenceNr = readuint32(in, false);
                 skip(in, metaData.getAlignment() - 8);
             } else {
-                sequenceNr = readuint32(in, true);
+                tmpSequenceNr = readuint32(in, true);
                 skip(in, metaData.getAlignment() - 4);
             }
 
-            if (sequenceNr < 0) {
+            if (tmpSequenceNr < 0) {
                 return;
             }
+            sequenceNr = tmpSequenceNr;
 
             skip(in, requiredBaseline * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4);
             for (int channel = 0; channel < metaData.getNrChannels(); channel++) {
@@ -349,6 +351,6 @@ public final class MSReader {
     }
 
     public int getNrSecondsOfData() {
-        return (int) maxSecondsOfData;
+        return (int) sequenceNr + 1; // maxSecondsOfData;
     }
 }
