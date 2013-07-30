@@ -98,7 +98,7 @@ public final class MSReader {
             if (NEW_FORMAT) {
                 final long magic = readuint32(in, false);
                 if (magic != 0x0000DA7A) {
-                    logger.info("data corrupted, magic is wrong!");
+                    logger.info("data corrupted, magic is wrong! val = " + magic);
                     sequenceNr = -1;
                     throw new RuntimeException("data corrupted, magic is wrong!");
                 }
