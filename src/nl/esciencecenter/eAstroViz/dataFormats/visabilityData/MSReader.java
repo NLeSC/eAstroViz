@@ -132,6 +132,9 @@ public final class MSReader {
             }
             skip(in, (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4);
 
+            int processed = metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4;
+            logger.debug("processed = " + processed);
+            
             skip(in, requiredBaseline * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples());
             for (int channel = 0; channel < metaData.getNrChannels(); channel++) {
                 int nr = 0;
