@@ -66,6 +66,9 @@ public final class VisibilityData extends DataProvider {
         if (baseline >= nrBaselines) {
             throw new IOException("illegal baseline");
         }
+        
+        logger.info("nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels + ", nrBaseLines = " + nrBaselines + ", integrationTime = " + integrationTime +
+                ", pols = " + nrCrossPolarizations + ", nrStations = " + nrStations + ", nrSeconds = " + nrSeconds); 
     }
 
     public static MSMetaData getMetaData(final String fileName) {
