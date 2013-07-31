@@ -87,7 +87,11 @@ public final class Viz {
             final BeamFormedFrame beamFormedFrame = new BeamFormedFrame(beamFormedData);
             beamFormedFrame.pack();
             beamFormedFrame.setVisible(true);
-            //            beamFormedFrame.save("outputHDF5.bmp");
+            
+            if(batch) {
+                beamFormedFrame.save("ouputBeamFormed.bmp");
+                System.exit(1);
+            }
 
             return;
         }
@@ -98,7 +102,11 @@ public final class Viz {
             final BeamFormedFrame beamFormedFrame = new BeamFormedFrame(compressedBeamFormedData);
             beamFormedFrame.pack();
             beamFormedFrame.setVisible(true);
-            //            IntermediateDataFrame.save("outputCompressedBeamFormed.bmp");
+
+            if(batch) {
+                beamFormedFrame.save("ouputCompressedBeamFormed.bmp");
+                System.exit(1);
+            }
 
             return;
         }
@@ -107,10 +115,15 @@ public final class Viz {
             final IntermediateData intermediateData = new IntermediateData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station);
             intermediateData.read();
 
-            final IntermediateFrame IntermediateDataFrame = new IntermediateFrame(intermediateData);
-            IntermediateDataFrame.pack();
-            IntermediateDataFrame.setVisible(true);
-            //            IntermediateDataFrame.save("outputIntermediate.bmp");
+            final IntermediateFrame intermediateFrame = new IntermediateFrame(intermediateData);
+            intermediateFrame.pack();
+            intermediateFrame.setVisible(true);
+            
+            if(batch) {
+                intermediateFrame.save("ouputIntermediate.bmp");
+                System.exit(1);
+            }
+
             return;
         }
 
@@ -118,10 +131,15 @@ public final class Viz {
             final FilteredData filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station);
             filteredData.read();
 
-            final IntermediateFrame IntermediateDataFrame = new IntermediateFrame(filteredData);
-            IntermediateDataFrame.pack();
-            IntermediateDataFrame.setVisible(true);
-            //            IntermediateDataFrame.save("outputFiltered.bmp");
+            final IntermediateFrame filteredFrame = new IntermediateFrame(filteredData);
+            filteredFrame.pack();
+            filteredFrame.setVisible(true);
+            
+            if(batch) {
+                filteredFrame.save("ouputFiltered.bmp");
+                System.exit(1);
+            }
+
             return;
         }
 
@@ -150,6 +168,12 @@ public final class Viz {
             final VisibilityFrame vizFrame = new VisibilityFrame(this, visibilityData, 0 /*pol*/);
             vizFrame.pack();
             vizFrame.setVisible(true);
+
+            if(batch) {
+                vizFrame.save("ouputVisibility.bmp");
+                System.exit(1);
+            }
+            
             return;
         }
 
