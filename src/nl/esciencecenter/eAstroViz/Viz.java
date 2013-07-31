@@ -86,13 +86,13 @@ public final class Viz {
             beamFormedData.read();
             final BeamFormedFrame beamFormedFrame = new BeamFormedFrame(beamFormedData);
             beamFormedFrame.pack();
-            beamFormedFrame.setVisible(true);
             
             if(batch) {
                 beamFormedFrame.save("ouputBeamFormed.bmp");
                 System.exit(1);
             }
 
+            beamFormedFrame.setVisible(true);
             return;
         }
 
@@ -101,13 +101,13 @@ public final class Viz {
             compressedBeamFormedData.read();
             final BeamFormedFrame beamFormedFrame = new BeamFormedFrame(compressedBeamFormedData);
             beamFormedFrame.pack();
-            beamFormedFrame.setVisible(true);
 
             if(batch) {
                 beamFormedFrame.save("ouputCompressedBeamFormed.bmp");
                 System.exit(1);
             }
 
+            beamFormedFrame.setVisible(true);
             return;
         }
 
@@ -117,13 +117,13 @@ public final class Viz {
 
             final IntermediateFrame intermediateFrame = new IntermediateFrame(intermediateData);
             intermediateFrame.pack();
-            intermediateFrame.setVisible(true);
             
             if(batch) {
                 intermediateFrame.save("ouputIntermediate.bmp");
                 System.exit(1);
             }
 
+            intermediateFrame.setVisible(true);
             return;
         }
 
@@ -133,13 +133,13 @@ public final class Viz {
 
             final IntermediateFrame filteredFrame = new IntermediateFrame(filteredData);
             filteredFrame.pack();
-            filteredFrame.setVisible(true);
             
             if(batch) {
                 filteredFrame.save("ouputFiltered.bmp");
                 System.exit(1);
             }
 
+            filteredFrame.setVisible(true);
             return;
         }
 
@@ -167,13 +167,13 @@ public final class Viz {
             visibilityData.read();
             final VisibilityFrame vizFrame = new VisibilityFrame(this, visibilityData, 0 /*pol*/);
             vizFrame.pack();
-            vizFrame.setVisible(true);
 
             if(batch) {
                 vizFrame.save("ouputVisibility.bmp");
                 System.exit(1);
             }
             
+            vizFrame.setVisible(true);
             return;
         }
 
