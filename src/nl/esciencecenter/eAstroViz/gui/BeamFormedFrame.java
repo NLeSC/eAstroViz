@@ -19,14 +19,14 @@ public final class BeamFormedFrame extends GUIFrame {
 
     @Override
     protected GUIPanel createPanel() {
-        return new BeamFormedPanel(data, this);
+        return new BeamFormedPanel(getData(), this);
     }
 
     @Override
     protected JPanel createAdditionalControlsPanel() {
         // for some reason, the inner panel does not work, so lets just create a new frame for now.
         JFrame fr = new JFrame();
-        BeamFormedInnerPanel innerPanel = new BeamFormedInnerPanel(data, this);
+        BeamFormedInnerPanel innerPanel = new BeamFormedInnerPanel(getData(), this);
         fr.setTitle("LOFAR visualizer dedispersion");
         fr.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         fr.add(innerPanel);
@@ -48,29 +48,29 @@ public final class BeamFormedFrame extends GUIFrame {
             float dm = 12.455f;
             float period = 1.3373f;
 
-            if (data instanceof BeamFormedData) {
-                BeamFormedData bf = (BeamFormedData) data;
+            if (getData() instanceof BeamFormedData) {
+                BeamFormedData bf = (BeamFormedData) getData();
                 bf.dedisperse(lowFreq, freqStep, dm);
                 folded = bf.fold(period);
-            } else if (data instanceof CompressedBeamFormedData) {
-                CompressedBeamFormedData bf = (CompressedBeamFormedData) data;
+            } else if (getData() instanceof CompressedBeamFormedData) {
+                CompressedBeamFormedData bf = (CompressedBeamFormedData) getData();
                 final int nrSamplesPerSecond = 64;
                 bf.dedisperse(nrSamplesPerSecond /*195312.5f*/, lowFreq, freqStep, dm);
                 folded = bf.fold(nrSamplesPerSecond, period);
             } else {
                 throw new RuntimeException("illegal data type");
             }
-            samplePanel.setData(data);
+            samplePanel.setData(getData());
             repaint();
             return;
         }
 
         // disabled
-        if (data instanceof BeamFormedData) {
-            BeamFormedData bf = (BeamFormedData) data;
+        if (getData() instanceof BeamFormedData) {
+            BeamFormedData bf = (BeamFormedData) getData();
             bf.read();
-        } else if (data instanceof CompressedBeamFormedData) {
-            CompressedBeamFormedData bf = (CompressedBeamFormedData) data;
+        } else if (getData() instanceof CompressedBeamFormedData) {
+            CompressedBeamFormedData bf = (CompressedBeamFormedData) getData();
             try {
                 bf.read();
             } catch (IOException e) {
@@ -79,7 +79,7 @@ public final class BeamFormedFrame extends GUIFrame {
         } else {
             throw new RuntimeException("illegal data type");
         }
-        samplePanel.setData(data);
+        samplePanel.setData(getData());
         repaint();
     }
 

@@ -146,13 +146,15 @@ public final class VisibilityData extends DataProvider {
             logger.warn("WARNING, DATA WAS DROPPED, seq no = " + sequenceNr + " expected = " + timeIndex);
         }
 
+        if(logger.isTraceEnabled()) {
         for (int channel = 1; channel < nrChannels; channel++) {
             if (nrValidSamplesIn[channel] != integrationTime) {
-//                logger.warn("WARNING, DATA WAS FLAGGED, sequenceNr = " + sequenceNr + ", baseline = " + baseline + ", channel = " + channel
-//                        + ", samples is only " + nrValidSamplesIn[channel] + ", expected " + integrationTime);
+                logger.trace("WARNING, DATA WAS FLAGGED, sequenceNr = " + sequenceNr + ", baseline = " + baseline + ", channel = " + channel
+                        + ", samples is only " + nrValidSamplesIn[channel] + ", expected " + integrationTime);
             }
         }
-
+        }
+        
         for (int channel = 0; channel < nrChannels; channel++) {
             for (int pol = 0; pol < nrCrossPolarizations; pol++) {
                 final float real = vis[channel][pol][Viz.REAL];

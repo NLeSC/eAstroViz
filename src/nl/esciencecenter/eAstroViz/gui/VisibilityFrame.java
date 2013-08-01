@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 public final class VisibilityFrame extends GUIFrame {
     private static final long serialVersionUID = 1L;
 
-    private static final Logger logger = LoggerFactory.getLogger(VisibilityFrame.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VisibilityFrame.class);
 
     private int pol;
     private int station1;
@@ -61,7 +61,7 @@ public final class VisibilityFrame extends GUIFrame {
             yyButton.setSelected(true);
             break;
         default:
-            logger.warn("error, illegal pol: " + pol);
+            LOGGER.warn("error, illegal pol: " + pol);
         }
 
         /* for now, we can only draw the power
@@ -79,8 +79,8 @@ public final class VisibilityFrame extends GUIFrame {
     // If we change the baseline, we have to re-read the input data.
     void changeBaseline(final int station1, final int station2) {
         try {
-            visibilityData = new VisibilityData(data.getFileName(), station1, station2, data.getMaxSequenceNr(), data.getMaxSubbands());
-            data = visibilityData; // also set in super class
+            visibilityData = new VisibilityData(getData().getFileName(), station1, station2, getData().getMaxSequenceNr(), getData().getMaxSubbands());
+            setData(visibilityData); // also set in super class
             visibilityData.read();
             samplePanel.setData(visibilityData);
         } catch (final IOException e) {
@@ -93,7 +93,7 @@ public final class VisibilityFrame extends GUIFrame {
 
     @Override
     protected GUIPanel createPanel() {
-        return new VisibilityPanel(data, this);
+        return new VisibilityPanel(getData(), this);
     }
 
     public static String polarizationToString(final int pol) {
@@ -121,7 +121,7 @@ public final class VisibilityFrame extends GUIFrame {
         } else if (polString.equals("YY")) {
             return 3;
         } else {
-            logger.warn("illegal polarization: " + polString);
+            LOGGER.warn("illegal polarization: " + polString);
             return 0;
         }
     }

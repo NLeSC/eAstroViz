@@ -20,12 +20,12 @@ import org.slf4j.LoggerFactory;
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public abstract class GUIFrame extends javax.swing.JFrame {
-    private static final Logger logger = LoggerFactory.getLogger(GUIFrame.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GUIFrame.class);
     private static final long serialVersionUID = 1L;
-    protected DataProvider data;
+    private DataProvider data;
     protected GUIPanel samplePanel;
-    protected String flaggerType = "none";
-    int[] histogram;
+    private String flaggerType = "none";
+    private int[] histogram;
 
     public GUIFrame(final DataProvider data) {
         this.data = data;
@@ -124,7 +124,7 @@ public abstract class GUIFrame extends javax.swing.JFrame {
             e.printStackTrace();
         }
         if (img == null) {
-            logger.warn("image is null!");
+            LOGGER.warn("image is null!");
             return;
         }
 
@@ -827,4 +827,12 @@ public abstract class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JLabel zoomYLabel;
     private javax.swing.JSlider zoomYSlider;
     // End of variables declaration//GEN-END:variables
+
+    protected DataProvider getData() {
+        return data;
+    }
+
+    protected void setData(DataProvider data) {
+        this.data = data;
+    }
 }

@@ -10,6 +10,6 @@ public final class IntermediateFrame extends GUIFrame {
 
     @Override
     protected GUIPanel createPanel() {
-        return new IntermediatePanel(data, this);
+        return new IntermediatePanel(getData(), this);
     }
 }
