@@ -106,7 +106,7 @@ public final class VisibilityData extends DataProvider {
             e.printStackTrace();
         }
 
-        logger.debug("Reading data for stations (" + station1 + ", " + station2 + "), baseline " + baseline + ", subband " + subband + "...");
+        logger.info("Reading data for stations (" + station1 + ", " + station2 + "), baseline " + baseline + ", subband " + subband + "...");
         long start = System.currentTimeMillis();
 
         long sequenceNr = 0;
@@ -122,7 +122,7 @@ public final class VisibilityData extends DataProvider {
         }
         long end = System.currentTimeMillis();
         nrSeconds = timeIndex;
-        logger.debug("Read " + nrSeconds + " time samples of data. Read took " + ((end - start) / 1000.0) + " seconds.");
+        logger.info("Read " + nrSeconds + " time samples of data. Read took " + ((end - start) / 1000.0) + " seconds.");
     }
 
     private long readSecond(final int subband, final int timeIndex) {
