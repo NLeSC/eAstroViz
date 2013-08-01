@@ -11,8 +11,8 @@ import nl.esciencecenter.eAstroViz.dataFormats.preprocessedData.intermediateData
 import nl.esciencecenter.eAstroViz.dataFormats.rawData.RawData;
 import nl.esciencecenter.eAstroViz.dataFormats.rawData.RawDataFrame;
 import nl.esciencecenter.eAstroViz.dataFormats.rawData.RawDataReader;
-import nl.esciencecenter.eAstroViz.dataFormats.visabilityData.MSMetaData;
-import nl.esciencecenter.eAstroViz.dataFormats.visabilityData.VisibilityData;
+import nl.esciencecenter.eAstroViz.dataFormats.visibilityData.MSMetaData;
+import nl.esciencecenter.eAstroViz.dataFormats.visibilityData.VisibilityData;
 import nl.esciencecenter.eAstroViz.gui.BeamFormedFrame;
 import nl.esciencecenter.eAstroViz.gui.IntermediateFrame;
 import nl.esciencecenter.eAstroViz.gui.RawFrame;

@@ -15,7 +15,7 @@ import java.io.IOException;
 
 import nl.esciencecenter.eAstroViz.Viz;
 import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
-import nl.esciencecenter.eAstroViz.dataFormats.visabilityData.VisibilityData;
+import nl.esciencecenter.eAstroViz.dataFormats.visibilityData.VisibilityData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

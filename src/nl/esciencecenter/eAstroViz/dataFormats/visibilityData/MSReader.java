@@ -1,4 +1,4 @@
-package nl.esciencecenter.eAstroViz.dataFormats.visabilityData;
+package nl.esciencecenter.eAstroViz.dataFormats.visibilityData;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -17,7 +17,7 @@ public final class MSReader {
     private static boolean NEW_FORMAT = true;
     private static boolean VERBOSE = true;
 
-    private static final Logger logger = LoggerFactory.getLogger(MSReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MSReader.class);
 
     private final String filename;
     private final int nrSubbands;
@@ -66,14 +66,14 @@ public final class MSReader {
 
         final String dirName = filename + File.separator + "SB" + subbandString + ".MS";
 
-        logger.info("reading subband dir: " + dirName);
+        LOGGER.debug("reading subband dir: " + dirName);
 
         readMeta(dirName);
 
         final File f = new File(dirName + File.separator + "table.f0data");
 
         if (VERBOSE) {
-            logger.info("reading file: " + f.getCanonicalPath());
+            LOGGER.debug("reading file: " + f.getCanonicalPath());
         }
         final FileInputStream fin = new FileInputStream(f);
         final BufferedInputStream bin = new BufferedInputStream(fin, 512);
@@ -96,7 +96,7 @@ public final class MSReader {
             if (NEW_FORMAT) {
                 final long magic = readuint32(in, false);
                 if (magic != 0x0000DA7A) {
-                    logger.info("data corrupted, magic is wrong! val = " + magic);
+                    LOGGER.info("data corrupted, magic is wrong! val = " + magic);
                     sequenceNr = -1;
                     
                     for(int i=0; i<200; i++) {
@@ -167,7 +167,7 @@ public final class MSReader {
     private void readMeta(final String dirName) throws IOException {
         final File m = new File(dirName + File.separator + "table.f0meta");
         if (VERBOSE) {
-            logger.info("reading META file: " + m.getCanonicalPath());
+            LOGGER.debug("reading META file: " + m.getCanonicalPath());
         }
 
         final FileInputStream fin = new FileInputStream(m);
@@ -186,7 +186,7 @@ public final class MSReader {
 
         final int version = (int) readuint32(din, true);
         if (VERBOSE) {
-            logger.info("Lofar storage manager version: " + version);
+            LOGGER.debug("Lofar storage manager version: " + version);
         }
         // Now, two blocks, indicating the antenna orders.
         skip(din, 4);
@@ -198,37 +198,37 @@ public final class MSReader {
         skip(din, 8);
         final double IONIntegrationTime = din.readDouble();
         if (VERBOSE) {
-            logger.info("ION integration time = " + IONIntegrationTime);
+            LOGGER.debug("ION integration time = " + IONIntegrationTime);
         }
 
         final int nrChannels = (int) readuint32(din, true);
         if (VERBOSE) {
-            logger.info("channels per subband: " + nrChannels);
+            LOGGER.debug("channels per subband: " + nrChannels);
         }
 
         final int nrCrossPolarizations = (int) readuint32(din, true);
         if (VERBOSE) {
-            logger.info("nr cross polarizations : " + nrCrossPolarizations);
+            LOGGER.debug("nr cross polarizations : " + nrCrossPolarizations);
         }
 
         final int integrationTimeProd = (int) din.readDouble();
         if (VERBOSE) {
-            logger.info("CN * ION integration time = " + integrationTimeProd);
+            LOGGER.debug("CN * ION integration time = " + integrationTimeProd);
         }
 
         final int alignment = (int) readuint32(din, true);
         if (VERBOSE) {
-            logger.info("alignment : " + alignment);
+            LOGGER.debug("alignment : " + alignment);
         }
 
         final boolean isBigEndian = din.readByte() == 0 ? true : false;
         if (VERBOSE) {
-            logger.info("big endian = " + isBigEndian);
+            LOGGER.debug("big endian = " + isBigEndian);
         }
 
         final int nrBytesPerValidSamples = (int) readuint32(din, true);
         if (VERBOSE) {
-            logger.info("nrBytesPerValidSamples : " + nrBytesPerValidSamples);
+            LOGGER.debug("nrBytesPerValidSamples : " + nrBytesPerValidSamples);
         }
 
         din.close();
@@ -247,7 +247,7 @@ public final class MSReader {
         maxSecondsOfData = (long) Math.ceil((double) maxFileSize / sizePerSecond);
 
         if (VERBOSE) {
-            logger.info("maximum file size = " + maxFileSize + ", maximum number of seconds of data = " + maxSecondsOfData);
+            LOGGER.debug("maximum file size = " + maxFileSize + ", maximum number of seconds of data = " + maxSecondsOfData);
         }
     }
 

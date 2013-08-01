@@ -1,4 +1,4 @@
-package nl.esciencecenter.eAstroViz.dataFormats.visabilityData;
+package nl.esciencecenter.eAstroViz.dataFormats.visibilityData;
 
 import java.io.IOException;
 
