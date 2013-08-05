@@ -89,7 +89,7 @@ public final class Viz {
             
             if(batch) {
                 beamFormedFrame.save("ouputBeamFormed.bmp");
-                System.exit(1);
+                System.exit(0);
             }
 
             beamFormedFrame.setVisible(true);
@@ -104,7 +104,7 @@ public final class Viz {
 
             if(batch) {
                 beamFormedFrame.save("ouputCompressedBeamFormed.bmp");
-                System.exit(1);
+                System.exit(0);
             }
 
             beamFormedFrame.setVisible(true);
@@ -120,7 +120,7 @@ public final class Viz {
             
             if(batch) {
                 intermediateFrame.save("ouputIntermediate.bmp");
-                System.exit(1);
+                System.exit(0);
             }
 
             intermediateFrame.setVisible(true);
@@ -136,7 +136,7 @@ public final class Viz {
             
             if(batch) {
                 filteredFrame.save("ouputFiltered.bmp");
-                System.exit(1);
+                System.exit(0);
             }
 
             filteredFrame.setVisible(true);
@@ -170,7 +170,7 @@ public final class Viz {
 
             if(batch) {
                 vizFrame.save("ouputVisibility.bmp");
-                System.exit(1);
+                System.exit(0);
             }
             
             vizFrame.setVisible(true);
