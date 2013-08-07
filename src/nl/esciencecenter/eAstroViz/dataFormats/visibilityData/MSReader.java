@@ -31,7 +31,7 @@ public final class MSReader {
     private long maxFileSize;
     private long maxSecondsOfData;
     private int sizePerSecond;
-    
+
     public MSReader(final String filename) throws IOException {
         this.filename = filename;
 
@@ -98,11 +98,11 @@ public final class MSReader {
                 if (magic != 0x0000DA7A) {
                     LOGGER.info("data corrupted, magic is wrong! val = " + magic);
                     sequenceNr = -1;
-                    
-                    for(int i=0; i<200; i++) {
-                       System.out.printf("%x\n", readuint32(in, false));
+
+                    for (int i = 0; i < 200; i++) {
+                        System.out.printf("%x\n", readuint32(in, false));
                     }
-                    
+
                     throw new RuntimeException("data corrupted, magic is wrong!");
                 }
 
@@ -124,18 +124,18 @@ public final class MSReader {
                     visData[requiredBaseline][channel][pol][Viz.IMAG] = readFloat(in);
                 }
             }
-            skip(in, (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4);
+            int baselineDataToSkip = (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4;
 
             int processed = metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4;
-            int toSkip = metaData.getAlignment() - (processed % metaData.getAlignment());
-            if(toSkip == metaData.getAlignment()) {
-                toSkip = 0;
+            int alignmentToSkip = metaData.getAlignment() - (processed % metaData.getAlignment());
+            if (alignmentToSkip == metaData.getAlignment()) {
+                alignmentToSkip = 0;
             }
-            
-//            logger.debug("processed is: " + processed + ", toSkip = " + toSkip);
-            skip(in, toSkip);
 
-            skip(in, requiredBaseline * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples());
+            int baselineFlagDataToSkip = requiredBaseline * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples();
+
+            skip(in, baselineDataToSkip + alignmentToSkip + baselineFlagDataToSkip);
+
             for (int channel = 0; channel < metaData.getNrChannels(); channel++) {
                 int nr = 0;
 
@@ -148,16 +148,16 @@ public final class MSReader {
                 }
                 nrValidSamples[requiredBaseline][channel] = nr;
             }
-            skip(in, (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples());
+            baselineFlagDataToSkip = (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples();
 
-            int toRead =
+            alignmentToSkip =
                     metaData.getAlignment()
                             - ((metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples()) % metaData.getAlignment());
-            if(toRead == metaData.getAlignment()) {
-                toRead = 0;
+            if (alignmentToSkip == metaData.getAlignment()) {
+                alignmentToSkip = 0;
             }
 
-            skip(in, toRead);
+            skip(in, baselineFlagDataToSkip + alignmentToSkip);
         } catch (final IOException e) {
             sequenceNr = -1;
             return;
@@ -346,7 +346,7 @@ public final class MSReader {
 
         return ch0;
     }
-    
+
     public float[][][] getVisibilities(final int baseline) {
         return visData[baseline];
     }
