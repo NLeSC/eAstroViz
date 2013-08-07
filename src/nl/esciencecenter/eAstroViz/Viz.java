@@ -88,7 +88,7 @@ public final class Viz {
             beamFormedFrame.pack();
             
             if(batch) {
-                beamFormedFrame.save("ouputBeamFormed.bmp");
+                beamFormedFrame.save("outputBeamFormed.bmp");
                 System.exit(0);
             }
 
@@ -103,7 +103,7 @@ public final class Viz {
             beamFormedFrame.pack();
 
             if(batch) {
-                beamFormedFrame.save("ouputCompressedBeamFormed.bmp");
+                beamFormedFrame.save("outputCompressedBeamFormed.bmp");
                 System.exit(0);
             }
 
@@ -119,7 +119,7 @@ public final class Viz {
             intermediateFrame.pack();
             
             if(batch) {
-                intermediateFrame.save("ouputIntermediate.bmp");
+                intermediateFrame.save("outputIntermediate.bmp");
                 System.exit(0);
             }
 
@@ -135,7 +135,7 @@ public final class Viz {
             filteredFrame.pack();
             
             if(batch) {
-                filteredFrame.save("ouputFiltered.bmp");
+                filteredFrame.save("outputFiltered.bmp");
                 System.exit(0);
             }
 
@@ -169,7 +169,7 @@ public final class Viz {
             vizFrame.pack();
 
             if(batch) {
-                vizFrame.save("ouputVisibility.bmp");
+                vizFrame.save("outputVisibility.bmp");
                 System.exit(0);
             }
             
