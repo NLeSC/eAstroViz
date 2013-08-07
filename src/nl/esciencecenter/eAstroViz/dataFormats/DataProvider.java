@@ -120,4 +120,27 @@ public abstract class DataProvider {
             in[i] = (in[i] - min) / (max - min);
         }
     }
+
+    public static final void scale(final float[][] in) {
+        float max = -10000000.0f;
+        float min = 1.0E20f;
+
+        for(int y=0; y<in.length; y++) {
+            for(int x=0; x<in[y].length; x++) {
+                float element = in[y][x];
+                if (element < min) {
+                    min = element;
+                }
+                if (element > max) {
+                    max = element;
+                }
+            }
+        }
+        
+        for(int y=0; y<in.length; y++) {
+            for(int x=0; x<in[y].length; x++) {
+                in[y][x] = (in[y][x] - min) / (max - min);
+            }
+        }
+    }
 }

@@ -184,7 +184,11 @@ public abstract class PreprocessedData extends DataProvider {
         min = minMaxVals.getMin();
         scaleValue = minMaxVals.getMax() - min;
 
-        logger.info("sampled already flagged in data set: " + initialFlaggedCount);
+        long nrSamples = nrTimes * nrSubbands * nrChannels * nrPolarizations;
+        float percent = ((float)initialFlaggedCount / nrSamples) * 100.0f;
+            
+        
+        logger.info("samples already flagged in data set: " + initialFlaggedCount + "(" + percent + "%)");
     }
 
     @Override
