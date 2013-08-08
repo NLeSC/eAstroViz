@@ -98,11 +98,6 @@ public final class MSReader {
                 if (magic != 0x0000DA7A) {
                     LOGGER.info("data corrupted, magic is wrong! val = " + magic);
                     sequenceNr = -1;
-
-                    for (int i = 0; i < 200; i++) {
-                        System.out.printf("%x\n", readuint32(in, false));
-                    }
-
                     throw new RuntimeException("data corrupted, magic is wrong!");
                 }
 

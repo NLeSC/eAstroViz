@@ -138,7 +138,7 @@ public class ConvertBinaryFiltered {
                 }
                 int station = (int) readuint32(in, false);
                 int subband = (int) readuint32(in, false);
-                logger.debug("read block " + block + ", subband " + subband);
+                logger.debug("read block " + block + ", station = " + station + ", subband " + subband);
                 for (int ch = 0; ch < nrChannels; ch++) {
                     for (int pol = 0; pol < nrPolarizations; pol++) {
                         float sample = readFloat(in);
