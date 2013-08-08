@@ -40,6 +40,9 @@ public abstract class GUIFrame extends javax.swing.JFrame {
         flaggerTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel(data.getFlaggerNames()));
         flaggerTypeComboBox.setSelectedItem("none");
 
+        polarizationComboBox.setModel(new javax.swing.DefaultComboBoxModel(data.getPolarizationNames()));
+        flaggerTypeComboBox.setSelectedItem(data.getPolarizationNames()[0]);
+
         sensitivityLabel.setText(String.format("%2.2f", sensitivitySlider.getValue() / 100.0f));
 
         scaleSlider.setMinimum(0);
@@ -227,6 +230,11 @@ public abstract class GUIFrame extends javax.swing.JFrame {
         positionLabel = new javax.swing.JLabel();
         rawValueLabel = new javax.swing.JLabel();
         scaledValueLabel = new javax.swing.JLabel();
+        zoomPanel = new javax.swing.JPanel();
+        zoomXSlider = new javax.swing.JSlider();
+        zoomXLabel = new javax.swing.JLabel();
+        zoomYLabel = new javax.swing.JLabel();
+        zoomYSlider = new javax.swing.JSlider();
         flaggerPanel = new javax.swing.JPanel();
         flaggerTypeComboBox = new javax.swing.JComboBox();
         label5 = new javax.swing.JLabel();
@@ -235,12 +243,14 @@ public abstract class GUIFrame extends javax.swing.JFrame {
         label7 = new javax.swing.JLabel();
         flaggedLabel = new javax.swing.JLabel();
         sensitivityLabel = new javax.swing.JLabel();
-        zoomPanel = new javax.swing.JPanel();
-        zoomXSlider = new javax.swing.JSlider();
-        zoomXLabel = new javax.swing.JLabel();
-        zoomYLabel = new javax.swing.JLabel();
-        zoomYSlider = new javax.swing.JSlider();
-        additionalControlsPanel = createAdditionalControlsPanel();
+        stationPanel = new javax.swing.JPanel();
+        station1Spinner = new javax.swing.JSpinner();
+        station1Label = new javax.swing.JLabel();
+        station2Label = new javax.swing.JLabel();
+        station2Spinner = new javax.swing.JSpinner();
+        baselineLabel = new javax.swing.JLabel();
+        polarizationLabel = new javax.swing.JLabel();
+        polarizationComboBox = new javax.swing.JComboBox();
         StatusBar = new javax.swing.JPanel();
         statusBarLabel = new javax.swing.JLabel();
         scrollPane = new javax.swing.JScrollPane();
@@ -257,7 +267,7 @@ public abstract class GUIFrame extends javax.swing.JFrame {
 
         javax.swing.GroupLayout logoPanelLayout = new javax.swing.GroupLayout(logoPanel);
         logoPanel.setLayout(logoPanelLayout);
-        logoPanelLayout.setHorizontalGroup(logoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 313, Short.MAX_VALUE));
+        logoPanelLayout.setHorizontalGroup(logoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 0, Short.MAX_VALUE));
         logoPanelLayout.setVerticalGroup(logoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 21, Short.MAX_VALUE));
 
         scalingPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -265,7 +275,6 @@ public abstract class GUIFrame extends javax.swing.JFrame {
         scaleSlider.setMinimum(1);
         scaleSlider.setValue(90);
         scaleSlider.addChangeListener(new javax.swing.event.ChangeListener() {
-            @Override
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 scaleSliderscaleStateChanged(evt);
             }
@@ -277,16 +286,20 @@ public abstract class GUIFrame extends javax.swing.JFrame {
 
         javax.swing.GroupLayout scalingPanelLayout = new javax.swing.GroupLayout(scalingPanel);
         scalingPanel.setLayout(scalingPanelLayout);
-        scalingPanelLayout.setHorizontalGroup(scalingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
-                scalingPanelLayout
-                        .createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(
-                                scalingPanelLayout
-                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(scalingPanelLayout.createSequentialGroup().addComponent(label0).addGap(18, 18, 18).addComponent(scaleLabel))
-                                        .addComponent(scaleSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE)).addContainerGap(101, Short.MAX_VALUE)));
+        scalingPanelLayout.setHorizontalGroup(scalingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(
+                        scalingPanelLayout
+                                .createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(
+                                        scalingPanelLayout
+                                                .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(
+                                                        scalingPanelLayout.createSequentialGroup().addComponent(label0).addGap(18, 18, 18)
+                                                                .addComponent(scaleLabel))
+                                                .addComponent(scaleSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
         scalingPanelLayout.setVerticalGroup(scalingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
                 scalingPanelLayout
                         .createSequentialGroup()
@@ -304,7 +317,6 @@ public abstract class GUIFrame extends javax.swing.JFrame {
 
         colorMapComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         colorMapComboBox.addActionListener(new java.awt.event.ActionListener() {
-            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comorMapSelected(evt);
             }
@@ -312,7 +324,7 @@ public abstract class GUIFrame extends javax.swing.JFrame {
 
         javax.swing.GroupLayout colorMapLegendPanelLayout = new javax.swing.GroupLayout(colorMapLegendPanel);
         colorMapLegendPanel.setLayout(colorMapLegendPanelLayout);
-        colorMapLegendPanelLayout.setHorizontalGroup(colorMapLegendPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 289,
+        colorMapLegendPanelLayout.setHorizontalGroup(colorMapLegendPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 0,
                 Short.MAX_VALUE));
         colorMapLegendPanelLayout.setVerticalGroup(colorMapLegendPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 20,
                 Short.MAX_VALUE));
@@ -329,24 +341,24 @@ public abstract class GUIFrame extends javax.swing.JFrame {
                                         .addGroup(
                                                 colorMapPanelLayout
                                                         .createSequentialGroup()
-                                                        .addGroup(
-                                                                colorMapPanelLayout
-                                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                                        .addComponent(jLabel1)
-                                                                        .addComponent(colorMapComboBox, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                        .addGap(0, 213, Short.MAX_VALUE))
+                                                        .addComponent(jLabel1)
+                                                        .addGap(4, 4, 4)
+                                                        .addComponent(colorMapComboBox, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addGap(0, 0, Short.MAX_VALUE))
                                         .addComponent(colorMapLegendPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
                                                 Short.MAX_VALUE)).addContainerGap()));
         colorMapPanelLayout.setVerticalGroup(colorMapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
                 colorMapPanelLayout
                         .createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jLabel1)
+                        .addGroup(
+                                colorMapPanelLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel1)
+                                        .addComponent(colorMapComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(colorMapComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(colorMapLegendPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
                                 javax.swing.GroupLayout.PREFERRED_SIZE).addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
@@ -355,7 +367,7 @@ public abstract class GUIFrame extends javax.swing.JFrame {
 
         javax.swing.GroupLayout histogramInnerPanelLayout = new javax.swing.GroupLayout(histogramInnerPanel);
         histogramInnerPanel.setLayout(histogramInnerPanelLayout);
-        histogramInnerPanelLayout.setHorizontalGroup(histogramInnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 289,
+        histogramInnerPanelLayout.setHorizontalGroup(histogramInnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 0,
                 Short.MAX_VALUE));
         histogramInnerPanelLayout.setVerticalGroup(histogramInnerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 110,
                 Short.MAX_VALUE));
@@ -373,7 +385,7 @@ public abstract class GUIFrame extends javax.swing.JFrame {
                                         .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(histogramInnerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
                                                 Short.MAX_VALUE)
-                                        .addGroup(histogramPanelLayout.createSequentialGroup().addComponent(jLabel2).addGap(0, 211, Short.MAX_VALUE)))
+                                        .addGroup(histogramPanelLayout.createSequentialGroup().addComponent(jLabel2).addGap(0, 0, Short.MAX_VALUE)))
                         .addContainerGap()));
         histogramPanelLayout.setVerticalGroup(histogramPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
                 javax.swing.GroupLayout.Alignment.TRAILING,
@@ -450,7 +462,8 @@ public abstract class GUIFrame extends javax.swing.JFrame {
                                                                         .createSequentialGroup()
                                                                         .addContainerGap()
                                                                         .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, 166,
-                                                                                javax.swing.GroupLayout.PREFERRED_SIZE))).addContainerGap(132, Short.MAX_VALUE)));
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
         infoPanelLayout.setVerticalGroup(infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
                 infoPanelLayout
                         .createSequentialGroup()
@@ -469,11 +482,58 @@ public abstract class GUIFrame extends javax.swing.JFrame {
                                 infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(label4)
                                         .addComponent(scaledValueLabel)).addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
+        zoomPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        zoomXSlider.setMaximum(10);
+        zoomXSlider.setMinimum(1);
+        zoomXSlider.setValue(1);
+        zoomXSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                zoomXSliderStateChanged(evt);
+            }
+        });
+
+        zoomXLabel.setText("zoom x");
+
+        zoomYLabel.setText("zoom y");
+
+        zoomYSlider.setMaximum(10);
+        zoomYSlider.setMinimum(1);
+        zoomYSlider.setValue(1);
+        zoomYSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                zoomYSliderStateChanged(evt);
+            }
+        });
+
+        javax.swing.GroupLayout zoomPanelLayout = new javax.swing.GroupLayout(zoomPanel);
+        zoomPanel.setLayout(zoomPanelLayout);
+        zoomPanelLayout.setHorizontalGroup(zoomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
+                zoomPanelLayout.createSequentialGroup().addContainerGap().addComponent(zoomXLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(zoomXSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(zoomYLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(zoomYSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+        zoomPanelLayout.setVerticalGroup(zoomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
+                zoomPanelLayout
+                        .createSequentialGroup()
+                        .addGap(13, 13, 13)
+                        .addGroup(
+                                zoomPanelLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(zoomXLabel)
+                                        .addComponent(zoomYSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(zoomXSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(zoomYLabel))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+
         flaggerPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         flaggerTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         flaggerTypeComboBox.addActionListener(new java.awt.event.ActionListener() {
-            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 flaggerTypeSelected(evt);
             }
@@ -488,7 +548,6 @@ public abstract class GUIFrame extends javax.swing.JFrame {
         sensitivitySlider.setToolTipText("");
         sensitivitySlider.setValue(100);
         sensitivitySlider.addChangeListener(new javax.swing.event.ChangeListener() {
-            @Override
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 sensitivitySliderStateChanged(evt);
             }
@@ -521,7 +580,8 @@ public abstract class GUIFrame extends javax.swing.JFrame {
                                                         javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGroup(
                                                         flaggerPanelLayout.createSequentialGroup().addComponent(label7).addGap(26, 26, 26)
-                                                                .addComponent(flaggedLabel))).addContainerGap(101, Short.MAX_VALUE)));
+                                                                .addComponent(flaggedLabel)))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
         flaggerPanelLayout.setVerticalGroup(flaggerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
                 flaggerPanelLayout
                         .createSequentialGroup()
@@ -542,73 +602,116 @@ public abstract class GUIFrame extends javax.swing.JFrame {
                                 flaggerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(label7)
                                         .addComponent(flaggedLabel)).addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
-        zoomPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        stationPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        zoomXSlider.setMaximum(10);
-        zoomXSlider.setMinimum(1);
-        zoomXSlider.setValue(1);
-        zoomXSlider.addChangeListener(new javax.swing.event.ChangeListener() {
-            @Override
+        station1Spinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                zoomXSliderStateChanged(evt);
+                station1SpinnerStateChanged(evt);
             }
         });
 
-        zoomXLabel.setText("zoom x");
+        station1Label.setText("station 1:");
 
-        zoomYLabel.setText("zoom y");
+        station2Label.setText("station 2:");
 
-        zoomYSlider.setMaximum(10);
-        zoomYSlider.setMinimum(1);
-        zoomYSlider.setValue(1);
-        zoomYSlider.addChangeListener(new javax.swing.event.ChangeListener() {
-            @Override
+        station2Spinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                zoomYSliderStateChanged(evt);
+                station2SpinnerStateChanged(evt);
             }
         });
 
-        javax.swing.GroupLayout zoomPanelLayout = new javax.swing.GroupLayout(zoomPanel);
-        zoomPanel.setLayout(zoomPanelLayout);
-        zoomPanelLayout.setHorizontalGroup(zoomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
-                zoomPanelLayout.createSequentialGroup().addContainerGap().addComponent(zoomXLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(zoomXSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(zoomYLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(zoomYSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(46, Short.MAX_VALUE)));
-        zoomPanelLayout.setVerticalGroup(zoomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
-                zoomPanelLayout
+        baselineLabel.setText("baseline: ");
+
+        polarizationLabel.setText("Polarization:");
+
+        polarizationComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        polarizationComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                polarizationComboBoxActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout stationPanelLayout = new javax.swing.GroupLayout(stationPanel);
+        stationPanel.setLayout(stationPanelLayout);
+        stationPanelLayout.setHorizontalGroup(stationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
+                stationPanelLayout
                         .createSequentialGroup()
-                        .addGap(13, 13, 13)
+                        .addContainerGap()
                         .addGroup(
-                                zoomPanelLayout
+                                stationPanelLayout
                                         .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(zoomXLabel)
-                                        .addComponent(zoomYSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(zoomXSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(zoomYLabel))
+                                        .addComponent(baselineLabel)
+                                        .addGroup(
+                                                stationPanelLayout
+                                                        .createSequentialGroup()
+                                                        .addGroup(
+                                                                stationPanelLayout
+                                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(station1Label, javax.swing.GroupLayout.PREFERRED_SIZE, 80,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(polarizationLabel))
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addGroup(
+                                                                stationPanelLayout
+                                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(polarizationComboBox, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addGroup(
+                                                                                stationPanelLayout
+                                                                                        .createSequentialGroup()
+                                                                                        .addComponent(station1Spinner, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                                42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                                        .addComponent(station2Label)
+                                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                                        .addComponent(station2Spinner, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                                42, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+        stationPanelLayout.setVerticalGroup(stationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(
+                        stationPanelLayout
+                                .createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(
+                                        stationPanelLayout
+                                                .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(station1Label)
+                                                .addComponent(station2Label)
+                                                .addComponent(station2Spinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(station1Spinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(baselineLabel)
+                                .addGap(18, 18, 18)
+                                .addGroup(
+                                        stationPanelLayout
+                                                .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(polarizationLabel)
+                                                .addComponent(polarizationComboBox, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
         javax.swing.GroupLayout standardControlsPanelLayout = new javax.swing.GroupLayout(standardControlsPanel);
         standardControlsPanel.setLayout(standardControlsPanelLayout);
         standardControlsPanelLayout.setHorizontalGroup(standardControlsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addComponent(histogramPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(flaggerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(scalingPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(colorMapPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(infoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(logoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(flaggerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(zoomPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(logoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+                .addComponent(stationPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
         standardControlsPanelLayout.setVerticalGroup(standardControlsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
                 standardControlsPanelLayout
                         .createSequentialGroup()
                         .addComponent(logoPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(zoomPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(stationPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(zoomPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(scalingPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
                                 javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -623,36 +726,14 @@ public abstract class GUIFrame extends javax.swing.JFrame {
                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(flaggerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                javax.swing.GroupLayout.PREFERRED_SIZE)));
-
-        additionalControlsPanel.setPreferredSize(new java.awt.Dimension(100, 200));
-
-        javax.swing.GroupLayout additionalControlsPanelLayout = new javax.swing.GroupLayout(additionalControlsPanel);
-        additionalControlsPanel.setLayout(additionalControlsPanelLayout);
-        additionalControlsPanelLayout.setHorizontalGroup(additionalControlsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0,
-                317, Short.MAX_VALUE));
-        additionalControlsPanelLayout.setVerticalGroup(additionalControlsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0,
-                200, Short.MAX_VALUE));
+                                javax.swing.GroupLayout.PREFERRED_SIZE).addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
         javax.swing.GroupLayout leftPanelLayout = new javax.swing.GroupLayout(leftPanel);
         leftPanel.setLayout(leftPanelLayout);
-        leftPanelLayout.setHorizontalGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
-                leftPanelLayout
-                        .createSequentialGroup()
-                        .addGroup(
-                                leftPanelLayout
-                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(additionalControlsPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                317, Short.MAX_VALUE)
-                                        .addComponent(standardControlsPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)).addGap(0, 0, Short.MAX_VALUE)));
-        leftPanelLayout.setVerticalGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
-                leftPanelLayout
-                        .createSequentialGroup()
-                        .addComponent(standardControlsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                javax.swing.GroupLayout.PREFERRED_SIZE).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(additionalControlsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+        leftPanelLayout.setHorizontalGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(standardControlsPanel,
+                javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE));
+        leftPanelLayout.setVerticalGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(standardControlsPanel,
+                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
 
         StatusBar.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -663,7 +744,7 @@ public abstract class GUIFrame extends javax.swing.JFrame {
         StatusBarLayout.setHorizontalGroup(StatusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
                 StatusBarLayout.createSequentialGroup()
                         .addComponent(statusBarLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(0, 1910, Short.MAX_VALUE)));
+                        .addGap(0, 0, Short.MAX_VALUE)));
         StatusBarLayout
                 .setVerticalGroup(StatusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
                         javax.swing.GroupLayout.Alignment.TRAILING,
@@ -676,7 +757,6 @@ public abstract class GUIFrame extends javax.swing.JFrame {
 
         saveMenuItem.setText("save as image");
         saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveMenuItemActionPerformed(evt);
             }
@@ -685,7 +765,6 @@ public abstract class GUIFrame extends javax.swing.JFrame {
 
         exitMenuItem.setText("exit");
         exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exitMenuItemActionPerformed(evt);
             }
@@ -705,15 +784,15 @@ public abstract class GUIFrame extends javax.swing.JFrame {
                         layout.createSequentialGroup()
                                 .addComponent(leftPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
                                         javax.swing.GroupLayout.PREFERRED_SIZE).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1701, Short.MAX_VALUE)));
+                                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)));
         layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
                 javax.swing.GroupLayout.Alignment.TRAILING,
                 layout.createSequentialGroup()
                         .addGroup(
                                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(leftPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 922, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
+                                        .addComponent(leftPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(scrollPane))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(StatusBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
                                 javax.swing.GroupLayout.PREFERRED_SIZE)));
 
@@ -755,6 +834,16 @@ public abstract class GUIFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_flaggerTypeSelected
 
+    private void zoomYSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_zoomYSliderStateChanged
+        final int newZoomY = zoomYSlider.getValue();
+        samplePanel.setZoomY(newZoomY);
+    }//GEN-LAST:event_zoomYSliderStateChanged
+
+    private void zoomXSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_zoomXSliderStateChanged
+        final int newZoomX = zoomXSlider.getValue();
+        samplePanel.setZoomX(newZoomX);
+    }//GEN-LAST:event_zoomXSliderStateChanged
+
     private void comorMapSelected(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comorMapSelected
         final String newColorMap = (String) colorMapComboBox.getSelectedItem();
         if (!newColorMap.equals(samplePanel.getColorMapName())) {
@@ -772,19 +861,29 @@ public abstract class GUIFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_scaleSliderscaleStateChanged
 
-    private void zoomXSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_zoomXSliderStateChanged
-        final int newZoomX = zoomXSlider.getValue();
-        samplePanel.setZoomX(newZoomX);
-    }//GEN-LAST:event_zoomXSliderStateChanged
+    private void station1SpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_station1SpinnerStateChanged
+        final int val = ((Integer) station1Spinner.getValue()).intValue();
+        final int newVal = setStation1(val);
+        baselineLabel.setText(getBaselineText());
+        station1Spinner.setValue(newVal);
+        repaint();
+    }//GEN-LAST:event_station1SpinnerStateChanged
 
-    private void zoomYSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_zoomYSliderStateChanged
-        final int newZoomY = zoomYSlider.getValue();
-        samplePanel.setZoomY(newZoomY);
-    }//GEN-LAST:event_zoomYSliderStateChanged
+    private void station2SpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_station2SpinnerStateChanged
+        final int val = ((Integer) station2Spinner.getValue()).intValue();
+        final int newVal = setStation2(val);
+        baselineLabel.setText(getBaselineText());
+        station2Spinner.setValue(newVal);
+        repaint();
+    }//GEN-LAST:event_station2SpinnerStateChanged
+
+    private void polarizationComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_polarizationComboBoxActionPerformed
+        setPolarization((String)polarizationComboBox.getSelectedItem());
+    }//GEN-LAST:event_polarizationComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel StatusBar;
-    public javax.swing.JPanel additionalControlsPanel;
+    private javax.swing.JLabel baselineLabel;
     private javax.swing.JComboBox colorMapComboBox;
     private javax.swing.JPanel colorMapLegendPanel;
     private javax.swing.JPanel colorMapPanel;
@@ -809,6 +908,8 @@ public abstract class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JLabel label7;
     private javax.swing.JPanel leftPanel;
     private javax.swing.JPanel logoPanel;
+    private javax.swing.JComboBox polarizationComboBox;
+    private javax.swing.JLabel polarizationLabel;
     private javax.swing.JLabel positionLabel;
     private javax.swing.JLabel rawValueLabel;
     private javax.swing.JMenuItem saveMenuItem;
@@ -820,12 +921,18 @@ public abstract class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JLabel sensitivityLabel;
     private javax.swing.JSlider sensitivitySlider;
     private javax.swing.JPanel standardControlsPanel;
+    private javax.swing.JLabel station1Label;
+    private javax.swing.JSpinner station1Spinner;
+    private javax.swing.JLabel station2Label;
+    private javax.swing.JSpinner station2Spinner;
+    private javax.swing.JPanel stationPanel;
     private javax.swing.JLabel statusBarLabel;
     private javax.swing.JPanel zoomPanel;
     private javax.swing.JLabel zoomXLabel;
     private javax.swing.JSlider zoomXSlider;
     private javax.swing.JLabel zoomYLabel;
     private javax.swing.JSlider zoomYSlider;
+
     // End of variables declaration//GEN-END:variables
 
     protected DataProvider getData() {
@@ -834,5 +941,38 @@ public abstract class GUIFrame extends javax.swing.JFrame {
 
     protected void setData(DataProvider data) {
         this.data = data;
+    }
+
+    protected abstract int setStation1(int newVal);
+
+    protected abstract int setStation2(int newVal);
+
+    protected abstract String getBaselineText();
+
+    protected abstract String setPolarization(String s);
+    
+    void disableStation2Spinner() {
+        station2Label.setEnabled(false);
+        station2Spinner.setEnabled(false);
+    }
+
+    protected int getStation1Spinner() {
+        return ((Integer) station1Spinner.getValue()).intValue();
+    }
+
+    protected void setStation1Spinner(int val) {
+        station1Spinner.setValue(new Integer(val));
+    }
+
+    protected int getStation2Spinner() {
+        return ((Integer) station2Spinner.getValue()).intValue();
+    }
+
+    protected void setStation2Spinner(int val) {
+        station2Spinner.setValue(new Integer(val));
+    }
+    
+    protected void setBaselineText(String val) {
+        baselineLabel.setText(val);
     }
 }

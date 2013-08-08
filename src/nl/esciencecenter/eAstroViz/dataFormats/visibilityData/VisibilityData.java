@@ -28,9 +28,10 @@ public final class VisibilityData extends DataProvider {
     final float[][][][] powers; // [time][nrSubbands][nrChannels][nrCrossPolarizations]
     final int[][][] nrValidSamples; // [time][nrSubbands][nrChannels]
     final boolean[][][] flagged; // [time][nrSubbands][nrChannels]
-    final int baseline;
-    final int station1;
-    final int station2;
+    int baseline;
+    int station1;
+    int station2;
+    int pol;
     final int nrChannels;
     final int integrationTime;
     final int nrStations;
@@ -39,12 +40,16 @@ public final class VisibilityData extends DataProvider {
     private final int nrCrossPolarizations;
     private int nrSeconds;
 
-    public VisibilityData(final String fileName, final int station1, final int station2, final int maxSequenceNr, final int maxSubbands) throws IOException {
-        super(fileName, maxSequenceNr, maxSubbands, new String[] { "XX", "XY", "YX", "YY" }, new String[] { "none", "Threshold", "SumThreshold",
+    public VisibilityData(final String fileName, final int station1, final int station2, final int pol, final int maxSequenceNr, final int maxSubbands) throws IOException {
+        super();
+        init(fileName, maxSequenceNr, maxSubbands, new String[] { "XX", "XY", "YX", "YY" }, new String[] { "none", "Threshold", "SumThreshold",
                 "SmoothedSumThreshold", "HistorySumThreshold", "HistorySmoothedSumThreshold" });
         this.station1 = station1;
         this.station2 = station2;
-        this.baseline = Viz.baseline(station1, station2);
+        this.baseline = baseline(station1, station2);
+        
+        System.err.println("XXXXXXXXXXX s1 = " + station1 + ", station 2 = " + station2 + ", baseline = " + baseline);
+        this.pol = pol;
 
         r = new MSReader(fileName);
         nrSubbands = r.getNrSubbands();
@@ -69,6 +74,14 @@ public final class VisibilityData extends DataProvider {
         
         logger.info("nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels + ", nrBaseLines = " + nrBaselines + ", integrationTime = " + integrationTime +
                 ", pols = " + nrCrossPolarizations + ", nrStations = " + nrStations + ", nrSeconds = " + nrSeconds); 
+    }
+
+    public static int baseline(final int station1, final int station2) {
+        if (station2 > station1) {
+            logger.warn("Illegal baseline, station1 = " + station1 + ", station 2 = " + station2);
+            return -1;
+        }
+        return station2 * (station2 + 1) / 2 + station1;
     }
 
     public static MSMetaData getMetaData(final String fileName) {
@@ -219,7 +232,7 @@ public final class VisibilityData extends DataProvider {
         }
     }
 
-    public float getPower(final int time, final int frequency, final int pol) {
+    public float getPower(final int time, final int frequency) {
         int subband;
         int channel;
         if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
@@ -289,13 +302,13 @@ public final class VisibilityData extends DataProvider {
     }
 
     @Override
-    public float getValue(final int x, final int y, int pol) { // TODO SCALE
-        return getPower(x, y, pol);
+    public float getValue(final int x, final int y) { // TODO SCALE
+        return getPower(x, y);
     }
 
     @Override
-    public float getRawValue(final int x, final int y, int pol) {
-        return getPower(x, y, pol);
+    public float getRawValue(final int x, final int y) {
+        return getPower(x, y);
     }
 
     public int getStation1() {
@@ -304,5 +317,83 @@ public final class VisibilityData extends DataProvider {
 
     public int getStation2() {
         return station2;
+    }
+
+    @Override
+    public int setStation1(int station1) {
+        if(station1 < 0 || station1 >= nrStations || station1 == this.station1) {
+            return this.station1;
+        }
+        
+        this.station1 = station1;
+        this.baseline = baseline(station1, station2);
+        try {
+            read();
+        } catch (IOException e) {
+            logger.error("" + e);
+            throw new RuntimeException(e); 
+        }
+        return this.station1;
+    }
+
+    @Override
+    public int setStation2(int station2) {
+        if(station2 < 0 || station2 >= nrStations || station2 == this.station2) {
+            return this.station2;
+        }
+        
+        this.station2 = station2;
+        this.baseline = baseline(station1, station2);
+        try {
+            read();
+        } catch (IOException e) {
+            logger.error("" + e);
+            throw new RuntimeException(e); 
+        }
+        return this.station2;
+    }
+
+    public String polarizationToString(final int pol) {
+        switch (pol) {
+        case 0:
+            return "XX";
+        case 1:
+            return "XY";
+        case 2:
+            return "YX";
+        case 3:
+            return "YY";
+        default:
+            return "error";
+        }
+    }
+
+    public int StringToPolarization(final String polString) {
+        if (polString.equals("XX")) {
+            return 0;
+        } else if (polString.equals("XY")) {
+            return 1;
+        } else if (polString.equals("YX")) {
+            return 2;
+        } else if (polString.equals("YY")) {
+            return 3;
+        } else {
+            logger.warn("illegal polarization: " + polString);
+            return 0;
+        }
+    }
+
+    @Override
+    public int getPolarization() {
+        return pol; 
+    }
+
+    @Override
+    public int setPolarization(int newValue) {
+        if(pol < 0 || pol >= polList.length) {
+            return pol;
+        }
+        this.pol = newValue;
+        return newValue;
     }
 }

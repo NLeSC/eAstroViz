@@ -60,8 +60,11 @@ public final class BeamFormedData extends DataProvider {
     final int zoomFactor;
     static int maximumShift;
 
+    int stoke = 0;
+    
     public BeamFormedData(final String fileName, final int maxSequenceNr, final int maxSubbands, final int zoomFactor) {
-        super(fileName, maxSequenceNr, maxSubbands, new String[] { "I" }, new String[] { "none" });
+        super();
+        init(fileName, maxSequenceNr, maxSubbands, new String[] { "I" }, new String[] { "none" });
 
         final File[] ls = new File(fileName).listFiles(new Viz.ExtFilter("h5"));
         if (ls.length != 1) {
@@ -389,12 +392,12 @@ public final class BeamFormedData extends DataProvider {
     }
 
     @Override
-    public float getValue(final int x, final int y, int stoke) {
-        return (getRawValue(x, y, stoke) - minVal) / (maxVal - minVal);
+    public float getValue(final int x, final int y) {
+        return (getRawValue(x, y) - minVal) / (maxVal - minVal);
     }
 
     @Override
-    public float getRawValue(final int x, final int y, int stoke) { // TODO: maybe return other stokes
+    public float getRawValue(final int x, final int y) { // TODO: maybe return other stokes
         final int subband = y / nrChannels;
         final int channel = y % nrChannels;
         return data[x][subband][channel];
@@ -570,5 +573,48 @@ public final class BeamFormedData extends DataProvider {
 
     public float getBeamCenterFrequency() {
         return beamCenterFrequency;
+    }
+
+    @Override
+    public int getStation1() {
+        return -1;
+    }
+
+    @Override
+    public int setStation1(int station1) {
+        return -1;
+    }
+
+    @Override
+    public int getStation2() {
+        return -1;
+    }
+
+    @Override
+    public int setStation2(int station2) {
+        return -1;
+    }
+
+    @Override
+    public int getPolarization() {
+        return stoke;
+    }
+
+    @Override
+    public int setPolarization(int newValue) {
+        // TODO Auto-generated method stub
+        return stoke;
+    }
+
+    @Override
+    public String polarizationToString(int pol) {
+        // TODO Auto-generated method stub
+        return "I";
+    }
+
+    @Override
+    public int StringToPolarization(String polString) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 }

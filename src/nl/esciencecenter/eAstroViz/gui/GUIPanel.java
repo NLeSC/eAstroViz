@@ -123,7 +123,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
                 if (data.isFlagged(x, y)) {
                     sampleVal = 0.0f;
                 } else {
-                    sampleVal = data.getRawValue(x, y, currentPol);
+                    sampleVal = data.getRawValue(x, y);
                 }
 
                 rawData[data.getSizeX() * y + x] = sampleVal;
@@ -166,7 +166,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         for (int y = 0; y < data.getSizeY(); y++) {
             for (int x = 0; x < data.getSizeX(); x++) {
                 if (!data.isFlagged(x, y)) {
-                    float sampleVal = data.getRawValue(x, y, currentPol);
+                    float sampleVal = data.getRawValue(x, y);
                     sampleVal = (sampleVal - percentileValLow) / scaleFactor;
                     if (sampleVal < 0.0f) {
                         sampleVal = 0.0f;
@@ -222,8 +222,8 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
             x = 0;
             y = 0;
         } else {
-            raw = data.getRawValue(x, y, currentPol);
-            val = data.getValue(x, y, currentPol);
+            raw = data.getRawValue(x, y);
+            val = data.getValue(x, y);
         }
 
         parentFrame.setPositionText(String.format("%06d, %06d", x, y));
@@ -318,11 +318,11 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         return colorMaps.getColorMaps();
     }
 
-    public int getCurrentPol() {
+    public int getPolarization() {
         return currentPol;
     }
 
-    public void setCurrentPol(int pol) {
+    public void setPolarization(int pol) {
         if (this.currentPol == pol) {
             return;
         }

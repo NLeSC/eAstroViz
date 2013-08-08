@@ -1,34 +1,38 @@
 package nl.esciencecenter.eAstroViz.dataFormats.preprocessedData.intermediateData;
 
-import java.io.IOException;
-
 import nl.esciencecenter.eAstroViz.dataFormats.preprocessedData.PreprocessedData;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public final class IntermediateData extends PreprocessedData {
+    private static final Logger logger = LoggerFactory.getLogger(IntermediateData.class);
+
     public IntermediateData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands, final int station) {
-        super(fileName, integrationFactor, maxSequenceNr, maxSubbands, new String[] { "X", "Y" }, station);
+        super(fileName, integrationFactor, maxSequenceNr, maxSubbands, new String[] { "X", "Y" }, station, 0);
     }
 
     @Override
-    public void read() throws IOException {
-        super.read();
+    public String polarizationToString(final int pol) {
+        switch (pol) {
+        case 0:
+            return "X";
+        case 1:
+            return "Y";
+        default:
+            return "error";
+        }
+    }
 
-        // no longer needed
-        /*
-                // correct the fftshift
-                for (int time = 0; time < nrTimes; time++) {
-                    for (int sb = 0; sb < nrSubbands; sb++) {
-                        final float[] orig = data[time][sb].clone();
-                        final boolean[] origInitialFlags = initialFlagged[time][sb].clone();
-                        final boolean[] origFlags = flagged[time][sb].clone();
-                        
-                        for (int ch = 0; ch < nrChannels; ch++) {
-                            data[time][sb][ch] = orig[((nrChannels / 2) + ch) % nrChannels];
-                            initialFlagged[time][sb][ch] = origInitialFlags[((nrChannels / 2) + ch) % nrChannels];
-                            flagged[time][sb][ch] = origFlags[((nrChannels / 2) + ch) % nrChannels];
-                        }
-                    }
-                }
-                */
+    @Override
+    public int StringToPolarization(final String polString) {
+        if (polString.equals("X")) {
+            return 0;
+        } else if (polString.equals("Y")) {
+            return 1;
+        } else {
+            logger.warn("illegal polarization: " + polString);
+            return -1;
+        }
     }
 }

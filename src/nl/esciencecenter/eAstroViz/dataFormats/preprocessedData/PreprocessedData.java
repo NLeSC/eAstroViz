@@ -42,13 +42,18 @@ public abstract class PreprocessedData extends DataProvider {
     private static final boolean SCALE_PER_SUBBAND = false;
     private float min;
     private float scaleValue;
-    private final int station;
-
+    private int station1;
+    private final int station2;
+    private int pol;
+    
     public PreprocessedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands, final String[] polList,
-            final int station) {
-        super(fileName, maxSequenceNr, maxSubbands, polList, new String[] { "none", "Intermediate" });
+            final int station, final int pol) {
+        super();
+        init(fileName, maxSequenceNr, maxSubbands, polList, new String[] { "none", "Intermediate" });
         this.integrationFactor = integrationFactor;
-        this.station = station;
+        this.station1 = station;
+        this.station2 = -1;
+        this.pol = pol;
     }
 
     @SuppressWarnings("unused")
@@ -80,8 +85,7 @@ public abstract class PreprocessedData extends DataProvider {
 
         int stationBlockSize = integrationFactor * nrSubbandsInFile * nrChannels * nrPolarizations * 4;
 
-        fin.skip(stationBlockSize * station);
-        logger.debug("skipped " + station + " stations");
+        din.skip(stationBlockSize * station1);
         
         final ByteBuffer bb = ByteBuffer.allocateDirect(stationBlockSize);
         bb.order(ByteOrder.BIG_ENDIAN);
@@ -262,16 +266,14 @@ public abstract class PreprocessedData extends DataProvider {
         return nrSubbands * nrChannels;
     }
 
-    @Override
-    public final float getRawValue(final int x, final int y, int pol) {
+    public final float getRawValue(final int x, final int y) {
         final int subband = y / nrChannels;
         final int channel = y % nrChannels;
 
         return data[x][subband][pol][channel];
     }
 
-    @Override
-    public final float getValue(final int x, final int y, int pol) {
+    public final float getValue(final int x, final int y) {
         final int subband = y / nrChannels;
         final int channel = y % nrChannels;
         final float sample = data[x][subband][pol][channel];
@@ -292,5 +294,58 @@ public abstract class PreprocessedData extends DataProvider {
 
     public int getNrStations() {
         return nrStations;
+    }
+    
+    @Override
+    public int getStation1() {
+        return station1;
+    }
+
+    @Override
+    public int setStation1(int station1) {
+        if(station1 < 0 || station1 >= nrStations || station1 == this.station1) {
+            return this.station1;
+        }
+        
+        this.station1 = station1;
+        try {
+            read();
+        } catch (IOException e) {
+            logger.error("" + e);
+            throw new RuntimeException(e); 
+        }
+        return this.station1;
+    }
+
+    @Override
+    public int getStation2() {
+        return -1;
+    }
+
+    @Override
+    public int setStation2(int station2) {
+        return -1;
+    }
+    
+
+    @Override
+    public int getPolarization() {
+        return pol;
+    }
+
+    @Override
+    public int setPolarization(int newValue) {
+        if(newValue < 0 || newValue >= polList.length) {
+            return pol;
+        }
+        pol = newValue;
+        
+        try {
+            read();
+        } catch (IOException e) {
+            logger.error("" + e);
+            throw new RuntimeException(e); 
+        }
+        return pol;
     }
 }

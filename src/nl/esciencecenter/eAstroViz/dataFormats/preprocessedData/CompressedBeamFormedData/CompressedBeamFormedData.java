@@ -33,10 +33,12 @@ public final class CompressedBeamFormedData extends DataProvider {
     private static final boolean SCALE_PER_SUBBAND = false;
     private float min;
     private float scaleValue;
-
+    private int stoke = 0;
+    
     public CompressedBeamFormedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands) {
         // for now, we only have stokes I
-        super(fileName, maxSequenceNr, maxSubbands, new String[] { "I" }, new String[] { "none", "Intermediate" });
+        super();
+        init(fileName, maxSequenceNr, maxSubbands, new String[] { "I" }, new String[] { "none", "Intermediate" });
         this.integrationFactor = integrationFactor;
     }
 
@@ -202,7 +204,7 @@ public final class CompressedBeamFormedData extends DataProvider {
     }
 
     @Override
-    public final float getRawValue(final int x, final int y, int pol) {
+    public final float getRawValue(final int x, final int y) {
         final int subband = y / nrChannels;
         final int channel = y % nrChannels;
 
@@ -210,7 +212,7 @@ public final class CompressedBeamFormedData extends DataProvider {
     }
 
     @Override
-    public final float getValue(final int x, final int y, int pol) {
+    public final float getValue(final int x, final int y) {
         final int subband = y / nrChannels;
         final int channel = y % nrChannels;
         final float sample = data[x][subband][channel];
@@ -236,5 +238,48 @@ public final class CompressedBeamFormedData extends DataProvider {
 
     public float[] fold(float nrSamplesPerSecond, float period) {
         return BeamFormedData.fold(getData(), flagged, nrSamplesPerSecond, period);
+    }
+
+    @Override
+    public int getStation1() {
+        return -1;
+    }
+
+    @Override
+    public int setStation1(int station1) {
+        return -1;
+    }
+
+    @Override
+    public int getStation2() {
+        return -1;
+    }
+
+    @Override
+    public int setStation2(int station2) {
+        return -1;
+    }
+
+    @Override
+    public int getPolarization() {
+        return stoke;
+    }
+
+    @Override
+    public int setPolarization(int newValue) {
+        // TODO Auto-generated method stub
+        return stoke;
+    }
+
+    @Override
+    public String polarizationToString(int pol) {
+        // TODO Auto-generated method stub
+        return "I";
+    }
+
+    @Override
+    public int StringToPolarization(String polString) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 }

@@ -86,4 +86,28 @@ public final class BeamFormedFrame extends GUIFrame {
     public float[] getFoldedData() {
         return folded;
     }
+
+    @Override
+    protected int setStation1(int newVal) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    protected int setStation2(int newVal) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    protected String getBaselineText() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected String setPolarization(String s) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

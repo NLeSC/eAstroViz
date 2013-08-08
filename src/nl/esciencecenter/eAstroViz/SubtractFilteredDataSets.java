@@ -20,10 +20,10 @@ public class SubtractFilteredDataSets {
         int COLOR_BLACK = 0;
         int COLOR_WHITE = 0xFFFFFF;
         
-        final FilteredData filteredData1 = new FilteredData(args[0], integrationFactor, maxSequenceNr, maxSubbands, station);
+        final FilteredData filteredData1 = new FilteredData(args[0], integrationFactor, maxSequenceNr, maxSubbands, station, 0);
         filteredData1.read();
 
-        final FilteredData filteredData2 = new FilteredData(args[1], integrationFactor, maxSequenceNr, maxSubbands, station);
+        final FilteredData filteredData2 = new FilteredData(args[1], integrationFactor, maxSequenceNr, maxSubbands, station, 0);
         filteredData2.read();
 
         assert filteredData1.getSizeX() == filteredData2.getSizeX();
@@ -37,8 +37,8 @@ public class SubtractFilteredDataSets {
         float[][] diff = new float[filteredData1.getSizeY()][filteredData1.getSizeX()];
         for(int y=0; y<filteredData1.getSizeY(); y++) {
             for (int x=0; x < filteredData1.getSizeX(); x++) {
-                float sample1 = filteredData1.getRawValue(x, y, 0);
-                float sample2 = filteredData2.getRawValue(x, y, 0);
+                float sample1 = filteredData1.getRawValue(x, y);
+                float sample2 = filteredData2.getRawValue(x, y);
                 diff[y][x] = Math.abs(sample2 - sample1);
             }
         }

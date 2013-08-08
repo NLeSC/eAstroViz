@@ -1,19 +1,23 @@
 package nl.esciencecenter.eAstroViz.dataFormats;
 
 public abstract class DataProvider {
-    
+
     public static final int SIZE_OF_FLOAT = 4;
-    
+
     protected String flaggerType;
     protected float flaggerSensitivity = 1.0f;
     protected float flaggerSIRValue = 0.4f;
-    protected final String[] polList; // polarizations or stokes
-    protected final String[] flaggerList;
-    protected final String fileName;
-    protected final int maxSequenceNr;
-    protected final int maxSubbands;
+    protected String[] polList; // polarizations or stokes
+    protected String[] flaggerList;
+    protected String fileName;
+    protected int maxSequenceNr;
+    protected int maxSubbands;
 
-    protected DataProvider(final String fileName, final int maxSequenceNr, final int maxSubbands, final String[] polList, final String[] flaggerList) {
+    protected DataProvider() {
+
+    }
+
+    protected void init(final String fileName, final int maxSequenceNr, final int maxSubbands, final String[] polList, final String[] flaggerList) {
         this.fileName = fileName;
         this.maxSequenceNr = maxSequenceNr;
         this.maxSubbands = maxSubbands;
@@ -35,7 +39,7 @@ public abstract class DataProvider {
      *            the polarization, or, in case of beam formed data, the stoke
      * @return a value between 0 and 1
      */
-    public abstract float getValue(int x, int y, int polarization);
+    public abstract float getValue(int x, int y);
 
     /**
      * @param x
@@ -46,7 +50,7 @@ public abstract class DataProvider {
      *            the polarization, or, in case of beam formed data, the stoke
      * @return The original unscaled data value
      */
-    public abstract float getRawValue(int x, int y, int polarization);
+    public abstract float getRawValue(int x, int y);
 
     /**
      * Flags are not kept per polarization, so we have one parameter less compared to the getValues for the data itself.
@@ -81,6 +85,10 @@ public abstract class DataProvider {
 
     public String[] getFlaggerNames() {
         return flaggerList;
+    }
+
+    public String[] getPolarizationNames() {
+        return polList;
     }
 
     public float getFlaggerSensitivity() {
@@ -128,8 +136,8 @@ public abstract class DataProvider {
         float max = -10000000.0f;
         float min = 1.0E20f;
 
-        for(int y=0; y<in.length; y++) {
-            for(int x=0; x<in[y].length; x++) {
+        for (int y = 0; y < in.length; y++) {
+            for (int x = 0; x < in[y].length; x++) {
                 float element = in[y][x];
                 if (element < min) {
                     min = element;
@@ -139,11 +147,28 @@ public abstract class DataProvider {
                 }
             }
         }
-        
-        for(int y=0; y<in.length; y++) {
-            for(int x=0; x<in[y].length; x++) {
+
+        for (int y = 0; y < in.length; y++) {
+            for (int x = 0; x < in[y].length; x++) {
                 in[y][x] = (in[y][x] - min) / (max - min);
             }
         }
     }
+
+    public abstract int getStation1();
+
+    public abstract int setStation1(int station1);
+
+    public abstract int getStation2();
+
+    public abstract int setStation2(int station2);
+
+    public abstract int getPolarization();
+
+    public abstract int setPolarization(int newValue);
+
+    public abstract String polarizationToString(final int pol);
+
+    public abstract int StringToPolarization(final String polString);
+
 }

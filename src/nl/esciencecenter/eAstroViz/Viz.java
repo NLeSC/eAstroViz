@@ -42,13 +42,6 @@ public final class Viz {
     private boolean visibilities = false;
     private final int integrationFactor;
 
-    public static int baseline(final int station1, final int station2) {
-        if (station2 > station1) {
-            return -1;
-        }
-        return station2 * (station2 + 1) / 2 + station1;
-    }
-
     public static final class ExtFilter implements FilenameFilter {
         private final String ext;
 
@@ -78,7 +71,7 @@ public final class Viz {
     }
 
     public void start() throws IOException {
-        final int station = 1;
+        final int station = 0;
 
         if (beamFormed) {
             final BeamFormedData beamFormedData =
@@ -129,12 +122,12 @@ public final class Viz {
 
         if (filtered) {
             if (batch) {
-                FilteredData filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, 0);
+                FilteredData filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, 0, 0);
                 filteredData.read();
                 int nrStations = filteredData.getNrStations();
 
                 for (int s = 0; s < nrStations; s++) {
-                    filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, s);
+                    filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, s, 0);
                     filteredData.read();
 
                     final IntermediateFrame filteredFrame = new IntermediateFrame(filteredData);
@@ -142,7 +135,7 @@ public final class Viz {
                 }
                 System.exit(0);
             } else {
-                final FilteredData filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station);
+                final FilteredData filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station, 0);
                 filteredData.read();
 
                 final IntermediateFrame filteredFrame = new IntermediateFrame(filteredData);
@@ -173,7 +166,7 @@ public final class Viz {
         }
 
         if (visibilities) {
-            final VisibilityData visibilityData = new VisibilityData(fileName, 1/*station1*/, 0/*station2*/, maxSequenceNr, maxSubbands);
+            final VisibilityData visibilityData = new VisibilityData(fileName, 1, 0, 0, maxSequenceNr, maxSubbands);
             visibilityData.read();
             final VisibilityFrame vizFrame = new VisibilityFrame(this, visibilityData, 0 /*pol*/);
             vizFrame.pack();
@@ -193,17 +186,18 @@ public final class Viz {
             final int nrStations = meta.getNrStations();
             for (int station1 = 0; station1 < nrStations; station1++) {
                 for (int station2 = 0; station2 < nrStations; station2++) {
-                    final VisibilityData visibilityData = new VisibilityData(fileName, station1, station2, maxSequenceNr, maxSubbands);
+                    final VisibilityData visibilityData = new VisibilityData(fileName, station1, station2, 0, maxSequenceNr, maxSubbands);
                     visibilityData.read();
                     for (int pol = 0; pol < NR_POLARIZATIONS * NR_POLARIZATIONS; pol++) {
                         final VisibilityFrame vizFrame = new VisibilityFrame(this, visibilityData, pol);
-                        final String fileName = "baseline-" + station1 + "-" + station2 + "-polarization-" + VisibilityFrame.polarizationToString(pol) + ".bmp";
+                        final String fileName = "baseline-" + station1 + "-" + station2 + "-polarization-" + visibilityData.polarizationToString(pol) + ".bmp";
                         logger.info("writing file: " + fileName);
                         vizFrame.save(fileName);
                         vizFrame.dispose();
                     }
                 }
             }
+            System.exit(0);
         }
 
         logger.info("unknwon file type!");
