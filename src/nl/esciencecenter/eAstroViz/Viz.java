@@ -86,8 +86,8 @@ public final class Viz {
             beamFormedData.read();
             final BeamFormedFrame beamFormedFrame = new BeamFormedFrame(beamFormedData);
             beamFormedFrame.pack();
-            
-            if(batch) {
+
+            if (batch) {
                 beamFormedFrame.save("outputBeamFormed.bmp");
                 System.exit(0);
             }
@@ -102,7 +102,7 @@ public final class Viz {
             final BeamFormedFrame beamFormedFrame = new BeamFormedFrame(compressedBeamFormedData);
             beamFormedFrame.pack();
 
-            if(batch) {
+            if (batch) {
                 beamFormedFrame.save("outputCompressedBeamFormed.bmp");
                 System.exit(0);
             }
@@ -117,8 +117,8 @@ public final class Viz {
 
             final IntermediateFrame intermediateFrame = new IntermediateFrame(intermediateData);
             intermediateFrame.pack();
-            
-            if(batch) {
+
+            if (batch) {
                 intermediateFrame.save("outputIntermediate.bmp");
                 System.exit(0);
             }
@@ -128,19 +128,29 @@ public final class Viz {
         }
 
         if (filtered) {
-            final FilteredData filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station);
-            filteredData.read();
+            if (batch) {
+                FilteredData filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, 0);
+                filteredData.read();
+                int nrStations = filteredData.getNrStations();
 
-            final IntermediateFrame filteredFrame = new IntermediateFrame(filteredData);
-            filteredFrame.pack();
-            
-            if(batch) {
-                filteredFrame.save("outputFiltered.bmp");
+                for (int s = 0; s < nrStations; s++) {
+                    filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, s);
+                    filteredData.read();
+
+                    final IntermediateFrame filteredFrame = new IntermediateFrame(filteredData);
+                    filteredFrame.save("outputFiltered-station-" + s + ".bmp");
+                }
                 System.exit(0);
-            }
+            } else {
+                final FilteredData filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station);
+                filteredData.read();
 
-            filteredFrame.setVisible(true);
-            return;
+                final IntermediateFrame filteredFrame = new IntermediateFrame(filteredData);
+                filteredFrame.pack();
+
+                filteredFrame.setVisible(true);
+                return;
+            }
         }
 
         if (raw) {
@@ -168,11 +178,11 @@ public final class Viz {
             final VisibilityFrame vizFrame = new VisibilityFrame(this, visibilityData, 0 /*pol*/);
             vizFrame.pack();
 
-            if(batch) {
+            if (batch) {
                 vizFrame.save("outputVisibility.bmp");
                 System.exit(0);
             }
-            
+
             vizFrame.setVisible(true);
             return;
         }

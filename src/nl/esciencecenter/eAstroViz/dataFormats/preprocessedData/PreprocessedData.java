@@ -288,4 +288,8 @@ public abstract class PreprocessedData extends DataProvider {
         final int channel = y % nrChannels;
         return flagged[x][subband][channel];
     }
+
+    public int getNrStations() {
+        return nrStations;
+    }
 }
