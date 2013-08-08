@@ -78,7 +78,7 @@ public final class Viz {
     }
 
     public void start() throws IOException {
-        final int station = 0;
+        final int station = 1;
 
         if (beamFormed) {
             final BeamFormedData beamFormedData =
