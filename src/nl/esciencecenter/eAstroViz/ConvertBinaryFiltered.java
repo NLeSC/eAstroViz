@@ -11,6 +11,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,8 +93,8 @@ public class ConvertBinaryFiltered {
             totalSize -= ls.length * 4 * 4;
             logger.info("totalSize - headers = " + totalSize);
 
-            nrTimes = (int) (totalSize / (nrSubbands * nrStations * (3 + nrChannels * nrPolarizations) * 4));
-            int rem = (int) (totalSize % (nrSubbands * nrStations * (3 + nrChannels * nrPolarizations) * 4));
+            nrTimes = (int) (totalSize / (nrSubbands * nrStations * (3 + nrChannels * nrPolarizations) * DataProvider.SIZE_OF_FLOAT));
+            int rem = (int) (totalSize % (nrSubbands * nrStations * (3 + nrChannels * nrPolarizations) * DataProvider.SIZE_OF_FLOAT));
 
             if (rem != 0) {
                 logger.info("internal error, size wrong, leftover = " + rem);

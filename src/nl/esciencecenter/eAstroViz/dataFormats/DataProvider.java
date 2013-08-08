@@ -1,6 +1,9 @@
 package nl.esciencecenter.eAstroViz.dataFormats;
 
 public abstract class DataProvider {
+    
+    public static final int SIZE_OF_FLOAT = 4;
+    
     protected String flaggerType;
     protected float flaggerSensitivity = 1.0f;
     protected float flaggerSIRValue = 0.4f;

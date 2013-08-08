@@ -81,7 +81,8 @@ public abstract class PreprocessedData extends DataProvider {
         int stationBlockSize = integrationFactor * nrSubbandsInFile * nrChannels * nrPolarizations * 4;
 
         fin.skip(stationBlockSize * station);
-
+        logger.debug("skipped " + station + " stations");
+        
         final ByteBuffer bb = ByteBuffer.allocateDirect(stationBlockSize);
         bb.order(ByteOrder.BIG_ENDIAN);
         final FloatBuffer fb = bb.asFloatBuffer();
