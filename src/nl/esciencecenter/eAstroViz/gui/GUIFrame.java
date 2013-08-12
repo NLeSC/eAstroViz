@@ -961,7 +961,7 @@ public abstract class GUIFrame extends javax.swing.JFrame {
     }
 
     protected void setStation1Spinner(int val) {
-        station1Spinner.setValue(new Integer(val));
+        station1Spinner.setValue(Integer.valueOf(val));
     }
 
     protected int getStation2Spinner() {
@@ -969,7 +969,7 @@ public abstract class GUIFrame extends javax.swing.JFrame {
     }
 
     protected void setStation2Spinner(int val) {
-        station2Spinner.setValue(new Integer(val));
+        station2Spinner.setValue(Integer.valueOf(val));
     }
     
     protected void setBaselineText(String val) {
