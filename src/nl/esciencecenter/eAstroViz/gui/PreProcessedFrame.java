@@ -3,8 +3,8 @@ package nl.esciencecenter.eAstroViz.gui;
 import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
 
 @SuppressWarnings("serial")
-public final class IntermediateFrame extends GUIFrame {
-    public IntermediateFrame(final DataProvider data) {
+public final class PreProcessedFrame extends GUIFrame {
+    public PreProcessedFrame(final DataProvider data) {
         super(data);
         
         disableStation2Spinner();
@@ -12,12 +12,12 @@ public final class IntermediateFrame extends GUIFrame {
 
     @Override
     protected GUIPanel createPanel() {
-        return new IntermediatePanel(getData(), this);
+        return new PreProcessedPanel(getData(), this);
     }
 
     @Override
     protected int setStation1(int newVal) {
-        int s = getData().setStation1(newVal);
+        int s = samplePanel.setStation1(newVal);
         repaint();
         return s;
     }
@@ -33,10 +33,10 @@ public final class IntermediateFrame extends GUIFrame {
     }
 
     @Override
-    protected String setPolarization(String newVal) {
-        int pol = getData().StringToPolarization(newVal);
-        String s = getData().polarizationToString(getData().setPolarization(pol));
+    protected String setPolarization(String newString) {
+        int newPol = getData().StringToPolarization(newString);
+        int result = samplePanel.setPolarization(newPol);
         repaint();
-        return s;
+        return getData().polarizationToString(result);
     }
 }

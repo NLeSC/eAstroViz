@@ -68,8 +68,9 @@ public final class VisibilityFrame extends GUIFrame {
         return new VisibilityPanel(getData(), this);
     }
 
-    public String setPolarization(final String s) {
-        pol = getData().StringToPolarization(s);
+    public String setPolarization(final String newPol) {
+        pol = getData().StringToPolarization(newPol);
+        getData().setPolarization(pol);
         samplePanel.setPolarization(pol);
         return getData().polarizationToString(pol);
     }

@@ -34,16 +34,10 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     private float percentileValLow;
     private float percentileValHigh;
 
-    private float[] rawData;
     private float[][] scaledData;
 
     private int zoomX = 1;
     private int zoomY = 1;
-
-    /**
-     * The current polarization or stoke.
-     */
-    private int currentPol = 0;
 
     int COLOR_WHITE = colorToRGB(1.0f, 1.0f, 1.0f);
     ColorMapInterpreter colorMaps;
@@ -114,7 +108,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     protected void setData(final DataProvider d) {
         this.data = d;
 
-        rawData = new float[data.getSizeX() * data.getSizeY()]; // just in a 1D array, so we can sort it
+        float[] rawData = new float[data.getSizeX() * data.getSizeY()]; // just in a 1D array, so we can sort it
         scaledData = new float[data.getSizeX()][data.getSizeY()];
 
         for (int y = 0; y < data.getSizeY(); y++) {
@@ -131,6 +125,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         }
 
         Arrays.sort(rawData);
+        computePercentile(rawData);
         generateImage();
     }
 
@@ -138,14 +133,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         return scaledData;
     }
 
-    // generate a new image, assuming the underlying data itself has not changed. If it has, call setData.
-    protected void generateImage() {
-        logger.info("generate image...");
-
-        long start = System.currentTimeMillis();
-
-        int samplesFlagged = 0;
-
+    private void computePercentile(float[] rawData) {
         final int lowIndex = (int) (((100.0f - scale) / 100.0f) * rawData.length);
         if (lowIndex < 0) {
             percentileValLow = rawData[0];
@@ -160,6 +148,15 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         }
         logger.trace("index of " + scale + "th percentile low = " + lowIndex + ", high = " + highIndex + ", low val = " + percentileValLow + ", high val = "
                 + percentileValHigh);
+    }
+
+    // generate a new image, assuming the underlying data itself has not changed. If it has, call setData.
+    protected void generateImage() {
+        logger.info("generate image...");
+
+        long start = System.currentTimeMillis();
+
+        int samplesFlagged = 0;
 
         final float scaleFactor = percentileValHigh - percentileValLow;
 
@@ -318,16 +315,21 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         return colorMaps.getColorMaps();
     }
 
-    public int getPolarization() {
-        return currentPol;
+    public int setPolarization(int pol) {
+        int result = data.setPolarization(pol);
+        setData(data);
+        return result;
     }
 
-    public void setPolarization(int pol) {
-        if (this.currentPol == pol) {
-            return;
+    public int setStation1(int newVal) {
+        int oldVal = data.getStation1();
+        if (oldVal == newVal) {
+            return oldVal;
         }
-
-        this.currentPol = pol;
-        setData(data);
+        int s = data.setStation1(newVal);
+        if(s != oldVal) {
+            setData(data);
+        }
+        return s;
     }
 }

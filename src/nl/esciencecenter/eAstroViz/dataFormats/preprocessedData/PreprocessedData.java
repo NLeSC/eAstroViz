@@ -43,16 +43,14 @@ public abstract class PreprocessedData extends DataProvider {
     private float min;
     private float scaleValue;
     private int station1;
-    private final int station2;
     private int pol;
-    
+
     public PreprocessedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands, final String[] polList,
             final int station, final int pol) {
         super();
         init(fileName, maxSequenceNr, maxSubbands, polList, new String[] { "none", "Intermediate" });
         this.integrationFactor = integrationFactor;
         this.station1 = station;
-        this.station2 = -1;
         this.pol = pol;
     }
 
@@ -83,10 +81,10 @@ public abstract class PreprocessedData extends DataProvider {
         flagged = new boolean[nrTimes][nrSubbands][nrChannels];
         initialFlagged = new boolean[nrTimes][nrSubbands][nrChannels];
 
-        int stationBlockSize = integrationFactor * nrSubbandsInFile * nrChannels * nrPolarizations * 4;
+        int stationBlockSize = integrationFactor * nrSubbandsInFile * nrChannels * nrPolarizations * DataProvider.SIZE_OF_FLOAT;
 
-        din.skip(stationBlockSize * station1);
-        
+        din.skip(nrTimes * stationBlockSize * station1);
+
         final ByteBuffer bb = ByteBuffer.allocateDirect(stationBlockSize);
         bb.order(ByteOrder.BIG_ENDIAN);
         final FloatBuffer fb = bb.asFloatBuffer();
@@ -190,9 +188,8 @@ public abstract class PreprocessedData extends DataProvider {
         scaleValue = minMaxVals.getMax() - min;
 
         long nrSamples = nrTimes * nrSubbands * nrChannels * nrPolarizations;
-        float percent = ((float)initialFlaggedCount / nrSamples) * 100.0f;
-            
-        
+        float percent = ((float) initialFlaggedCount / nrSamples) * 100.0f;
+
         logger.info("samples already flagged in data set: " + initialFlaggedCount + "(" + percent + "%)");
     }
 
@@ -295,7 +292,7 @@ public abstract class PreprocessedData extends DataProvider {
     public int getNrStations() {
         return nrStations;
     }
-    
+
     @Override
     public int getStation1() {
         return station1;
@@ -303,16 +300,17 @@ public abstract class PreprocessedData extends DataProvider {
 
     @Override
     public int setStation1(int station1) {
-        if(station1 < 0 || station1 >= nrStations || station1 == this.station1) {
+        if (station1 < 0 || station1 >= nrStations || station1 == this.station1) {
+            logger.warn("could not set station to " + station1);
             return this.station1;
         }
-        
+
         this.station1 = station1;
         try {
             read();
         } catch (IOException e) {
             logger.error("" + e);
-            throw new RuntimeException(e); 
+            throw new RuntimeException(e);
         }
         return this.station1;
     }
@@ -326,7 +324,6 @@ public abstract class PreprocessedData extends DataProvider {
     public int setStation2(int station2) {
         return -1;
     }
-    
 
     @Override
     public int getPolarization() {
@@ -335,17 +332,15 @@ public abstract class PreprocessedData extends DataProvider {
 
     @Override
     public int setPolarization(int newValue) {
-        if(newValue < 0 || newValue >= polList.length) {
+        System.err.println("preproc:: setPol");
+        if (newValue < 0 || newValue >= polList.length) {
             return pol;
         }
+        System.err.println("preproc:: setPol: old = " + pol + ", new = " + newValue);
+
         pol = newValue;
-        
-        try {
-            read();
-        } catch (IOException e) {
-            logger.error("" + e);
-            throw new RuntimeException(e); 
-        }
+
+        // No need to re-read the data, we already loaded both polarizations.
         return pol;
     }
 }

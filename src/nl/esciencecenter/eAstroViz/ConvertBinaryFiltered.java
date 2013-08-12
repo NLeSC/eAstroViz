@@ -23,7 +23,7 @@ public class ConvertBinaryFiltered {
     private final String outputFileName;
     private final int maxNrTimes;
 
-    private float[][][][][] data; // [staton][time][subband][channel][pol]
+    private float[][][][][] data; // [station][time][subband][channel][pol]
     private int nrStations;
     private int nrSubbands;
     private int nrChannels;
@@ -36,7 +36,7 @@ public class ConvertBinaryFiltered {
         this.maxNrTimes = maxNrTimes;
     }
 
-    void write() throws IOException {
+    public void write() throws IOException {
         final FileOutputStream out = new FileOutputStream(outputFileName);
         final BufferedOutputStream buf = new BufferedOutputStream(out);
         final DataOutputStream dataOut = new DataOutputStream(buf);
@@ -52,7 +52,6 @@ public class ConvertBinaryFiltered {
                 for (int sb = 0; sb < nrSubbands; sb++) {
                     for (int ch = 0; ch < nrChannels; ch++) {
                         for (int pol = 0; pol < nrPolarizations; pol++) {
-
                             dataOut.writeFloat(data[station][time][sb][ch][pol]);
                         }
                     }
@@ -63,7 +62,7 @@ public class ConvertBinaryFiltered {
         dataOut.close();
     }
 
-    void read() {
+    public void read() {
         final File[] ls = new File(fileName).listFiles(new Viz.ExtFilter("myFilteredData"));
 
         try {
@@ -113,7 +112,7 @@ public class ConvertBinaryFiltered {
         }
     }
 
-    void readFile(File f) throws FileNotFoundException {
+    public void readFile(File f) throws FileNotFoundException {
         FileInputStream fin = new FileInputStream(f);
         BufferedInputStream bin = new BufferedInputStream(fin);
         DataInputStream in = new DataInputStream(bin);
@@ -138,7 +137,7 @@ public class ConvertBinaryFiltered {
                 }
                 int station = (int) readuint32(in, false);
                 int subband = (int) readuint32(in, false);
-                logger.debug("read block " + block + ", station = " + station + ", subband " + subband);
+//                logger.debug("read block " + block + ", station = " + station + ", subband " + subband);
                 for (int ch = 0; ch < nrChannels; ch++) {
                     for (int pol = 0; pol < nrPolarizations; pol++) {
                         float sample = readFloat(in);
@@ -194,5 +193,41 @@ public class ConvertBinaryFiltered {
         final ConvertBinaryFiltered cm = new ConvertBinaryFiltered(args[0], args[1], Integer.parseInt(args[2]));
         cm.read();
         cm.write();
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public String getOutputFileName() {
+        return outputFileName;
+    }
+
+    public int getMaxNrTimes() {
+        return maxNrTimes;
+    }
+
+    public float[][][][][] getData() {
+        return data;
+    }
+
+    public int getNrStations() {
+        return nrStations;
+    }
+
+    public int getNrSubbands() {
+        return nrSubbands;
+    }
+
+    public int getNrChannels() {
+        return nrChannels;
+    }
+
+    public int getNrPolarizations() {
+        return nrPolarizations;
+    }
+
+    public int getNrTimes() {
+        return nrTimes;
     }
 }

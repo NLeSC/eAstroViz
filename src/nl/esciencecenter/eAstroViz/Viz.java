@@ -14,7 +14,7 @@ import nl.esciencecenter.eAstroViz.dataFormats.rawData.RawDataReader;
 import nl.esciencecenter.eAstroViz.dataFormats.visibilityData.MSMetaData;
 import nl.esciencecenter.eAstroViz.dataFormats.visibilityData.VisibilityData;
 import nl.esciencecenter.eAstroViz.gui.BeamFormedFrame;
-import nl.esciencecenter.eAstroViz.gui.IntermediateFrame;
+import nl.esciencecenter.eAstroViz.gui.PreProcessedFrame;
 import nl.esciencecenter.eAstroViz.gui.RawFrame;
 import nl.esciencecenter.eAstroViz.gui.VisibilityFrame;
 
@@ -108,7 +108,7 @@ public final class Viz {
             final IntermediateData intermediateData = new IntermediateData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station);
             intermediateData.read();
 
-            final IntermediateFrame intermediateFrame = new IntermediateFrame(intermediateData);
+            final PreProcessedFrame intermediateFrame = new PreProcessedFrame(intermediateData);
             intermediateFrame.pack();
 
             if (batch) {
@@ -130,7 +130,7 @@ public final class Viz {
                     filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, s, 0);
                     filteredData.read();
 
-                    final IntermediateFrame filteredFrame = new IntermediateFrame(filteredData);
+                    final PreProcessedFrame filteredFrame = new PreProcessedFrame(filteredData);
                     filteredFrame.save("outputFiltered-station-" + s + ".bmp");
                 }
                 System.exit(0);
@@ -138,7 +138,7 @@ public final class Viz {
                 final FilteredData filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station, 0);
                 filteredData.read();
 
-                final IntermediateFrame filteredFrame = new IntermediateFrame(filteredData);
+                final PreProcessedFrame filteredFrame = new PreProcessedFrame(filteredData);
                 filteredFrame.pack();
 
                 filteredFrame.setVisible(true);
