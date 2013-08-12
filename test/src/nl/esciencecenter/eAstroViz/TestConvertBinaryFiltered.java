@@ -1,4 +1,4 @@
-package src.nl.esciencecenter.eAstroViz;
+package nl.esciencecenter.eAstroViz;
 
 import static org.junit.Assert.*;
 
