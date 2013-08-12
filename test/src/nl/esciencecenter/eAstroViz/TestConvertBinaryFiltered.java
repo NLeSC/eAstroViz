@@ -11,6 +11,7 @@ import java.io.IOException;
 import nl.esciencecenter.eAstroViz.ConvertBinaryFiltered;
 import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
 
+import org.junit.After;
 import org.junit.Test;
 
 public class TestConvertBinaryFiltered {
@@ -25,6 +26,12 @@ public class TestConvertBinaryFiltered {
     
     static final String INPUT_FILE_NAME = "test/fixtures/Flaggertest-01-11-11_dataset_tiny-5_stations-32_subbands-16_channels-flagged/result.filteredRaw";
     static final String OUTPUT_FILE_NAME = "dummy.filtered";
+
+    @After
+    public void tearDown() throws Exception {
+        System.err.println("after");
+        new File(OUTPUT_FILE_NAME).delete();
+    }
 
     @Test
     public void testWrite() {
