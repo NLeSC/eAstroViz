@@ -31,7 +31,7 @@ public class ConvertBinaryFiltered {
     private int nrTimes;
     private String extension;
     
-    public ConvertBinaryFiltered(final String fileName, final String outputFileName, String extension, int maxNrTimes) {
+    public ConvertBinaryFiltered(final String fileName, final String outputFileName, final String extension, int maxNrTimes) {
         this.fileName = fileName;
         this.outputFileName = outputFileName;
         this.extension = extension;

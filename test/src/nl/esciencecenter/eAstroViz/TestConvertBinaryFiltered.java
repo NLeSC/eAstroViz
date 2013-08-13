@@ -26,7 +26,8 @@ public class TestConvertBinaryFiltered {
     
     static final String INPUT_FILE_NAME = "test/fixtures/Flaggertest-01-11-11_dataset_tiny-5_stations-32_subbands-16_channels-flagged/result.filteredRaw";
     static final String OUTPUT_FILE_NAME = "dummy.filtered";
-
+    static final String INPUT_EXTENSION = "myFilteredData";
+    
     @After
     public void tearDown() throws Exception {
         System.err.println("after");
@@ -35,7 +36,7 @@ public class TestConvertBinaryFiltered {
 
     @Test
     public void testWrite() {
-        ConvertBinaryFiltered f = new ConvertBinaryFiltered(INPUT_FILE_NAME, OUTPUT_FILE_NAME, -1);
+        ConvertBinaryFiltered f = new ConvertBinaryFiltered(INPUT_FILE_NAME, OUTPUT_FILE_NAME, INPUT_EXTENSION, -1);
         f.read();
 
         try {
@@ -73,7 +74,7 @@ public class TestConvertBinaryFiltered {
     @Test
     public void testRead() {
 
-        ConvertBinaryFiltered f = new ConvertBinaryFiltered(INPUT_FILE_NAME, OUTPUT_FILE_NAME, -1);
+        ConvertBinaryFiltered f = new ConvertBinaryFiltered(INPUT_FILE_NAME, OUTPUT_FILE_NAME, INPUT_EXTENSION, -1);
         f.read();
 
         assertEquals(INPUT_FILE_NAME, f.getFileName());
