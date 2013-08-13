@@ -18,6 +18,13 @@ import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+// TODO calculate stats on entire dataset, but only create and draw the image that is actually visible.
+// The difference may be large due to zoom levels, and the number of channels/subbands may be in the thoustands.
+// Moreover, swing crashes or draws corrupted images if the image is too large.
+
+// TODO calculate histogram based on data, not pixels. It should not change (much) with the scaling. Only the clipped samples?
+
 public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     public static final int LOW_SCALE = 90;
     public static final int START_SCALE = 99;
