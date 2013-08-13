@@ -35,7 +35,8 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     private float percentileValHigh;
 
     private float[][] scaledData;
-
+    float[] rawData;
+    
     private int zoomX = 1;
     private int zoomY = 1;
 
@@ -108,7 +109,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     protected void setData(final DataProvider d) {
         this.data = d;
 
-        float[] rawData = new float[data.getSizeX() * data.getSizeY()]; // just in a 1D array, so we can sort it
+        rawData = new float[data.getSizeX() * data.getSizeY()]; // just in a 1D array, so we can sort it
         scaledData = new float[data.getSizeX()][data.getSizeY()];
 
         for (int y = 0; y < data.getSizeY(); y++) {
@@ -125,7 +126,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         }
 
         Arrays.sort(rawData);
-        computePercentile(rawData);
+        computePercentile();
         generateImage();
     }
 
@@ -133,7 +134,12 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         return scaledData;
     }
 
-    private void computePercentile(float[] rawData) {
+    /**
+     * Compute percentile values of the visualized data. Depends on the data itself, and on the scale that is set.
+     * So, if the scale changes, we have to re-invoke this method.
+     * @param rawData
+     */
+    private void computePercentile() {
         final int lowIndex = (int) (((100.0f - scale) / 100.0f) * rawData.length);
         if (lowIndex < 0) {
             percentileValLow = rawData[0];
@@ -152,7 +158,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
 
     // generate a new image, assuming the underlying data itself has not changed. If it has, call setData.
     protected void generateImage() {
-        logger.info("generate image...");
+        logger.debug("generate image...");
 
         long start = System.currentTimeMillis();
 
@@ -188,7 +194,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
 
         long end = System.currentTimeMillis();
 
-        logger.info("DONE in " + (end - start) + " ms.");
+        logger.debug("DONE in " + (end - start) + " ms.");
     }
 
     @Override
@@ -245,6 +251,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
             return;
         }
         this.scale = scale;
+        computePercentile();
         generateImage();
     }
 
@@ -254,11 +261,13 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
 
     public void setZoomX(int zoomX) {
         this.zoomX = zoomX;
+        setSize(getPreferredSize());
         repaint();
     }
 
     public void setZoomY(int zoomY) {
         this.zoomY = zoomY;
+        setSize(getPreferredSize());
         repaint();
     }
 
