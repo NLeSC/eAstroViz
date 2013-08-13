@@ -130,9 +130,6 @@ public class ConvertBinaryIntermediate {
 
         while (true) {
             try {
-                int tmp = (int) readuint32(in, false);
-                @SuppressWarnings("unused")
-                boolean flagged = tmp != 0 ? true : false;
                 int time = (int) readuint32(in, false);
                 int station = (int) readuint32(in, false);
                 int pol = (int) readuint32(in, false);

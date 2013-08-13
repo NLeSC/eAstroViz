@@ -29,10 +29,12 @@ public class ConvertBinaryFiltered {
     private int nrChannels;
     private int nrPolarizations;
     private int nrTimes;
-
-    public ConvertBinaryFiltered(final String fileName, final String outputFileName, int maxNrTimes) {
+    private String extension;
+    
+    public ConvertBinaryFiltered(final String fileName, final String outputFileName, String extension, int maxNrTimes) {
         this.fileName = fileName;
         this.outputFileName = outputFileName;
+        this.extension = extension;
         this.maxNrTimes = maxNrTimes;
     }
 
@@ -63,7 +65,7 @@ public class ConvertBinaryFiltered {
     }
 
     public void read() {
-        final File[] ls = new File(fileName).listFiles(new Viz.ExtFilter("myFilteredData"));
+        final File[] ls = new File(fileName).listFiles(new Viz.ExtFilter(extension));
 
         try {
             FileInputStream fin = new FileInputStream(ls[0]);
@@ -190,7 +192,7 @@ public class ConvertBinaryFiltered {
     }
 
     public static void main(final String[] args) throws IOException {
-        final ConvertBinaryFiltered cm = new ConvertBinaryFiltered(args[0], args[1], Integer.parseInt(args[2]));
+        final ConvertBinaryFiltered cm = new ConvertBinaryFiltered(args[0], args[1], args[2], Integer.parseInt(args[3]));
         cm.read();
         cm.write();
     }
