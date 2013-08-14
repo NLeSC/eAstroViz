@@ -332,11 +332,9 @@ public abstract class PreprocessedData extends DataProvider {
 
     @Override
     public int setPolarization(int newValue) {
-        System.err.println("preproc:: setPol");
         if (newValue < 0 || newValue >= polList.length) {
             return pol;
         }
-        System.err.println("preproc:: setPol: old = " + pol + ", new = " + newValue);
 
         pol = newValue;
 
