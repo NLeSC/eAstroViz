@@ -30,7 +30,6 @@ public class TestConvertBinaryFiltered {
     
     @After
     public void tearDown() throws Exception {
-        System.err.println("after");
         new File(OUTPUT_FILE_NAME).delete();
     }
 

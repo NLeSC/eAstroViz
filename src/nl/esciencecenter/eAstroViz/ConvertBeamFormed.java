@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 
 public class ConvertBeamFormed {
     private static final Logger logger = LoggerFactory.getLogger(ConvertBeamFormed.class);
-    static final int MAX_TIME = 1000;
-
+    static final int DEFAULT_ZOOM = 1024;
+    
     private final String fileName;
     private final String outputFileName;
 
@@ -22,14 +22,19 @@ public class ConvertBeamFormed {
     private int nrChannels;
     private int nrTimes;
     private int nrSamplesPerSecond;
-
-    public ConvertBeamFormed(final String fileName, final String outputFileName) {
+    private int zoomFactor;
+    
+    public ConvertBeamFormed(final String fileName, final String outputFileName, int zoomFactor) {
         this.fileName = fileName;
         this.outputFileName = outputFileName;
+        this.zoomFactor = zoomFactor;
+        if(this.zoomFactor < 0) {
+            this.zoomFactor = DEFAULT_ZOOM;
+        }
     }
 
     void read() {
-        final BeamFormedData bfd = new BeamFormedData(fileName, Integer.MAX_VALUE, Integer.MAX_VALUE, 1024 /* zoom factor */);
+        final BeamFormedData bfd = new BeamFormedData(fileName, Integer.MAX_VALUE, Integer.MAX_VALUE, zoomFactor);
         bfd.read();
         data = bfd.getData();
         nrSubbands = bfd.getNrSubbands();
@@ -42,10 +47,6 @@ public class ConvertBeamFormed {
         final FileOutputStream out = new FileOutputStream(outputFileName);
         final BufferedOutputStream buf = new BufferedOutputStream(out);
         final DataOutputStream dataOut = new DataOutputStream(buf);
-
-        if (MAX_TIME > 0) {
-            nrTimes = MAX_TIME;
-        }
 
         dataOut.writeInt(nrTimes);
         dataOut.writeInt(nrSubbands);
@@ -66,7 +67,7 @@ public class ConvertBeamFormed {
     }
 
     public static void main(final String[] args) throws IOException {
-        final ConvertBeamFormed cm = new ConvertBeamFormed(args[0], args[1]);
+        final ConvertBeamFormed cm = new ConvertBeamFormed(args[0], args[1], Integer.parseInt(args[2]));
         cm.read();
         cm.write();
     }

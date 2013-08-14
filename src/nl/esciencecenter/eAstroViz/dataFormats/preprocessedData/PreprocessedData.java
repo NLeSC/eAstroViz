@@ -343,4 +343,12 @@ public abstract class PreprocessedData extends DataProvider {
         // No need to re-read the data, we already loaded both polarizations.
         return pol;
     }
+
+    public int getNrPolarizations() {
+        return nrPolarizations;
+    }
+
+    public int getIntegrationFactor() {
+        return integrationFactor;
+    }
 }

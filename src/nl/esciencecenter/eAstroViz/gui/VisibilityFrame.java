@@ -50,6 +50,7 @@ public final class VisibilityFrame extends GUIFrame {
 
     // If we change the baseline, we have to re-read the input data.
     void changeBaseline(final int station1, final int station2) {
+        LOGGER.debug("trying to set baseline to " + VisibilityData.baseline(station1, station2));
         try {
             visibilityData = new VisibilityData(getData().getFileName(), station1, station2, pol, getData().getMaxSequenceNr(), getData().getMaxSubbands());
             setData(visibilityData); // also set in super class
