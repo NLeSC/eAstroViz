@@ -130,11 +130,11 @@ public final class Viz {
                 int nrStations = filteredData.getNrStations();
 
                 for (int s = 0; s < nrStations; s++) {
+                    filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, s, 0);
+                    filteredData.read();
+                    final PreProcessedFrame filteredFrame = new PreProcessedFrame(filteredData);
                     for (int pol = 0; pol < NR_POLARIZATIONS; pol++) {
-                        filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, s, 0);
-                        filteredData.read();
-
-                        final PreProcessedFrame filteredFrame = new PreProcessedFrame(filteredData);
+                        filteredFrame.setPolarization(pol);
                         filteredFrame.save("outputFiltered-station-" + s + "-polarization-" + pol + ".bmp");
                     }
                 }

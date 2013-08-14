@@ -76,6 +76,12 @@ public final class VisibilityFrame extends GUIFrame {
         return getData().polarizationToString(pol);
     }
 
+    public int setPolarization(final int newPol) {
+        getData().setPolarization(newPol);
+        samplePanel.setPolarization(newPol);
+        return getData().getPolarization();
+    }
+
     public int setStation1(final int value) {
         if (value == station1 || value < 0 || value >= nrStations || VisibilityData.baseline(value, station2) < 0) {
             return station1;
@@ -106,7 +112,7 @@ public final class VisibilityFrame extends GUIFrame {
         return station2;
     }
 
-    protected String getBaselineText() {
+    public String getBaselineText() {
         String res = "Baseline: " + VisibilityData.baseline(station1, station2);
         if (station1 == station2) {
             res += " (auto correlation)";

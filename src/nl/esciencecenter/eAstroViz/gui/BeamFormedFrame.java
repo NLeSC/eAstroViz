@@ -88,26 +88,32 @@ public final class BeamFormedFrame extends GUIFrame {
     }
 
     @Override
-    protected int setStation1(int newVal) {
+    public int setStation1(int newVal) {
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    protected int setStation2(int newVal) {
+    public int setStation2(int newVal) {
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    protected String getBaselineText() {
+    public String getBaselineText() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected String setPolarization(String s) {
+    public String setPolarization(String s) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public int setPolarization(int pol) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 }

@@ -16,27 +16,34 @@ public final class PreProcessedFrame extends GUIFrame {
     }
 
     @Override
-    protected int setStation1(int newVal) {
+    public int setStation1(int newVal) {
         int s = samplePanel.setStation1(newVal);
         repaint();
         return s;
     }
 
     @Override
-    protected int setStation2(int newVal) {
+    public int setStation2(int newVal) {
         return -1;
     }
 
     @Override
-    protected String getBaselineText() {
+    public String getBaselineText() {
         return "N.A.";
     }
 
     @Override
-    protected String setPolarization(String newString) {
+    public String setPolarization(String newString) {
         int newPol = getData().StringToPolarization(newString);
         int result = samplePanel.setPolarization(newPol);
         repaint();
         return getData().polarizationToString(result);
+    }
+
+    @Override
+    public int setPolarization(int newPol) {
+        int result = samplePanel.setPolarization(newPol);
+        repaint();
+        return result;
     }
 }
