@@ -176,8 +176,8 @@ public final class Viz {
                 // batch processing mode
                 final MSMetaData meta = VisibilityData.getMetaData(fileName);
                 final int nrStations = meta.getNrStations();
-                for (int station1 = 0; station1 < nrStations; station1++) {
-                    for (int station2 = 0; station2 < nrStations; station2++) {
+                for (int station2 = 0; station2 < nrStations; station2++) {
+                    for (int station1 = 0; station1 < nrStations; station1++) {
                         final VisibilityData visibilityData =
                                 new VisibilityData(fileName, station1, station2, 0, maxSequenceNr, maxSubbands);
                         visibilityData.read();

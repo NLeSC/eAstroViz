@@ -47,8 +47,6 @@ public final class VisibilityData extends DataProvider {
         this.station1 = station1;
         this.station2 = station2;
         this.baseline = baseline(station1, station2);
-        
-        System.err.println("XXXXXXXXXXX s1 = " + station1 + ", station 2 = " + station2 + ", baseline = " + baseline);
         this.pol = pol;
 
         r = new MSReader(fileName);
@@ -77,13 +75,28 @@ public final class VisibilityData extends DataProvider {
     }
 
     public static int baseline(final int station1, final int station2) {
-        if (station2 > station1) {
-            logger.warn("Illegal baseline, station1 = " + station1 + ", station 2 = " + station2);
-            return -1;
-        }
+        assert(station1 <= station2);
         return station2 * (station2 + 1) / 2 + station1;
     }
 
+    // TODO
+    /*
+     *  from c++ code:
+inline void Correlator::baselineToStations(const unsigned baseline, unsigned& station1, unsigned& station2)
+{
+  station2 = (unsigned) (sqrtf(2 * baseline + .25f) - .5f);
+  station1 = baseline - station2 * (station2 + 1) / 2;
+}
+
+inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
+{
+  unsigned station1, station2;
+  baselineToStations(baseline, station1, station2);
+  return station1 == station2;
+}
+
+     */
+    
     public static MSMetaData getMetaData(final String fileName) {
         MSReader r = null;
         try {
