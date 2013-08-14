@@ -55,8 +55,9 @@ public final class Viz {
         }
     }
 
-    public Viz(final String fileName, final boolean batch, final boolean raw, boolean visibilities, final boolean beamFormed, final boolean intermediate,
-            final boolean filtered, final boolean compressedBeamFormed, final int integrationFactor, final int maxSeqNo, final int maxSubbands) {
+    public Viz(final String fileName, final boolean batch, final boolean raw, boolean visibilities, final boolean beamFormed,
+            final boolean intermediate, final boolean filtered, final boolean compressedBeamFormed, final int integrationFactor,
+            final int maxSeqNo, final int maxSubbands) {
         this.fileName = fileName;
         this.batch = batch;
         this.raw = raw;
@@ -90,7 +91,8 @@ public final class Viz {
         }
 
         if (compressedBeamFormed) {
-            final CompressedBeamFormedData compressedBeamFormedData = new CompressedBeamFormedData(fileName, integrationFactor, maxSequenceNr, maxSubbands);
+            final CompressedBeamFormedData compressedBeamFormedData =
+                    new CompressedBeamFormedData(fileName, integrationFactor, maxSequenceNr, maxSubbands);
             compressedBeamFormedData.read();
             final BeamFormedFrame beamFormedFrame = new BeamFormedFrame(compressedBeamFormedData);
             beamFormedFrame.pack();
@@ -105,7 +107,8 @@ public final class Viz {
         }
 
         if (intermediate) {
-            final IntermediateData intermediateData = new IntermediateData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station);
+            final IntermediateData intermediateData =
+                    new IntermediateData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station);
             intermediateData.read();
 
             final PreProcessedFrame intermediateFrame = new PreProcessedFrame(intermediateData);
@@ -127,15 +130,18 @@ public final class Viz {
                 int nrStations = filteredData.getNrStations();
 
                 for (int s = 0; s < nrStations; s++) {
-                    filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, s, 0);
-                    filteredData.read();
+                    for (int pol = 0; pol < NR_POLARIZATIONS; pol++) {
+                        filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, s, 0);
+                        filteredData.read();
 
-                    final PreProcessedFrame filteredFrame = new PreProcessedFrame(filteredData);
-                    filteredFrame.save("outputFiltered-station-" + s + ".bmp");
+                        final PreProcessedFrame filteredFrame = new PreProcessedFrame(filteredData);
+                        filteredFrame.save("outputFiltered-station-" + s + "-polarization-" + pol + ".bmp");
+                    }
                 }
                 System.exit(0);
             } else {
-                final FilteredData filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station, 0);
+                final FilteredData filteredData =
+                        new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station, 0);
                 filteredData.read();
 
                 final PreProcessedFrame filteredFrame = new PreProcessedFrame(filteredData);
@@ -166,38 +172,35 @@ public final class Viz {
         }
 
         if (visibilities) {
-            final VisibilityData visibilityData = new VisibilityData(fileName, 1, 0, 0, maxSequenceNr, maxSubbands);
-            visibilityData.read();
-            final VisibilityFrame vizFrame = new VisibilityFrame(this, visibilityData, 0 /*pol*/);
-            vizFrame.pack();
-
             if (batch) {
-                vizFrame.save("outputVisibility.bmp");
-                System.exit(0);
-            }
-
-            vizFrame.setVisible(true);
-            return;
-        }
-
-        if (batch) {
-            // batch processing mode
-            final MSMetaData meta = VisibilityData.getMetaData(fileName);
-            final int nrStations = meta.getNrStations();
-            for (int station1 = 0; station1 < nrStations; station1++) {
-                for (int station2 = 0; station2 < nrStations; station2++) {
-                    final VisibilityData visibilityData = new VisibilityData(fileName, station1, station2, 0, maxSequenceNr, maxSubbands);
-                    visibilityData.read();
-                    for (int pol = 0; pol < NR_POLARIZATIONS * NR_POLARIZATIONS; pol++) {
-                        final VisibilityFrame vizFrame = new VisibilityFrame(this, visibilityData, pol);
-                        final String fileName = "baseline-" + station1 + "-" + station2 + "-polarization-" + visibilityData.polarizationToString(pol) + ".bmp";
-                        logger.info("writing file: " + fileName);
-                        vizFrame.save(fileName);
-                        vizFrame.dispose();
+                // batch processing mode
+                final MSMetaData meta = VisibilityData.getMetaData(fileName);
+                final int nrStations = meta.getNrStations();
+                for (int station1 = 0; station1 < nrStations; station1++) {
+                    for (int station2 = 0; station2 < nrStations; station2++) {
+                        final VisibilityData visibilityData =
+                                new VisibilityData(fileName, station1, station2, 0, maxSequenceNr, maxSubbands);
+                        visibilityData.read();
+                        for (int pol = 0; pol < NR_POLARIZATIONS * NR_POLARIZATIONS; pol++) {
+                            final VisibilityFrame vizFrame = new VisibilityFrame(this, visibilityData, pol);
+                            final String fileName =
+                                    "outputVisibilities-baseline-" + station1 + "-" + station2 + "-polarization-"
+                                            + visibilityData.polarizationToString(pol) + ".bmp";
+                            logger.info("writing file: " + fileName);
+                            vizFrame.save(fileName);
+                            vizFrame.dispose();
+                        }
                     }
                 }
+                System.exit(0);
+            } else {
+                final VisibilityData visibilityData = new VisibilityData(fileName, 1, 0, 0, maxSequenceNr, maxSubbands);
+                visibilityData.read();
+                final VisibilityFrame vizFrame = new VisibilityFrame(this, visibilityData, 0 /*pol*/);
+                vizFrame.pack();
+                vizFrame.setVisible(true);
+                return;
             }
-            System.exit(0);
         }
 
         logger.info("unknwon file type!");
@@ -238,7 +241,8 @@ public final class Viz {
             } else {
                 // it must be the filename
                 if (fileName != null) {
-                    logger.info("You cannot specify the file name twice. The first one was: " + fileName + ", the second one was: " + args[i]);
+                    logger.info("You cannot specify the file name twice. The first one was: " + fileName
+                            + ", the second one was: " + args[i]);
                     System.exit(1);
                 }
 
@@ -262,8 +266,8 @@ public final class Viz {
         }
 
         try {
-            new Viz(fileName, batch, raw, visibilities, beamFormed, intermediate, filtered, compressedBeamFormed, integrationFactor, maxSeqNo, maxSubbands)
-                    .start();
+            new Viz(fileName, batch, raw, visibilities, beamFormed, intermediate, filtered, compressedBeamFormed,
+                    integrationFactor, maxSeqNo, maxSubbands).start();
         } catch (final IOException e) {
             e.printStackTrace();
             System.exit(1);
