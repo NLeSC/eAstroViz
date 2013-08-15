@@ -8,8 +8,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import nl.esciencecenter.eAstroViz.ConvertBinaryFiltered;
-import nl.esciencecenter.eAstroViz.dataFormats.DataProvider;
+import nl.esciencecenter.eastroviz.ConvertBinaryFiltered;
+import nl.esciencecenter.eastroviz.dataformats.DataProvider;
 
 import org.junit.After;
 import org.junit.Test;

@@ -7,4 +7,4 @@ then
     LIBRARY="dist/linux_x86_64"
 fi
 
-LD_LIBRARY_PATH=$LIBRARY:$LD_LIBRARY_PATH java -Xmx2048M -classpath "dist/*:." nl.esciencecenter.eAstroViz.Viz $*
+LD_LIBRARY_PATH=$LIBRARY:$LD_LIBRARY_PATH java -Xmx2048M -classpath "dist/*:." nl.esciencecenter.eastroviz.Viz $*

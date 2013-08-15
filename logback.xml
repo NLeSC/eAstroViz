@@ -10,7 +10,7 @@
     <appender-ref ref="STDERR" />
   </root>
 
-  <logger name="nl.esciencecenter.eAstroViz" level="info" />
+  <logger name="nl.esciencecenter.eastroviz" level="info" />
 
   <!-- sends logs to logback-beagle -->
   <!--

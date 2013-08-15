@@ -3,7 +3,7 @@ package nl.esciencecenter.eAstroViz;
 import java.io.IOException;
 import static org.junit.Assert.*;
 
-import nl.esciencecenter.eAstroViz.dataFormats.preprocessedData.filteredData.FilteredData;
+import nl.esciencecenter.eastroviz.dataformats.preprocessed.filtered.FilteredData;
 
 import org.junit.Test;
 
