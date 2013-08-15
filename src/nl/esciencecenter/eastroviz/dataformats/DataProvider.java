@@ -4,17 +4,16 @@ public abstract class DataProvider {
 
     public static final int SIZE_OF_FLOAT = 4;
 
-    protected String flaggerType;
-    protected float flaggerSensitivity = 1.0f;
-    protected float flaggerSIRValue = 0.4f;
-    protected String[] polList; // polarizations or stokes
-    protected String[] flaggerList;
-    protected String fileName;
-    protected int maxSequenceNr;
-    protected int maxSubbands;
+    private String flaggerType;
+    private float flaggerSensitivity = 1.0f;
+    private float flaggerSIRValue = 0.4f;
+    private String[] polList; // polarizations or stokes
+    private String[] flaggerList;
+    private String fileName;
+    private int maxSequenceNr;
+    private int maxSubbands;
 
     protected DataProvider() {
-
     }
 
     protected void init(final String fileName, final int maxSequenceNr, final int maxSubbands, final String[] polList, final String[] flaggerList) {
@@ -170,5 +169,49 @@ public abstract class DataProvider {
     public abstract String polarizationToString(final int pol);
 
     public abstract int StringToPolarization(final String polString);
+
+    protected String getFlaggerType() {
+        return flaggerType;
+    }
+
+    protected void setFlaggerType(String flaggerType) {
+        this.flaggerType = flaggerType;
+    }
+
+    protected float getFlaggerSIRValue() {
+        return flaggerSIRValue;
+    }
+
+    protected void setFlaggerSIRValue(float flaggerSIRValue) {
+        this.flaggerSIRValue = flaggerSIRValue;
+    }
+
+    protected String[] getPolList() {
+        return polList;
+    }
+
+    protected void setPolList(String[] polList) {
+        this.polList = polList;
+    }
+
+    protected String[] getFlaggerList() {
+        return flaggerList;
+    }
+
+    protected void setFlaggerList(String[] flaggerList) {
+        this.flaggerList = flaggerList;
+    }
+
+    protected void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    protected void setMaxSequenceNr(int maxSequenceNr) {
+        this.maxSequenceNr = maxSequenceNr;
+    }
+
+    protected void setMaxSubbands(int maxSubbands) {
+        this.maxSubbands = maxSubbands;
+    }
 
 }

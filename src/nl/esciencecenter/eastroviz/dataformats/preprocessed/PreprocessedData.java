@@ -29,16 +29,16 @@ public abstract class PreprocessedData extends DataProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(PreprocessedData.class);
 
-    protected float[][][][] data; // [time][nrSubbands][nrPolarizations][nrChannels]
-    protected boolean[][][] initialFlagged; // [time][nrSubbands][nrChannels]
-    protected boolean[][][] flagged; // [time][nrSubbands][nrChannels]
-    protected int nrStations;
-    protected int nrSubbands;
-    protected int nrChannels;
-    protected int nrTimes;
-    protected int nrPolarizations;
-    protected int integrationFactor;
-    protected MinMaxVals minMaxVals;
+    private  float[][][][] data; // [time][nrSubbands][nrPolarizations][nrChannels]
+    private  boolean[][][] initialFlagged; // [time][nrSubbands][nrChannels]
+    private  boolean[][][] flagged; // [time][nrSubbands][nrChannels]
+    private  int nrStations;
+    private int nrSubbands;
+    private int nrChannels;
+    private int nrTimes;
+    private int nrPolarizations;
+    private int integrationFactor;
+    private MinMaxVals minMaxVals;
     private static final boolean SCALE_PER_SUBBAND = false;
     private float min;
     private float scaleValue;
@@ -56,7 +56,7 @@ public abstract class PreprocessedData extends DataProvider {
 
     @SuppressWarnings("unused")
     public void read() throws IOException {
-        final FileInputStream fin = new FileInputStream(fileName);
+        final FileInputStream fin = new FileInputStream(getFileName());
         final DataInputStream din = new DataInputStream(fin);
 
         nrStations = din.readInt();
@@ -66,15 +66,15 @@ public abstract class PreprocessedData extends DataProvider {
         nrPolarizations = din.readInt();
 
         nrSubbands = nrSubbandsInFile;
-        if (maxSubbands < nrSubbandsInFile) {
-            nrSubbands = maxSubbands;
+        if (getMaxSubbands() < nrSubbandsInFile) {
+            nrSubbands = getMaxSubbands();
         }
 
         logger.info("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes + ", nrSubbands = " + nrSubbandsInFile
                 + ", nrChannels = " + nrChannels);
 
-        if (maxSequenceNr < nrTimes) {
-            nrTimes = maxSequenceNr;
+        if (getMaxSequenceNr() < nrTimes) {
+            nrTimes = getMaxSequenceNr();
         }
 
         data = new float[nrTimes][nrSubbands][nrPolarizations][nrChannels];
@@ -93,7 +93,7 @@ public abstract class PreprocessedData extends DataProvider {
         final long start = System.currentTimeMillis();
 
         for (int second = 0; second < nrTimes; second++) {
-            if (second > maxSequenceNr) {
+            if (second > getMaxSequenceNr()) {
                 break;
             }
 
@@ -112,7 +112,7 @@ public abstract class PreprocessedData extends DataProvider {
                     for (int ch = 0; ch < nrChannels; ch++) {
                         for (int pol = 0; pol < nrPolarizations; pol++) {
                             float sample = fb.get();
-                            if (sb < maxSubbands) {
+                            if (sb < getMaxSubbands()) {
                                 if (sample < 0.0f) {
                                     initialFlagged[second][sb][ch] = true;
                                     flagged[second][sb][ch] = true;
@@ -203,14 +203,14 @@ public abstract class PreprocessedData extends DataProvider {
             }
         }
 
-        if (flaggerType.equals("none")) {
+        if (getFlaggerType().equals("none")) {
             return;
         }
 
         if (nrChannels > 1) {
             final IntermediateFlagger[] flaggers = new IntermediateFlagger[nrSubbands];
             for (int i = 0; i < nrSubbands; i++) {
-                flaggers[i] = new IntermediateFlagger(flaggerSensitivity, flaggerSIRValue);
+                flaggers[i] = new IntermediateFlagger(getFlaggerSensitivity(), getFlaggerSIRValue());
             }
 
             for (int time = 0; time < nrTimes; time++) {
@@ -219,7 +219,7 @@ public abstract class PreprocessedData extends DataProvider {
                 }
             }
         } else {
-            final IntermediateFlagger flagger = new IntermediateFlagger(flaggerSensitivity, flaggerSIRValue);
+            final IntermediateFlagger flagger = new IntermediateFlagger(getFlaggerSensitivity(), getFlaggerSIRValue());
             for (int time = 0; time < nrTimes; time++) {
                 final boolean[] tmpFlags = new boolean[nrSubbands];
                 final float[][] tmp = new float[nrPolarizations][nrSubbands];
@@ -332,7 +332,7 @@ public abstract class PreprocessedData extends DataProvider {
 
     @Override
     public int setPolarization(int newValue) {
-        if (newValue < 0 || newValue >= polList.length) {
+        if (newValue < 0 || newValue >= getPolList().length) {
             return pol;
         }
 

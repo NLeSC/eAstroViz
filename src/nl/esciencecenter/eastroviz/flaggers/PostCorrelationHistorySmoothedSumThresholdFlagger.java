@@ -32,8 +32,8 @@ public class PostCorrelationHistorySmoothedSumThresholdFlagger extends PostCorre
         final float[] smoothedPower = oneDimensionalGausConvolution(powers, 0.5f); // 2nd param is sigma, height of the gaussian curve
 
         // calculate difference
-        final float[] diff = new float[nrChannels];
-        for (int i = 0; i < nrChannels; i++) {
+        final float[] diff = new float[getNrChannels()];
+        for (int i = 0; i < getNrChannels(); i++) {
             diff[i] = powers[i] - smoothedPower[i];
         }
 
@@ -58,7 +58,7 @@ public class PostCorrelationHistorySmoothedSumThresholdFlagger extends PostCorre
             logger.trace("median = " + getMedian() + ", meanMedian = " + meanMedian + ", factor = " + (getMedian() / meanMedian) + ", stddev = " + stdDevOfMedians
                     + (flagSecond ? " FLAGGED" : ""));
             if (flagSecond) {
-                for (int i = 0; i < nrChannels; i++) {
+                for (int i = 0; i < getNrChannels(); i++) {
                     flagged[i] = true;
                 }
                 // add the mean to the history

@@ -7,7 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class RawDataReader {
-    static final int NR_POLARIZATIONS = 2;
+    public static final int NR_POLARIZATIONS = 2;
 
     class TransportHeader {
         private int versionAndHeaderLength;
@@ -99,7 +99,7 @@ public class RawDataReader {
         }
     }
 
-    final int clockSpeed = 200000000; // 200 MHz
+    public static final int CLOCK_SPEED = 200000000; // 200 MHz
 
     @SuppressWarnings("unused")
     private final String fileName;

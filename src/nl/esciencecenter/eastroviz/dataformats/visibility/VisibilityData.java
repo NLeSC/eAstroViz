@@ -23,18 +23,17 @@ public final class VisibilityData extends DataProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(VisibilityData.class);
 
-    final private MSReader r;
-
-    final float[][][][] powers; // [time][nrSubbands][nrChannels][nrCrossPolarizations]
-    final int[][][] nrValidSamples; // [time][nrSubbands][nrChannels]
-    final boolean[][][] flagged; // [time][nrSubbands][nrChannels]
-    int baseline;
-    int station1;
-    int station2;
-    int pol;
-    final int nrChannels;
-    final int integrationTime;
-    final int nrStations;
+    private final MSReader r;
+    private final float[][][][] powers; // [time][nrSubbands][nrChannels][nrCrossPolarizations]
+    private final int[][][] nrValidSamples; // [time][nrSubbands][nrChannels]
+    private final boolean[][][] flagged; // [time][nrSubbands][nrChannels]
+    private int baseline;
+    private int station1;
+    private int station2;
+    private int pol;
+    private final int nrChannels;
+    private final int integrationTime;
+    private final int nrStations;
     private final int nrBaselines;
     private final int nrSubbands;
     private final int nrCrossPolarizations;
@@ -140,7 +139,7 @@ inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
         do {
             sequenceNr = readSecond(subband, timeIndex);
             timeIndex++;
-        } while (sequenceNr >= 0 && sequenceNr < maxSequenceNr);
+        } while (sequenceNr >= 0 && sequenceNr < getMaxSequenceNr());
         try {
             r.close();
         } catch (final IOException e) {
@@ -202,7 +201,7 @@ inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
             }
         }
 
-        if (flaggerType == null || flaggerType.equals("none")) {
+        if (getFlaggerType() == null || getFlaggerType().equals("none")) {
             return;
         }
 
@@ -211,21 +210,21 @@ inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
         final PostCorrelationFlagger[] flaggers = new PostCorrelationFlagger[nrSubbands];
 
         for (int i = 0; i < nrSubbands; i++) {
-            if (flaggerType.equals(flaggerList[1])) {
-                flaggers[i] = new PostCorrelationThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
-            } else if (flaggerType.equals(flaggerList[2])) {
-                flaggers[i] = new PostCorrelationSumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
-            } else if (flaggerType.equals(flaggerList[3])) {
-                flaggers[i] = new PostCorrelationSmoothedSumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
-            } else if (flaggerType.equals(flaggerList[4])) {
-                flaggers[i] = new PostCorrelationHistorySumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
-            } else if (flaggerType.equals(flaggerList[5])) {
-                flaggers[i] = new PostCorrelationHistorySmoothedSumThresholdFlagger(nrChannels, flaggerSensitivity, flaggerSIRValue);
+            if (getFlaggerType().equals(getFlaggerList()[1])) {
+                flaggers[i] = new PostCorrelationThresholdFlagger(nrChannels, getFlaggerSensitivity(), getFlaggerSIRValue());
+            } else if (getFlaggerType().equals(getFlaggerList()[2])) {
+                flaggers[i] = new PostCorrelationSumThresholdFlagger(nrChannels, getFlaggerSensitivity(), getFlaggerSIRValue());
+            } else if (getFlaggerType().equals(getFlaggerList()[3])) {
+                flaggers[i] = new PostCorrelationSmoothedSumThresholdFlagger(nrChannels, getFlaggerSensitivity(), getFlaggerSIRValue());
+            } else if (getFlaggerType().equals(getFlaggerList()[4])) {
+                flaggers[i] = new PostCorrelationHistorySumThresholdFlagger(nrChannels, getFlaggerSensitivity(), getFlaggerSIRValue());
+            } else if (getFlaggerType().equals(getFlaggerList()[5])) {
+                flaggers[i] = new PostCorrelationHistorySmoothedSumThresholdFlagger(nrChannels, getFlaggerSensitivity(), getFlaggerSIRValue());
             } else {
-                throw new RuntimeException("illegal flagger selected: " + flaggerType);
+                throw new RuntimeException("illegal flagger selected: " + getFlaggerType());
             }
         }
-        logger.info("Selected " + flaggerType.getClass().getName());
+        logger.info("Selected " + getFlaggerType().getClass().getName());
 
         for (int time = 0; time < nrSeconds; time++) {
             for (int subband = 0; subband < nrSubbands; subband++) {
@@ -234,7 +233,7 @@ inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
         }
 
         final long end = System.currentTimeMillis();
-        logger.info("Flagging with " + flaggerType + ", sensitivity " + flaggerSensitivity + " took " + (end - start) + " ms.");
+        logger.info("Flagging with " + getFlaggerType() + ", sensitivity " + getFlaggerSensitivity() + " took " + (end - start) + " ms.");
     }
 
     public int getNrFrequencies() {
@@ -403,7 +402,7 @@ inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
 
     @Override
     public int setPolarization(int newValue) {
-        if(pol < 0 || pol >= polList.length) {
+        if(pol < 0 || pol >= getPolList().length) {
             return pol;
         }
         this.pol = newValue;

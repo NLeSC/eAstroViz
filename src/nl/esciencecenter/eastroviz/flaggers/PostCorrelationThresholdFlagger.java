@@ -17,7 +17,7 @@ public class PostCorrelationThresholdFlagger extends PostCorrelationFlagger {
         final float threshold = getMedian() + cutoffThreshold * getBaseSensitivity() * getStdDev();
 
         // if one of the polarizations exceeds the threshold, flag them all.
-        for (int channel = 0; channel < nrChannels; channel++) {
+        for (int channel = 0; channel < getNrChannels(); channel++) {
             if (powers[channel] >= threshold) {
                 flagged[channel] = true;
             }

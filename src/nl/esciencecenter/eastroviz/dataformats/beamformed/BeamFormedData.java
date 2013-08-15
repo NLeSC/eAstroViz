@@ -89,8 +89,8 @@ public final class BeamFormedData extends DataProvider {
         totalIntegrationTime *= zoomFactor;
         nrSamplesPerSecond = (int) (nrSamples / totalIntegrationTime);
         nrSeconds = (int) totalIntegrationTime;
-        if (maxSequenceNr < nrSeconds) {
-            nrSeconds = maxSequenceNr;
+        if (getMaxSequenceNr() < nrSeconds) {
+            nrSeconds = getMaxSequenceNr();
         }
 
         logger.info("nrSeconds = " + nrSeconds + ", nrSamplesPerSecond = " + nrSamplesPerSecond);
@@ -114,7 +114,7 @@ public final class BeamFormedData extends DataProvider {
             // boost::extents[nrSamples | 2][nrSubbands][nrChannels] // the | 2
             // extra samples are not written to disk, only kept in memory!
             for (second = 0; second < nrSeconds; second++) {
-                if (second > maxSequenceNr) {
+                if (second > getMaxSequenceNr()) {
                     break;
                 }
                 final double size = (nrSamplesPerSecond * nrSubbands * nrChannels * 4) / (1024.0 * 1024.0);
@@ -351,8 +351,8 @@ public final class BeamFormedData extends DataProvider {
     }
 
     public int getTotalTime() {
-        if (maxSequenceNr > 0 && maxSequenceNr < nrSeconds) {
-            return maxSequenceNr;
+        if (getMaxSequenceNr() > 0 && getMaxSequenceNr() < nrSeconds) {
+            return getMaxSequenceNr();
         }
         return nrSeconds;
     }

@@ -21,15 +21,15 @@ import org.slf4j.LoggerFactory;
 public final class CompressedBeamFormedData extends DataProvider {
     private static final Logger logger = LoggerFactory.getLogger(CompressedBeamFormedData.class);
 
-    protected float[][][] data; // [time][nrSubbands][nrChannels]
-    protected boolean[][][] initialFlagged; // [time][nrSubbands][nrChannels]
-    protected boolean[][][] flagged; // [time][nrSubbands][nrChannels]
-    protected int nrSubbands;
-    protected int nrChannels;
-    protected int nrTimes;
-    protected int integrationFactor;
-    protected int nrSamplesPerSecond;
-    protected MinMaxVals minMaxVals;
+    private float[][][] data; // [time][nrSubbands][nrChannels]
+    private boolean[][][] initialFlagged; // [time][nrSubbands][nrChannels]
+    private boolean[][][] flagged; // [time][nrSubbands][nrChannels]
+    private int nrSubbands;
+    private int nrChannels;
+    private int nrTimes;
+    private int integrationFactor;
+    private int nrSamplesPerSecond;
+    private MinMaxVals minMaxVals;
     private static final boolean SCALE_PER_SUBBAND = false;
     private float min;
     private float scaleValue;
@@ -43,7 +43,7 @@ public final class CompressedBeamFormedData extends DataProvider {
     }
 
     public void read() throws IOException {
-        final FileInputStream fin = new FileInputStream(fileName);
+        final FileInputStream fin = new FileInputStream(getFileName());
         final DataInputStream din = new DataInputStream(fin);
 
         nrTimes = din.readInt() / integrationFactor;
@@ -54,8 +54,8 @@ public final class CompressedBeamFormedData extends DataProvider {
         logger.info("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrChannels = "
                 + nrChannels + ", nrSamplesPerSecond = " + nrSamplesPerSecond);
 
-        if (maxSequenceNr < nrTimes) {
-            nrTimes = maxSequenceNr;
+        if (getMaxSequenceNr() < nrTimes) {
+            nrTimes = getMaxSequenceNr();
         }
 
         data = new float[nrTimes][nrSubbands][nrChannels];
@@ -70,7 +70,7 @@ public final class CompressedBeamFormedData extends DataProvider {
         final FileChannel channel = fin.getChannel();
 
         for (int second = 0; second < nrTimes; second++) {
-            if (second > maxSequenceNr) {
+            if (second > getMaxSequenceNr()) {
                 break;
             }
 
@@ -141,14 +141,14 @@ public final class CompressedBeamFormedData extends DataProvider {
             }
         }
 
-        if (flaggerType.equals("none")) {
+        if (getFlaggerType().equals("none")) {
             return;
         }
 
         if (nrChannels > 1) {
             final BeamFormedFlagger[] flaggers = new BeamFormedFlagger[nrSubbands];
             for (int i = 0; i < nrSubbands; i++) {
-                flaggers[i] = new BeamFormedFlagger(flaggerSensitivity, flaggerSIRValue);
+                flaggers[i] = new BeamFormedFlagger(getFlaggerSensitivity(), getFlaggerSIRValue());
             }
 
             for (int time = 0; time < nrTimes; time++) {
@@ -157,7 +157,7 @@ public final class CompressedBeamFormedData extends DataProvider {
                 }
             }
         } else {
-            final BeamFormedFlagger flagger = new BeamFormedFlagger(flaggerSensitivity, flaggerSIRValue);
+            final BeamFormedFlagger flagger = new BeamFormedFlagger(getFlaggerSensitivity(), getFlaggerSIRValue());
             for (int time = 0; time < nrTimes; time++) {
                 final float[] tmp = new float[nrSubbands];
                 final boolean[] tmpFlags = new boolean[nrSubbands];

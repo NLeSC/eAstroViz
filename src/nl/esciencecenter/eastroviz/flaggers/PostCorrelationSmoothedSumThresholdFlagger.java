@@ -43,8 +43,8 @@ public class PostCorrelationSmoothedSumThresholdFlagger extends PostCorrelationS
         final float[] smoothedPower = oneDimensionalGausConvolution(powers, 0.5f); // 2nd param is sigma, heigth of the gauss curve
 
         // calculate difference
-        final float[] diff = new float[nrChannels];
-        for (int i = 0; i < nrChannels; i++) {
+        final float[] diff = new float[getNrChannels()];
+        for (int i = 0; i < getNrChannels(); i++) {
             diff[i] = powers[i] - smoothedPower[i];
         }
 

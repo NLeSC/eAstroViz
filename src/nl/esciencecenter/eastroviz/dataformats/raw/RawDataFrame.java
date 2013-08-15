@@ -4,15 +4,15 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 public class RawDataFrame {
-    static final int BEAMLET_DATA_SIZE = 8; // bytes: 16 bit sampes * real/imag * 2 polarizations
-    static final float MAX_VAL = 65535.0f / 2.0f;
+    public static final int BEAMLET_DATA_SIZE = 8; // bytes: 16 bit sampes * real/imag * 2 polarizations
+    public static final float MAX_VAL = 65535.0f / 2.0f;
     @SuppressWarnings("unused")
     private RawDataFrameHeader h;
 
     // beamlets are 4 signed shorts: xr, xi; yr, yi;
-    float data[][][][]; // [NR_SUBBANDS][NR_TIMES][NR_POLARIZATIONS][REAL/IMAG];
+    private float data[][][][]; // [NR_SUBBANDS][NR_TIMES][NR_POLARIZATIONS][REAL/IMAG];
 
-    int nrSubbands;
+    private int nrSubbands;
 
     RawDataFrame(final int nrSubbands) { // nofBeamlets is incorrectly written in the file. So, we have to use the nr of subbands.
         this.nrSubbands = nrSubbands;

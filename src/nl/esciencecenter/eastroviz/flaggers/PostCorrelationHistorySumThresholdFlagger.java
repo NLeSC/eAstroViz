@@ -42,7 +42,7 @@ public class PostCorrelationHistorySumThresholdFlagger extends PostCorrelationSu
             logger.trace("median = " + getMedian() + ", meanMedian = " + meanMedian + ", factor = " + (getMedian() / meanMedian) + ", stddev = " + stdDevOfMedians
                     + (flagSecond ? " FLAGGED" : ""));
             if (flagSecond) {
-                for (int i = 0; i < nrChannels; i++) {
+                for (int i = 0; i < getNrChannels(); i++) {
                     flagged[i] = true;
                 }
                 // add the mean to the history

@@ -13,7 +13,7 @@ package nl.esciencecenter.eastroviz.flaggers;
 // I = .5 (XX - YY)
 
 public abstract class PostCorrelationFlagger extends Flagger {
-    int nrChannels;
+    private int nrChannels;
 
     public PostCorrelationFlagger(final int nrChannels, final float sensitivity, final float SIREtaValue) {
         super(sensitivity, SIREtaValue);
@@ -60,5 +60,13 @@ public abstract class PostCorrelationFlagger extends Flagger {
             power[i] = samples[i][pol];
         }
         return power;
+    }
+
+    int getNrChannels() {
+        return nrChannels;
+    }
+
+    void setNrChannels(int nrChannels) {
+        this.nrChannels = nrChannels;
     }
 }

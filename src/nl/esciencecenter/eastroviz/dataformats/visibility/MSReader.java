@@ -24,7 +24,7 @@ public final class MSReader {
     private long sequenceNr;
     private DataInputStream in;
     private int subband;
-    MSMetaData metaData;
+    private MSMetaData metaData;
     private float[][][][] visData; // [nrBaselines][nrChannels][NR_CROSS_POLARIZATIONS][real/imag]
     private int[][] nrValidSamples; // [nrBaselines][nrChannels]
 
@@ -93,69 +93,79 @@ public final class MSReader {
 
         // 32 bit sequence number
         try {
-            if (NEW_FORMAT) {
-                final long magic = readuint32(in, false);
-                if (magic != 0x0000DA7A) {
-                    LOGGER.info("data corrupted, magic is wrong! val = " + magic);
-                    sequenceNr = -1;
-                    throw new RuntimeException("data corrupted, magic is wrong!");
-                }
-
-                sequenceNr = readuint32(in, false);
-                skip(in, metaData.getAlignment() - 8);
-            } else {
-                sequenceNr = readuint32(in, true);
-                skip(in, metaData.getAlignment() - 4);
-            }
-
+            readSequenceNr();
             if (sequenceNr < 0) {
                 return;
             }
 
-            skip(in, requiredBaseline * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4);
-            for (int channel = 0; channel < metaData.getNrChannels(); channel++) {
-                for (int pol = 0; pol < metaData.getNrCrossPolarizations(); pol++) {
-                    visData[requiredBaseline][channel][pol][Viz.REAL] = readFloat(in);
-                    visData[requiredBaseline][channel][pol][Viz.IMAG] = readFloat(in);
-                }
-            }
-            int baselineDataToSkip = (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4;
-
-            int processed = metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4;
-            int alignmentToSkip = metaData.getAlignment() - (processed % metaData.getAlignment());
-            if (alignmentToSkip == metaData.getAlignment()) {
-                alignmentToSkip = 0;
-            }
-
-            int baselineFlagDataToSkip = requiredBaseline * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples();
-
-            skip(in, baselineDataToSkip + alignmentToSkip + baselineFlagDataToSkip);
-
-            for (int channel = 0; channel < metaData.getNrChannels(); channel++) {
-                int nr = 0;
-
-                if (metaData.getNrBytesPerValidSamples() == 1) {
-                    nr = readuint8(in);
-                } else if (metaData.getNrBytesPerValidSamples() == 2) {
-                    nr = readuint16(in);
-                } else {
-                    throw new RuntimeException("unsupported nr bytes per nrValidsamples: " + metaData.getNrBytesPerValidSamples());
-                }
-                nrValidSamples[requiredBaseline][channel] = nr;
-            }
-            baselineFlagDataToSkip = (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples();
-
-            alignmentToSkip =
-                    metaData.getAlignment()
-                            - ((metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples()) % metaData.getAlignment());
-            if (alignmentToSkip == metaData.getAlignment()) {
-                alignmentToSkip = 0;
-            }
-
-            skip(in, baselineFlagDataToSkip + alignmentToSkip);
+            readVisibilities(requiredBaseline);
+            readFlags(requiredBaseline);
         } catch (final IOException e) {
             sequenceNr = -1;
             return;
+        }
+    }
+
+    private void readFlags(final int requiredBaseline) throws IOException {
+        for (int channel = 0; channel < metaData.getNrChannels(); channel++) {
+            int nr = 0;
+
+            if (metaData.getNrBytesPerValidSamples() == 1) {
+                nr = readuint8(in);
+            } else if (metaData.getNrBytesPerValidSamples() == 2) {
+                nr = readuint16(in);
+            } else {
+                throw new RuntimeException("unsupported nr bytes per nrValidsamples: " + metaData.getNrBytesPerValidSamples());
+            }
+            nrValidSamples[requiredBaseline][channel] = nr;
+        }
+        int baselineFlagDataToSkip = (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples();
+
+        int alignmentToSkip =
+                metaData.getAlignment()
+                        - ((metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples()) % metaData.getAlignment());
+        if (alignmentToSkip == metaData.getAlignment()) {
+            alignmentToSkip = 0;
+        }
+
+        skip(in, baselineFlagDataToSkip + alignmentToSkip);
+    }
+
+    private void readVisibilities(final int requiredBaseline) throws IOException {
+        skip(in, requiredBaseline * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4);
+        for (int channel = 0; channel < metaData.getNrChannels(); channel++) {
+            for (int pol = 0; pol < metaData.getNrCrossPolarizations(); pol++) {
+                visData[requiredBaseline][channel][pol][Viz.REAL] = readFloat(in);
+                visData[requiredBaseline][channel][pol][Viz.IMAG] = readFloat(in);
+            }
+        }
+        int baselineDataToSkip = (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4;
+
+        int processed = metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4;
+        int alignmentToSkip = metaData.getAlignment() - (processed % metaData.getAlignment());
+        if (alignmentToSkip == metaData.getAlignment()) {
+            alignmentToSkip = 0;
+        }
+
+        int baselineFlagDataToSkip = requiredBaseline * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples();
+
+        skip(in, baselineDataToSkip + alignmentToSkip + baselineFlagDataToSkip);
+    }
+
+    private void readSequenceNr() throws IOException {
+        if (NEW_FORMAT) {
+            final long magic = readuint32(in, false);
+            if (magic != 0x0000DA7A) {
+                LOGGER.info("data corrupted, magic is wrong! val = " + magic);
+                sequenceNr = -1;
+                throw new RuntimeException("data corrupted, magic is wrong!");
+            }
+
+            sequenceNr = readuint32(in, false);
+            skip(in, metaData.getAlignment() - 8);
+        } else {
+            sequenceNr = readuint32(in, true);
+            skip(in, metaData.getAlignment() - 4);
         }
     }
 

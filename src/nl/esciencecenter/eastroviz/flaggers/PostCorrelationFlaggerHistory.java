@@ -29,10 +29,10 @@ public class PostCorrelationFlaggerHistory {
 
     // history, element 0 is the most recent
     @SuppressWarnings("unchecked")
-    ArrayList<HistoryElement> history[] = new ArrayList[Viz.NR_POLARIZATIONS * Viz.NR_POLARIZATIONS];
-    float meanMean[] = new float[Viz.NR_POLARIZATIONS * Viz.NR_POLARIZATIONS];
-    float meanMedian[] = new float[Viz.NR_POLARIZATIONS * Viz.NR_POLARIZATIONS];
-    final int nrChannels;
+    private ArrayList<HistoryElement> history[] = new ArrayList[Viz.NR_POLARIZATIONS * Viz.NR_POLARIZATIONS];
+    private float meanMean[] = new float[Viz.NR_POLARIZATIONS * Viz.NR_POLARIZATIONS];
+    private float meanMedian[] = new float[Viz.NR_POLARIZATIONS * Viz.NR_POLARIZATIONS];
+    private final int nrChannels;
 
     PostCorrelationFlaggerHistory(final int nrChannels) {
         this.nrChannels = nrChannels;
