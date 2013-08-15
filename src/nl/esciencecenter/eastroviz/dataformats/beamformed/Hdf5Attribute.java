@@ -6,7 +6,7 @@ import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.Datatype;
 
 public class Hdf5Attribute {
-    Attribute a;
+    private Attribute a;
 
     public Hdf5Attribute(final Attribute a) {
         this.a = a;

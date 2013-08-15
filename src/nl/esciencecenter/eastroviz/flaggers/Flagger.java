@@ -11,9 +11,9 @@ public abstract class Flagger {
 
     private static final Logger logger = LoggerFactory.getLogger(Flagger.class);
 
-    protected float mean;
-    protected float stdDev;
-    protected float median;
+    private float mean;
+    private float stdDev;
+    private float median;
 
     private float baseSensitivity;
     private float SIREtaValue;
@@ -378,5 +378,17 @@ public abstract class Flagger {
 
     public void setBaseSensitivity(float baseSensitivity) {
         this.baseSensitivity = baseSensitivity;
+    }
+
+    public void setMean(float mean) {
+        this.mean = mean;
+    }
+
+    public void setStdDev(float stdDev) {
+        this.stdDev = stdDev;
+    }
+
+    public void setMedian(float median) {
+        this.median = median;
     }
 }

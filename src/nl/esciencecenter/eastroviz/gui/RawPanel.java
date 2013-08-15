@@ -14,9 +14,10 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("serial")
 public final class RawPanel extends JPanel {
     private static final Logger logger = LoggerFactory.getLogger(RawPanel.class);
-    RawFrame parent;
+    @SuppressWarnings("unused")
+    private RawFrame parent;
     private BufferedImage image;
-    RawData rawData;
+    private RawData rawData;
 
     public RawPanel(final RawFrame parent, final RawData rawData) {
         this.parent = parent;

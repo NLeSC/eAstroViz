@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 public class PostCorrelationHistorySmoothedSumThresholdFlagger extends PostCorrelationSumThresholdFlagger {
     private static final Logger logger = LoggerFactory.getLogger(PostCorrelationSumThresholdFlagger.class);
 
-    int second;
-    final PostCorrelationFlaggerHistory history;
-    final float historyFlaggingThreshold = 7.0f;
+    private int second;
+    private final PostCorrelationFlaggerHistory history;
+    private final float historyFlaggingThreshold = 7.0f;
 
     public PostCorrelationHistorySmoothedSumThresholdFlagger(final int nrChannels, final float sensitivity, final float SIREtaValue) {
         super(nrChannels, sensitivity, SIREtaValue);
@@ -22,7 +22,7 @@ public class PostCorrelationHistorySmoothedSumThresholdFlagger extends PostCorre
         final float originalSensitivity = getBaseSensitivity();
         calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
 
-        logger.trace("mean = " + mean + ", median = " + median + ", stdDev = " + stdDev);
+        logger.trace("mean = " + getMean() + ", median = " + getMedian() + ", stdDev = " + getStdDev());
 
         // first do an insensitive sumthreshold
         setBaseSensitivity(originalSensitivity * 1.0f); // higher number is less sensitive!
@@ -53,25 +53,25 @@ public class PostCorrelationHistorySmoothedSumThresholdFlagger extends PostCorre
         if (history.getSize(pol) >= PostCorrelationFlaggerHistory.MIN_HISTORY_SIZE) {
             final float meanMedian = history.getMeanMedian(pol);
             final float stdDevOfMedians = history.getStdDevOfMedians(pol);
-            final boolean flagSecond = median > (meanMedian + historyFlaggingThreshold * stdDevOfMedians);
+            final boolean flagSecond = getMedian() > (meanMedian + historyFlaggingThreshold * stdDevOfMedians);
 
-            logger.trace("median = " + median + ", meanMedian = " + meanMedian + ", factor = " + (median / meanMedian) + ", stddev = " + stdDevOfMedians
+            logger.trace("median = " + getMedian() + ", meanMedian = " + meanMedian + ", factor = " + (getMedian() / meanMedian) + ", stddev = " + stdDevOfMedians
                     + (flagSecond ? " FLAGGED" : ""));
             if (flagSecond) {
                 for (int i = 0; i < nrChannels; i++) {
                     flagged[i] = true;
                 }
                 // add the mean to the history
-                history.add(pol, second, mean, meanMedian, stdDev, powers);
+                history.add(pol, second, getMean(), meanMedian, getStdDev(), powers);
 
                 return;
             } else {
                 // add the corrected power statistics to the history
-                history.add(pol, second, mean, median, stdDev, powers);
+                history.add(pol, second, getMean(), getMedian(), getStdDev(), powers);
             }
         } else { // we don't have enough history yet, let's just add it
             // add the corrected power statistics to the history
-            history.add(pol, second, mean, median, stdDev, powers);
+            history.add(pol, second, getMean(), getMedian(), getStdDev(), powers);
         }
 
         if (pol == 0) {

@@ -10,11 +10,13 @@ public class PostCorrelationFlaggerHistory {
     static final int MIN_HISTORY_SIZE = 4; // HISTORY_SIZE;
 
     static class HistoryElement {
-        int second;
-        float mean;
-        float median;
-        float stdDev;
-        float[] freqData;
+        @SuppressWarnings("unused")
+        private int second;
+        private float mean;
+        private float median;
+        @SuppressWarnings("unused")
+        private float stdDev;
+        private float[] freqData;
 
         HistoryElement(final int second, final float mean, final float median, final float stdDev, final float[] freqData) {
             this.second = second;

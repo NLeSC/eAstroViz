@@ -42,15 +42,15 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     private float percentileValHigh;
 
     private float[][] scaledData;
-    float[] rawData;
+    private float[] rawData;
     
     private int zoomX = 1;
     private int zoomY = 1;
 
-    int COLOR_WHITE = colorToRGB(1.0f, 1.0f, 1.0f);
-    ColorMapInterpreter colorMaps;
-    ColorMap colorMap;
-    String colorMapName = "default";
+    private int COLOR_WHITE = colorToRGB(1.0f, 1.0f, 1.0f);
+    private ColorMapInterpreter colorMaps;
+    private ColorMap colorMap;
+    private String colorMapName = "default";
 
     GUIPanel(final GUIFrame parentFrame, final DataProvider data) {
         this.parentFrame = parentFrame;

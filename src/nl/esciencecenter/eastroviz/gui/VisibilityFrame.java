@@ -29,7 +29,7 @@ public final class VisibilityFrame extends GUIFrame {
     private int station1;
     private int station2;
     private final int nrStations;
-    VisibilityData visibilityData;
+    private VisibilityData visibilityData;
 
     public VisibilityFrame(final Viz viz, final DataProvider data, final int pol) {
         super(data);
@@ -55,7 +55,7 @@ public final class VisibilityFrame extends GUIFrame {
             visibilityData = new VisibilityData(getData().getFileName(), station1, station2, pol, getData().getMaxSequenceNr(), getData().getMaxSubbands());
             setData(visibilityData); // also set in super class
             visibilityData.read();
-            samplePanel.setData(visibilityData);
+            getSamplePanel().setData(visibilityData);
         } catch (final IOException e) {
             e.printStackTrace();
             System.exit(1);
@@ -72,13 +72,13 @@ public final class VisibilityFrame extends GUIFrame {
     public String setPolarization(final String newPol) {
         pol = getData().StringToPolarization(newPol);
         getData().setPolarization(pol);
-        samplePanel.setPolarization(pol);
+        getSamplePanel().setPolarization(pol);
         return getData().polarizationToString(pol);
     }
 
     public int setPolarization(final int newPol) {
         getData().setPolarization(newPol);
-        samplePanel.setPolarization(newPol);
+        getSamplePanel().setPolarization(newPol);
         return getData().getPolarization();
     }
 

@@ -23,7 +23,7 @@ public abstract class GUIFrame extends javax.swing.JFrame {
     private static final Logger LOGGER = LoggerFactory.getLogger(GUIFrame.class);
     private static final long serialVersionUID = 1L;
     private DataProvider data;
-    protected GUIPanel samplePanel;
+    private GUIPanel samplePanel;
     private String flaggerType = "none";
     private int[] histogram;
 
@@ -241,6 +241,14 @@ public abstract class GUIFrame extends javax.swing.JFrame {
 
     public void setBaselineText(String val) {
         baselineLabel.setText(val);
+    }
+
+    protected GUIPanel getSamplePanel() {
+        return samplePanel;
+    }
+
+    protected void setSamplePanel(GUIPanel samplePanel) {
+        this.samplePanel = samplePanel;
     }
 
     /**

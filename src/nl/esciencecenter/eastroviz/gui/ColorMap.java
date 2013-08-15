@@ -2,7 +2,8 @@ package nl.esciencecenter.eastroviz.gui;
 
 public class ColorMap {
     private int[] colorMap;
-    String name;
+    @SuppressWarnings("unused")
+    private String name;
 
     public ColorMap(String name, int[] map) {
         this.colorMap = map.clone();

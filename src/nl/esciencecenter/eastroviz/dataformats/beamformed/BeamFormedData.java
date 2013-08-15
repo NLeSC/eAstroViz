@@ -30,37 +30,37 @@ public final class BeamFormedData extends DataProvider {
     static final int NR_PERIODS_IN_FOLD = 1;
     static final boolean CORRECT_ANTENNA_BANDPASS = false;
 
-    float[][][] data; // [second][subband][channel]
-    boolean[][][] flagged;
+    private float[][][] data; // [second][subband][channel]
+    private boolean[][][] flagged;
 
-    int nrStokes;
-    int nrChannels;
-    int nrSamples;
-    int nrSubbands;
-    int nrStations;
-    double totalIntegrationTime;
-    int bitsPerSample;
-    double clockFrequency;
-    int nrBeams;
+    private int nrStokes;
+    private int nrChannels;
+    private int nrSamples;
+    private int nrSubbands;
+    private int nrStations;
+    private double totalIntegrationTime;
+    private int bitsPerSample;
+    private double clockFrequency;
+    private int nrBeams;
 
-    int nrSamplesPerSecond;
-    int nrSeconds;
+    private int nrSamplesPerSecond;
+    private int nrSeconds;
 
-    float maxVal = -10000000.0f;
-    float minVal = 1.0E20f;
+    private float maxVal = -10000000.0f;
+    private float minVal = 1.0E20f;
 
-    float subbandWidth; // MHz
-    float channelWidth; //MHz
-    float beamCenterFrequency; // MHz
+    private float subbandWidth; // MHz
+    private float channelWidth; //MHz
+    private float beamCenterFrequency; // MHz
 
-    String rawFileName;
-    String hdf5FileName;
-    FileFormat fileFormat;
+    private String rawFileName;
+    private String hdf5FileName;
+    private FileFormat fileFormat;
 
-    final int zoomFactor;
-    static int maximumShift;
+    private final int zoomFactor;
+    private static int maximumShift;
 
-    int stoke = 0;
+    private int stoke = 0;
     
     public BeamFormedData(final String fileName, final int maxSequenceNr, final int maxSubbands, final int zoomFactor) {
         super();

@@ -60,7 +60,7 @@ public final class BeamFormedFrame extends GUIFrame {
             } else {
                 throw new RuntimeException("illegal data type");
             }
-            samplePanel.setData(getData());
+            getSamplePanel().setData(getData());
             repaint();
             return;
         }
@@ -79,7 +79,7 @@ public final class BeamFormedFrame extends GUIFrame {
         } else {
             throw new RuntimeException("illegal data type");
         }
-        samplePanel.setData(getData());
+        getSamplePanel().setData(getData());
         repaint();
     }
 

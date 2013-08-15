@@ -10,20 +10,20 @@ public class RawDataReader {
     static final int NR_POLARIZATIONS = 2;
 
     class TransportHeader {
-        int versionAndHeaderLength;
-        int typeOfService;
-        int totalLength;
-        int identification;
-        long flagsAndFragmentOffset;
-        long ttl;
-        long protocol;
-        long headerCrc;
-        long sourceIP;
-        long destinationIP;
-        long udpSourcePort;
-        long udpDestPort;
-        long udpLength;
-        long udpChecksum;
+        private int versionAndHeaderLength;
+        private int typeOfService;
+        private int totalLength;
+        private int identification;
+        private long flagsAndFragmentOffset;
+        private long ttl;
+        private long protocol;
+        private long headerCrc;
+        private long sourceIP;
+        private long destinationIP;
+        private long udpSourcePort;
+        private long udpDestPort;
+        private long udpLength;
+        private long udpChecksum;
 
         void read(final DataInputStream din) throws IOException {
             versionAndHeaderLength = din.readUnsignedByte();
@@ -40,6 +40,62 @@ public class RawDataReader {
             udpDestPort = din.readUnsignedShort();
             udpLength = din.readUnsignedShort();
             udpChecksum = din.readUnsignedShort();
+        }
+
+        public int getVersionAndHeaderLength() {
+            return versionAndHeaderLength;
+        }
+
+        public int getTypeOfService() {
+            return typeOfService;
+        }
+
+        public int getTotalLength() {
+            return totalLength;
+        }
+
+        public int getIdentification() {
+            return identification;
+        }
+
+        public long getFlagsAndFragmentOffset() {
+            return flagsAndFragmentOffset;
+        }
+
+        public long getTtl() {
+            return ttl;
+        }
+
+        public long getProtocol() {
+            return protocol;
+        }
+
+        public long getHeaderCrc() {
+            return headerCrc;
+        }
+
+        public long getSourceIP() {
+            return sourceIP;
+        }
+
+        public long getDestinationIP() {
+            return destinationIP;
+        }
+
+        public long getUdpSourcePort() {
+            return udpSourcePort;
+        }
+
+        public long getUdpDestPort() {
+            return udpDestPort;
+        }
+
+        public long getUdpLength() {
+            return udpLength;
+        }
+
+        public long getUdpChecksum() {
+            return udpChecksum;
         }
     }
 

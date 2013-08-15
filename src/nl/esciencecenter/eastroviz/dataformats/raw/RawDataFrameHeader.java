@@ -12,14 +12,14 @@ class RawDataFrameHeader {
 
     private static final Logger logger = LoggerFactory.getLogger(RawDataFrameHeader.class);
 
-    int versionId;
-    int sourceInfo;
-    int configurationId;
-    int stationId;
-    int nofBeamlets;
-    int nofBlocks;
-    long timestamp;
-    long blockSequenceNumber;
+    private int versionId;
+    private int sourceInfo;
+    private int configurationId;
+    private int stationId;
+    private int nofBeamlets;
+    private int nofBlocks;
+    private long timestamp;
+    private long blockSequenceNumber;
 
     boolean read(final DataInputStream din) {
         try {
@@ -59,5 +59,37 @@ class RawDataFrameHeader {
         logger.debug("nofBlocks = " + nofBlocks);
         logger.debug("timestamp = " + timestamp);
         logger.debug("blockSequenceNumber = " + blockSequenceNumber);
+    }
+
+    public int getVersionId() {
+        return versionId;
+    }
+
+    public int getSourceInfo() {
+        return sourceInfo;
+    }
+
+    public int getConfigurationId() {
+        return configurationId;
+    }
+
+    public int getStationId() {
+        return stationId;
+    }
+
+    public int getNofBeamlets() {
+        return nofBeamlets;
+    }
+
+    public int getNofBlocks() {
+        return nofBlocks;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public long getBlockSequenceNumber() {
+        return blockSequenceNumber;
     }
 }

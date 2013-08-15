@@ -17,7 +17,7 @@ public final class PreProcessedFrame extends GUIFrame {
 
     @Override
     public int setStation1(int newVal) {
-        int s = samplePanel.setStation1(newVal);
+        int s = getSamplePanel().setStation1(newVal);
         repaint();
         return s;
     }
@@ -35,14 +35,14 @@ public final class PreProcessedFrame extends GUIFrame {
     @Override
     public String setPolarization(String newString) {
         int newPol = getData().StringToPolarization(newString);
-        int result = samplePanel.setPolarization(newPol);
+        int result = getSamplePanel().setPolarization(newPol);
         repaint();
         return getData().polarizationToString(result);
     }
 
     @Override
     public int setPolarization(int newPol) {
-        int result = samplePanel.setPolarization(newPol);
+        int result = getSamplePanel().setPolarization(newPol);
         repaint();
         return result;
     }

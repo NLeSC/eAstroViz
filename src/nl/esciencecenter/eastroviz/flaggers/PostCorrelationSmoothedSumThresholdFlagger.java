@@ -32,7 +32,7 @@ public class PostCorrelationSmoothedSumThresholdFlagger extends PostCorrelationS
 
         calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
 
-        logger.trace("mean = " + mean + ", median = " + median + ", stdDev = " + stdDev);
+        logger.trace("mean = " + getMean() + ", median = " + getMedian() + ", stdDev = " + getStdDev());
 
         // first do an insensitive sumthreshold
         final float originalSensitivity = getBaseSensitivity();

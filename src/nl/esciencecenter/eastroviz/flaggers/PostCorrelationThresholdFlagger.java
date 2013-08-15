@@ -2,7 +2,7 @@ package nl.esciencecenter.eastroviz.flaggers;
 
 public class PostCorrelationThresholdFlagger extends PostCorrelationFlagger {
 
-    final float cutoffThreshold = 7.0f;
+    private final float cutoffThreshold = 7.0f;
 
     public PostCorrelationThresholdFlagger(final int nrChannels, final float sensitivity, final float SIREtaValue) {
         super(nrChannels, sensitivity, SIREtaValue);
@@ -14,7 +14,7 @@ public class PostCorrelationThresholdFlagger extends PostCorrelationFlagger {
         //                calculateStatistics();
         calculateWinsorizedStatistics(powers, flagged);
 
-        final float threshold = median + cutoffThreshold * getBaseSensitivity() * stdDev;
+        final float threshold = getMedian() + cutoffThreshold * getBaseSensitivity() * getStdDev();
 
         // if one of the polarizations exceeds the threshold, flag them all.
         for (int channel = 0; channel < nrChannels; channel++) {
