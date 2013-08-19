@@ -10,7 +10,7 @@ import nl.esciencecenter.eastroviz.dataformats.DataProvider;
  * 
  * @author rob
  */
-public class BeamFormedInnerPanel extends javax.swing.JPanel {
+public class PulsarFrame extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
     private DataProvider data;
@@ -18,9 +18,9 @@ public class BeamFormedInnerPanel extends javax.swing.JPanel {
     private float[] foldedData;
 
     /**
-     * Creates new form BeamFormedInnerPanel
+     * Creates new form PulsarFrame
      */
-    public BeamFormedInnerPanel(final DataProvider data, final BeamFormedFrame frame) {
+    public PulsarFrame(final DataProvider data, final BeamFormedFrame frame) {
         this.data = data;
         this.mainGUIFrame = frame;
         initComponents();
