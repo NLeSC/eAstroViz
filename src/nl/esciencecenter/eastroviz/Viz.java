@@ -99,7 +99,13 @@ public final class Viz {
                 System.exit(0);
             }
 
-            beamFormedFrame.setVisible(true);
+            // TODO ook doen voor andere frames
+            java.awt.EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    beamFormedFrame.setVisible(true);
+                }
+            });
+
             return;
         }
 
