@@ -1,6 +1,8 @@
 package nl.esciencecenter.eAstroViz;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -23,11 +25,12 @@ public class TestConvertBinaryFiltered {
     static final int NR_TIMES = 3 * 16 - 1;
 
     static final int HEADER_FIELDS = 5;
-    
-    static final String INPUT_FILE_NAME = "test/fixtures/Flaggertest-01-11-11_dataset_tiny-5_stations-32_subbands-16_channels-flagged/result.filteredRaw";
+
+    static final String INPUT_FILE_NAME =
+            "test/fixtures/Flaggertest-01-11-11_dataset_tiny-5_stations-32_subbands-16_channels-flagged/result.filteredRaw";
     static final String OUTPUT_FILE_NAME = "dummy.filtered";
     static final String INPUT_EXTENSION = "myFilteredData";
-    
+
     @After
     public void tearDown() throws Exception {
         new File(OUTPUT_FILE_NAME).delete();
@@ -45,20 +48,21 @@ public class TestConvertBinaryFiltered {
         }
 
         File file = new File(OUTPUT_FILE_NAME);
-        
+
         assertTrue(file.exists());
 
-        assertEquals(HEADER_FIELDS * DataProvider.SIZE_OF_FLOAT + NR_STATIONS * NR_TIMES * NR_SUBBANDS * NR_CHANNELS * NR_POLARIZATIONS * DataProvider.SIZE_OF_FLOAT, file.length());
-        
+        assertEquals(HEADER_FIELDS * DataProvider.SIZE_OF_FLOAT + NR_STATIONS * NR_TIMES * NR_SUBBANDS * NR_CHANNELS
+                * NR_POLARIZATIONS * DataProvider.SIZE_OF_FLOAT, file.length());
+
         FileInputStream fin = null;
         try {
             fin = new FileInputStream(file);
         } catch (FileNotFoundException e) {
             fail("open failed: " + e);
         }
-        
+
         DataInputStream din = new DataInputStream(fin);
-        
+
         try {
             assertEquals(NR_STATIONS, din.readInt());
             assertEquals(NR_TIMES, din.readInt());
@@ -97,24 +101,24 @@ public class TestConvertBinaryFiltered {
 
         long diffs = 0;
         long flagged = 0;
-        for (int station = 0; station < data.length; station++) {
+        for (float[][][][] element : data) {
             for (int time = 0; time < data[0].length; time++) {
                 for (int sb = 0; sb < data[0][0].length; sb++) {
                     for (int ch = 0; ch < data[0][0][0].length; ch++) {
-                        if(data[station][time][sb][ch][0] < 0) {
+                        if (element[time][sb][ch][0] < 0) {
                             flagged++;
                         }
-                        float diff = Math.abs(data[station][time][sb][ch][0] - data[station][time][sb][ch][1]);
-                        if(diff > 1E-9) {
+                        float diff = Math.abs(element[time][sb][ch][0] - element[time][sb][ch][1]);
+                        if (diff > 1E-9) {
                             diffs++;
                         }
                     }
                 }
             }
         }
-        
-        long nrSamples = data.length * data[0].length * data[0][0].length * data[0][0][0].length; 
-                
+
+        long nrSamples = data.length * data[0].length * data[0][0].length * data[0][0][0].length;
+
         System.err.println("nrSamples = " + nrSamples + ", flagged = " + flagged + ", diffs = " + diffs);
         assertEquals(flagged + diffs, nrSamples);
     }

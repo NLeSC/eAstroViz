@@ -39,8 +39,8 @@ public class PostCorrelationHistorySumThresholdFlagger extends PostCorrelationSu
             final float stdDevOfMedians = history.getStdDevOfMedians(pol);
             final boolean flagSecond = getMedian() > (meanMedian + historyFlaggingThreshold * stdDevOfMedians);
 
-            logger.trace("median = " + getMedian() + ", meanMedian = " + meanMedian + ", factor = " + (getMedian() / meanMedian) + ", stddev = " + stdDevOfMedians
-                    + (flagSecond ? " FLAGGED" : ""));
+            logger.trace("median = " + getMedian() + ", meanMedian = " + meanMedian + ", factor = " + (getMedian() / meanMedian)
+                    + ", stddev = " + stdDevOfMedians + (flagSecond ? " FLAGGED" : ""));
             if (flagSecond) {
                 for (int i = 0; i < getNrChannels(); i++) {
                     flagged[i] = true;

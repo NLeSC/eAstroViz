@@ -119,11 +119,14 @@ public final class MSReader {
             }
             nrValidSamples[requiredBaseline][channel] = nr;
         }
-        int baselineFlagDataToSkip = (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples();
+        int baselineFlagDataToSkip =
+                (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels()
+                        * metaData.getNrBytesPerValidSamples();
 
         int alignmentToSkip =
                 metaData.getAlignment()
-                        - ((metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples()) % metaData.getAlignment());
+                        - ((metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrBytesPerValidSamples()) % metaData
+                                .getAlignment());
         if (alignmentToSkip == metaData.getAlignment()) {
             alignmentToSkip = 0;
         }
@@ -139,7 +142,9 @@ public final class MSReader {
                 visData[requiredBaseline][channel][pol][Viz.IMAG] = readFloat(in);
             }
         }
-        int baselineDataToSkip = (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4;
+        int baselineDataToSkip =
+                (metaData.getNrBaselines() - requiredBaseline - 1) * metaData.getNrChannels()
+                        * metaData.getNrCrossPolarizations() * 2 * 4;
 
         int processed = metaData.getNrBaselines() * metaData.getNrChannels() * metaData.getNrCrossPolarizations() * 2 * 4;
         int alignmentToSkip = metaData.getAlignment() - (processed % metaData.getAlignment());
@@ -239,8 +244,8 @@ public final class MSReader {
         din.close();
 
         metaData =
-                new MSMetaData(version, stations1, stations2, IONIntegrationTime, nrChannels, nrCrossPolarizations, integrationTimeProd, alignment,
-                        isBigEndian, nrBytesPerValidSamples);
+                new MSMetaData(version, stations1, stations2, IONIntegrationTime, nrChannels, nrCrossPolarizations,
+                        integrationTimeProd, alignment, isBigEndian, nrBytesPerValidSamples);
 
         visData = new float[metaData.getNrBaselines()][nrChannels][nrCrossPolarizations][2];
         nrValidSamples = new int[metaData.getNrBaselines()][nrChannels];

@@ -1,5 +1,9 @@
 package nl.esciencecenter.eastroviz.dataformats;
 
+/**
+ * @author rob
+ *
+ */
 public abstract class DataProvider {
 
     public static final int SIZE_OF_FLOAT = 4;
@@ -16,17 +20,31 @@ public abstract class DataProvider {
     protected DataProvider() {
     }
 
-    protected void init(final String fileName, final int maxSequenceNr, final int maxSubbands, final String[] polList, final String[] flaggerList) {
+    protected void init(final String fileName, final int maxSequenceNr, final int maxSubbands, final String[] polList,
+            final String[] flaggerList) {
         this.fileName = fileName;
         this.maxSequenceNr = maxSequenceNr;
+        if(this.maxSequenceNr <= 0) {
+            this.maxSequenceNr = Integer.MAX_VALUE;
+        }
         this.maxSubbands = maxSubbands;
+        if(this.maxSubbands <= 0) {
+            this.maxSubbands = Integer.MAX_VALUE;
+        }
         this.polList = polList.clone();
         this.flaggerList = flaggerList.clone();
         this.flaggerType = this.flaggerList[0];
     }
 
+    /**
+     * @return the total data size in the x direction (usually time).
+     */
     public abstract int getSizeX();
 
+    /**
+     * @return the total data size in the y direction (usually frequency). If the data has both subbands and channels, this refers
+     *         to them both, to the total number of frequency channels is returned (e.g., nrSubbands * nrChannels).
+     */
     public abstract int getSizeY();
 
     /**
@@ -55,13 +73,22 @@ public abstract class DataProvider {
      * Flags are not kept per polarization, so we have one parameter less compared to the getValues for the data itself.
      * 
      * @param x
+     *            X-position in the data
      * @param y
+     *            Y-position in the data
      * @return
      */
     public abstract boolean isFlagged(int x, int y);
 
+    /**
+     * Flag the data with the currently selected built in flagger.
+     */
     public abstract void flag();
 
+    /**
+     * Set the current flagger to a new flagger type.
+     * @param name the name of the flagger. For a list of valid names, see getFlaggerNames().
+     */
     public void setFlagger(final String name) {
         if (name.equals(flaggerType)) {
             return;
@@ -114,6 +141,11 @@ public abstract class DataProvider {
         return maxSubbands;
     }
 
+    /**
+     * This is a utility function that takes an array of values (floats), and scales them, so all values are between 0 and 1.
+     * The scaling is done in-place.
+     * @param in the array that should be scaled.
+     */
     public static final void scale(final float[] in) {
         float max = -10000000.0f;
         float min = 1.0E20f;
@@ -131,13 +163,18 @@ public abstract class DataProvider {
         }
     }
 
+    /**
+     * This is a utility function that takes an array of values (floats), and scales them, so all values are between 0 and 1.
+     * The scaling is done in-place.
+     * @param in the array that should be scaled.
+     */
     public static final void scale(final float[][] in) {
         float max = -10000000.0f;
         float min = 1.0E20f;
 
-        for (int y = 0; y < in.length; y++) {
-            for (int x = 0; x < in[y].length; x++) {
-                float element = in[y][x];
+        for (float[] element2 : in) {
+            for (int x = 0; x < element2.length; x++) {
+                float element = element2[x];
                 if (element < min) {
                     min = element;
                 }
@@ -213,5 +250,4 @@ public abstract class DataProvider {
     protected void setMaxSubbands(int maxSubbands) {
         this.maxSubbands = maxSubbands;
     }
-
 }

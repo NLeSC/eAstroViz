@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 public class ConvertBeamFormed {
     private static final Logger logger = LoggerFactory.getLogger(ConvertBeamFormed.class);
     static final int DEFAULT_ZOOM = 1024;
-    
+
     private final String fileName;
     private final String outputFileName;
 
@@ -23,12 +23,12 @@ public class ConvertBeamFormed {
     private int nrTimes;
     private int nrSamplesPerSecond;
     private int zoomFactor;
-    
+
     public ConvertBeamFormed(final String fileName, final String outputFileName, int zoomFactor) {
         this.fileName = fileName;
         this.outputFileName = outputFileName;
         this.zoomFactor = zoomFactor;
-        if(this.zoomFactor < 0) {
+        if (this.zoomFactor < 0) {
             this.zoomFactor = DEFAULT_ZOOM;
         }
     }
@@ -39,7 +39,7 @@ public class ConvertBeamFormed {
         data = bfd.getData();
         nrSubbands = bfd.getNrSubbands();
         nrChannels = bfd.getNrChannels();
-        nrTimes = bfd.getTotalTime();
+        nrTimes = bfd.getSizeX();
         nrSamplesPerSecond = bfd.getNrSamplesPerSecond();
     }
 

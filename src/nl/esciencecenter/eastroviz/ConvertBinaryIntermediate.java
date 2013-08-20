@@ -77,7 +77,8 @@ public class ConvertBinaryIntermediate {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-        logger.info("nrStations = " + nrStations + ", nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels + ", nrPols = " + nrPolarizations);
+        logger.info("nrStations = " + nrStations + ", nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels
+                + ", nrPols = " + nrPolarizations);
 
         if (maxNrTimes > 0) {
             nrTimes = maxNrTimes;

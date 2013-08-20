@@ -37,7 +37,8 @@ public final class ColorMapInterpreter {
                 int key = 0;
                 while ((str = in.readLine()) != null) {
                     String[] numbers = str.split(" ");
-                    colorMap[key] = Integer.parseInt(numbers[0]) << 16 | Integer.parseInt(numbers[1]) << 8 | Integer.parseInt(numbers[2]);
+                    colorMap[key] =
+                            Integer.parseInt(numbers[0]) << 16 | Integer.parseInt(numbers[1]) << 8 | Integer.parseInt(numbers[2]);
                     key++;
                 }
                 in.close();

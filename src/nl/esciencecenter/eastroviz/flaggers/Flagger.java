@@ -104,8 +104,8 @@ public abstract class Flagger {
         stdDev = (float) Math.sqrt(1.54 * stdDev / unflaggedCount);
 
         if (logger.isTraceEnabled()) {
-            logger.trace("winsorized stats: size = " + samples.length + ", unFlaggedCount = " + unflaggedCount + ", mean = " + mean + ", median = " + median
-                    + ", stddev = " + stdDev);
+            logger.trace("winsorized stats: size = " + samples.length + ", unFlaggedCount = " + unflaggedCount + ", mean = "
+                    + mean + ", median = " + median + ", stddev = " + stdDev);
         }
     }
 

@@ -39,10 +39,11 @@ public final class VisibilityData extends DataProvider {
     private final int nrCrossPolarizations;
     private int nrSeconds;
 
-    public VisibilityData(final String fileName, final int station1, final int station2, final int pol, final int maxSequenceNr, final int maxSubbands) throws IOException {
+    public VisibilityData(final String fileName, final int station1, final int station2, final int pol, final int maxSequenceNr,
+            final int maxSubbands) throws IOException {
         super();
-        init(fileName, maxSequenceNr, maxSubbands, new String[] { "XX", "XY", "YX", "YY" }, new String[] { "none", "Threshold", "SumThreshold",
-                "SmoothedSumThreshold", "HistorySumThreshold", "HistorySmoothedSumThreshold" });
+        init(fileName, maxSequenceNr, maxSubbands, new String[] { "XX", "XY", "YX", "YY" }, new String[] { "none", "Threshold",
+                "SumThreshold", "SmoothedSumThreshold", "HistorySumThreshold", "HistorySmoothedSumThreshold" });
         this.station1 = station1;
         this.station2 = station2;
         this.baseline = baseline(station1, station2);
@@ -68,34 +69,35 @@ public final class VisibilityData extends DataProvider {
         if (baseline >= nrBaselines) {
             throw new IOException("illegal baseline");
         }
-        
-        logger.info("nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels + ", nrBaseLines = " + nrBaselines + ", integrationTime = " + integrationTime +
-                ", pols = " + nrCrossPolarizations + ", nrStations = " + nrStations + ", nrSeconds = " + nrSeconds); 
+
+        logger.info("nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels + ", nrBaseLines = " + nrBaselines
+                + ", integrationTime = " + integrationTime + ", pols = " + nrCrossPolarizations + ", nrStations = " + nrStations
+                + ", nrSeconds = " + nrSeconds);
     }
 
     public static int baseline(final int station1, final int station2) {
-        assert(station1 <= station2);
+        assert (station1 <= station2);
         return station2 * (station2 + 1) / 2 + station1;
     }
 
     // TODO
     /*
      *  from c++ code:
-inline void Correlator::baselineToStations(const unsigned baseline, unsigned& station1, unsigned& station2)
-{
-  station2 = (unsigned) (sqrtf(2 * baseline + .25f) - .5f);
-  station1 = baseline - station2 * (station2 + 1) / 2;
-}
+    inline void Correlator::baselineToStations(const unsigned baseline, unsigned& station1, unsigned& station2)
+    {
+    station2 = (unsigned) (sqrtf(2 * baseline + .25f) - .5f);
+    station1 = baseline - station2 * (station2 + 1) / 2;
+    }
 
-inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
-{
-  unsigned station1, station2;
-  baselineToStations(baseline, station1, station2);
-  return station1 == station2;
-}
+    inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
+    {
+    unsigned station1, station2;
+    baselineToStations(baseline, station1, station2);
+    return station1 == station2;
+    }
 
      */
-    
+
     public static MSMetaData getMetaData(final String fileName) {
         MSReader r = null;
         try {
@@ -131,7 +133,8 @@ inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
             e.printStackTrace();
         }
 
-        logger.info("Reading data for stations (" + station1 + ", " + station2 + "), baseline " + baseline + ", subband " + subband + "...");
+        logger.info("Reading data for stations (" + station1 + ", " + station2 + "), baseline " + baseline + ", subband "
+                + subband + "...");
         long start = System.currentTimeMillis();
 
         long sequenceNr = 0;
@@ -171,15 +174,16 @@ inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
             logger.warn("WARNING, DATA WAS DROPPED, seq no = " + sequenceNr + " expected = " + timeIndex);
         }
 
-        if(logger.isTraceEnabled()) {
-        for (int channel = 1; channel < nrChannels; channel++) {
-            if (nrValidSamplesIn[channel] != integrationTime) {
-                logger.trace("WARNING, DATA WAS FLAGGED, sequenceNr = " + sequenceNr + ", baseline = " + baseline + ", channel = " + channel
-                        + ", samples is only " + nrValidSamplesIn[channel] + ", expected " + integrationTime);
+        if (logger.isTraceEnabled()) {
+            for (int channel = 1; channel < nrChannels; channel++) {
+                if (nrValidSamplesIn[channel] != integrationTime) {
+                    logger.trace("WARNING, DATA WAS FLAGGED, sequenceNr = " + sequenceNr + ", baseline = " + baseline
+                            + ", channel = " + channel + ", samples is only " + nrValidSamplesIn[channel] + ", expected "
+                            + integrationTime);
+                }
             }
         }
-        }
-        
+
         for (int channel = 0; channel < nrChannels; channel++) {
             for (int pol = 0; pol < nrCrossPolarizations; pol++) {
                 final float real = vis[channel][pol][Viz.REAL];
@@ -215,11 +219,15 @@ inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
             } else if (getFlaggerType().equals(getFlaggerList()[2])) {
                 flaggers[i] = new PostCorrelationSumThresholdFlagger(nrChannels, getFlaggerSensitivity(), getFlaggerSIRValue());
             } else if (getFlaggerType().equals(getFlaggerList()[3])) {
-                flaggers[i] = new PostCorrelationSmoothedSumThresholdFlagger(nrChannels, getFlaggerSensitivity(), getFlaggerSIRValue());
+                flaggers[i] =
+                        new PostCorrelationSmoothedSumThresholdFlagger(nrChannels, getFlaggerSensitivity(), getFlaggerSIRValue());
             } else if (getFlaggerType().equals(getFlaggerList()[4])) {
-                flaggers[i] = new PostCorrelationHistorySumThresholdFlagger(nrChannels, getFlaggerSensitivity(), getFlaggerSIRValue());
+                flaggers[i] =
+                        new PostCorrelationHistorySumThresholdFlagger(nrChannels, getFlaggerSensitivity(), getFlaggerSIRValue());
             } else if (getFlaggerType().equals(getFlaggerList()[5])) {
-                flaggers[i] = new PostCorrelationHistorySmoothedSumThresholdFlagger(nrChannels, getFlaggerSensitivity(), getFlaggerSIRValue());
+                flaggers[i] =
+                        new PostCorrelationHistorySmoothedSumThresholdFlagger(nrChannels, getFlaggerSensitivity(),
+                                getFlaggerSIRValue());
             } else {
                 throw new RuntimeException("illegal flagger selected: " + getFlaggerType());
             }
@@ -233,7 +241,8 @@ inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
         }
 
         final long end = System.currentTimeMillis();
-        logger.info("Flagging with " + getFlaggerType() + ", sensitivity " + getFlaggerSensitivity() + " took " + (end - start) + " ms.");
+        logger.info("Flagging with " + getFlaggerType() + ", sensitivity " + getFlaggerSensitivity() + " took " + (end - start)
+                + " ms.");
     }
 
     public int getNrFrequencies() {
@@ -323,48 +332,51 @@ inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
         return getPower(x, y);
     }
 
+    @Override
     public int getStation1() {
         return station1;
     }
 
+    @Override
     public int getStation2() {
         return station2;
     }
 
     @Override
     public int setStation1(int station1) {
-        if(station1 < 0 || station1 >= nrStations || station1 == this.station1) {
+        if (station1 < 0 || station1 >= nrStations || station1 == this.station1) {
             return this.station1;
         }
-        
+
         this.station1 = station1;
         this.baseline = baseline(station1, station2);
         try {
             read();
         } catch (IOException e) {
             logger.error("" + e);
-            throw new RuntimeException(e); 
+            throw new RuntimeException(e);
         }
         return this.station1;
     }
 
     @Override
     public int setStation2(int station2) {
-        if(station2 < 0 || station2 >= nrStations || station2 == this.station2) {
+        if (station2 < 0 || station2 >= nrStations || station2 == this.station2) {
             return this.station2;
         }
-        
+
         this.station2 = station2;
         this.baseline = baseline(station1, station2);
         try {
             read();
         } catch (IOException e) {
             logger.error("" + e);
-            throw new RuntimeException(e); 
+            throw new RuntimeException(e);
         }
         return this.station2;
     }
 
+    @Override
     public String polarizationToString(final int pol) {
         switch (pol) {
         case 0:
@@ -380,6 +392,7 @@ inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
         }
     }
 
+    @Override
     public int StringToPolarization(final String polString) {
         if (polString.equals("XX")) {
             return 0;
@@ -397,12 +410,12 @@ inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
 
     @Override
     public int getPolarization() {
-        return pol; 
+        return pol;
     }
 
     @Override
     public int setPolarization(int newValue) {
-        if(pol < 0 || pol >= getPolList().length) {
+        if (pol < 0 || pol >= getPolList().length) {
             return pol;
         }
         this.pol = newValue;

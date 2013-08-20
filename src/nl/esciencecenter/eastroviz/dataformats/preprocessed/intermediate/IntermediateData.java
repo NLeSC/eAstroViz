@@ -8,7 +8,8 @@ import org.slf4j.LoggerFactory;
 public final class IntermediateData extends PreprocessedData {
     private static final Logger logger = LoggerFactory.getLogger(IntermediateData.class);
 
-    public IntermediateData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands, final int station) {
+    public IntermediateData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands,
+            final int station) {
         super(fileName, integrationFactor, maxSequenceNr, maxSubbands, new String[] { "X", "Y" }, station, 0);
     }
 

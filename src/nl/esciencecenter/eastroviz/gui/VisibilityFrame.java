@@ -52,7 +52,9 @@ public final class VisibilityFrame extends GUIFrame {
     void changeBaseline(final int station1, final int station2) {
         LOGGER.debug("trying to set baseline to " + VisibilityData.baseline(station1, station2));
         try {
-            visibilityData = new VisibilityData(getData().getFileName(), station1, station2, pol, getData().getMaxSequenceNr(), getData().getMaxSubbands());
+            visibilityData =
+                    new VisibilityData(getData().getFileName(), station1, station2, pol, getData().getMaxSequenceNr(), getData()
+                            .getMaxSubbands());
             setData(visibilityData); // also set in super class
             visibilityData.read();
             getSamplePanel().setData(visibilityData);
@@ -69,6 +71,7 @@ public final class VisibilityFrame extends GUIFrame {
         return new VisibilityPanel(getData(), this);
     }
 
+    @Override
     public String setPolarization(final String newPol) {
         pol = getData().StringToPolarization(newPol);
         getData().setPolarization(pol);
@@ -76,12 +79,14 @@ public final class VisibilityFrame extends GUIFrame {
         return getData().polarizationToString(pol);
     }
 
+    @Override
     public int setPolarization(final int newPol) {
         getData().setPolarization(newPol);
         getSamplePanel().setPolarization(newPol);
         return getData().getPolarization();
     }
 
+    @Override
     public int setStation1(final int value) {
         if (value == station1 || value < 0 || value >= nrStations || VisibilityData.baseline(value, station2) < 0) {
             return station1;
@@ -93,8 +98,10 @@ public final class VisibilityFrame extends GUIFrame {
         return station1;
     }
 
+    @Override
     public int setStation2(final int value) {
-        if (value == station2 || value < 0 || value >= nrStations || value > station1 || VisibilityData.baseline(station1, value) < 0) {
+        if (value == station2 || value < 0 || value >= nrStations || value > station1
+                || VisibilityData.baseline(station1, value) < 0) {
             return station2;
         }
 
@@ -112,6 +119,7 @@ public final class VisibilityFrame extends GUIFrame {
         return station2;
     }
 
+    @Override
     public String getBaselineText() {
         String res = "Baseline: " + VisibilityData.baseline(station1, station2);
         if (station1 == station2) {

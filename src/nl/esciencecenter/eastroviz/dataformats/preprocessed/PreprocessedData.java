@@ -29,10 +29,10 @@ public abstract class PreprocessedData extends DataProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(PreprocessedData.class);
 
-    private  float[][][][] data; // [time][nrSubbands][nrPolarizations][nrChannels]
-    private  boolean[][][] initialFlagged; // [time][nrSubbands][nrChannels]
-    private  boolean[][][] flagged; // [time][nrSubbands][nrChannels]
-    private  int nrStations;
+    private float[][][][] data; // [time][nrSubbands][nrPolarizations][nrChannels]
+    private boolean[][][] initialFlagged; // [time][nrSubbands][nrChannels]
+    private boolean[][][] flagged; // [time][nrSubbands][nrChannels]
+    private int nrStations;
     private int nrSubbands;
     private int nrChannels;
     private int nrTimes;
@@ -45,8 +45,8 @@ public abstract class PreprocessedData extends DataProvider {
     private int station1;
     private int pol;
 
-    public PreprocessedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands, final String[] polList,
-            final int station, final int pol) {
+    public PreprocessedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands,
+            final String[] polList, final int station, final int pol) {
         super();
         init(fileName, maxSequenceNr, maxSubbands, polList, new String[] { "none", "Intermediate" });
         this.integrationFactor = integrationFactor;
@@ -70,8 +70,8 @@ public abstract class PreprocessedData extends DataProvider {
             nrSubbands = getMaxSubbands();
         }
 
-        logger.info("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes + ", nrSubbands = " + nrSubbandsInFile
-                + ", nrChannels = " + nrChannels);
+        logger.info("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes + ", nrSubbands = "
+                + nrSubbandsInFile + ", nrChannels = " + nrChannels);
 
         if (getMaxSequenceNr() < nrTimes) {
             nrTimes = getMaxSequenceNr();
@@ -263,6 +263,7 @@ public abstract class PreprocessedData extends DataProvider {
         return nrSubbands * nrChannels;
     }
 
+    @Override
     public final float getRawValue(final int x, final int y) {
         final int subband = y / nrChannels;
         final int channel = y % nrChannels;
@@ -270,6 +271,7 @@ public abstract class PreprocessedData extends DataProvider {
         return data[x][subband][pol][channel];
     }
 
+    @Override
     public final float getValue(final int x, final int y) {
         final int subband = y / nrChannels;
         final int channel = y % nrChannels;

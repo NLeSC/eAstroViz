@@ -31,9 +31,9 @@ public class MSMetaData {
         return (value + alignment - 1) / alignment * alignment;
     }
 
-    public MSMetaData(final int lofarStoreageManagerVersion, final int[][] stations1, final int[][] stations2, final double iONIntegrationTime,
-            final int nrChannelsPerSubband, final int nrCrossPolarizations, final int integrationTimeProd, final int alignment, final boolean isBigEndian,
-            final int nrBytesPerValidSamples) {
+    public MSMetaData(final int lofarStoreageManagerVersion, final int[][] stations1, final int[][] stations2,
+            final double iONIntegrationTime, final int nrChannelsPerSubband, final int nrCrossPolarizations,
+            final int integrationTimeProd, final int alignment, final boolean isBigEndian, final int nrBytesPerValidSamples) {
         this.lofarStoreageManagerVersion = lofarStoreageManagerVersion;
         this.nrBaselines = stations1.length;
 
@@ -72,7 +72,8 @@ public class MSMetaData {
         nrValidSamplesSize = nrBaselines * nrChannels * 2;
         alignedNrValidSamplesSize = align(nrValidSamplesSize, alignment);
 
-        logger.debug("nrStations: " + nrStations + ", nrBaseLines: " + nrBaselines + ", nrChannels: " + nrChannels + ", nrVisibilities = " + nrVisibilities);
+        logger.debug("nrStations: " + nrStations + ", nrBaseLines: " + nrBaselines + ", nrChannels: " + nrChannels
+                + ", nrVisibilities = " + nrVisibilities);
         logger.debug("vis size of 1 subband = " + visibilitiesSize + " bytes");
         logger.debug("aligned vis size = " + alignedVisibilitiesSize + " bytes");
         logger.debug("nrValidSamples buf size of 1 subband = " + nrValidSamplesSize + " bytes");

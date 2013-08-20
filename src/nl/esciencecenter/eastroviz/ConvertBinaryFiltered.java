@@ -30,7 +30,7 @@ public class ConvertBinaryFiltered {
     private int nrPolarizations;
     private int nrTimes;
     private String extension;
-    
+
     public ConvertBinaryFiltered(final String fileName, final String outputFileName, final String extension, int maxNrTimes) {
         this.fileName = fileName;
         this.outputFileName = outputFileName;
@@ -94,8 +94,10 @@ public class ConvertBinaryFiltered {
             totalSize -= ls.length * 4 * 4;
             logger.info("totalSize - headers = " + totalSize);
 
-            nrTimes = (int) (totalSize / (nrSubbands * nrStations * (3 + nrChannels * nrPolarizations) * DataProvider.SIZE_OF_FLOAT));
-            int rem = (int) (totalSize % (nrSubbands * nrStations * (3 + nrChannels * nrPolarizations) * DataProvider.SIZE_OF_FLOAT));
+            nrTimes =
+                    (int) (totalSize / (nrSubbands * nrStations * (3 + nrChannels * nrPolarizations) * DataProvider.SIZE_OF_FLOAT));
+            int rem =
+                    (int) (totalSize % (nrSubbands * nrStations * (3 + nrChannels * nrPolarizations) * DataProvider.SIZE_OF_FLOAT));
 
             if (rem != 0) {
                 logger.info("internal error, size wrong, leftover = " + rem);
@@ -139,7 +141,7 @@ public class ConvertBinaryFiltered {
                 }
                 int station = (int) readuint32(in, false);
                 int subband = (int) readuint32(in, false);
-//                logger.debug("read block " + block + ", station = " + station + ", subband " + subband);
+                //                logger.debug("read block " + block + ", station = " + station + ", subband " + subband);
                 for (int ch = 0; ch < nrChannels; ch++) {
                     for (int pol = 0; pol < nrPolarizations; pol++) {
                         float sample = readFloat(in);

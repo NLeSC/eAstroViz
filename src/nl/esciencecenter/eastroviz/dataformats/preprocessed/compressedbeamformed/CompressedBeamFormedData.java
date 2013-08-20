@@ -34,8 +34,9 @@ public final class CompressedBeamFormedData extends DataProvider {
     private float min;
     private float scaleValue;
     private int stoke = 0;
-    
-    public CompressedBeamFormedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands) {
+
+    public CompressedBeamFormedData(final String fileName, final int integrationFactor, final int maxSequenceNr,
+            final int maxSubbands) {
         // for now, we only have stokes I
         super();
         init(fileName, maxSequenceNr, maxSubbands, new String[] { "I" }, new String[] { "none", "Intermediate" });
@@ -51,8 +52,8 @@ public final class CompressedBeamFormedData extends DataProvider {
         nrChannels = din.readInt();
         nrSamplesPerSecond = din.readInt() * integrationFactor;
 
-        logger.info("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrChannels = "
-                + nrChannels + ", nrSamplesPerSecond = " + nrSamplesPerSecond);
+        logger.info("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes + ", nrSubbands = "
+                + nrSubbands + ", nrChannels = " + nrChannels + ", nrSamplesPerSecond = " + nrSamplesPerSecond);
 
         if (getMaxSequenceNr() < nrTimes) {
             nrTimes = getMaxSequenceNr();

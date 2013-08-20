@@ -9,6 +9,7 @@ public final class BeamFormedFrame extends GUIFrame {
         super(data);
 
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new PulsarFrame(getData(), BeamFormedFrame.this).setVisible(true);
             }

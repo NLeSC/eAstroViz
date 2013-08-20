@@ -137,6 +137,7 @@ public class PulsarFrame extends javax.swing.JFrame {
 
         dedisperseCheckBox.setText("dedisperse");
         dedisperseCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dedisperseCheckBoxActionPerformed(evt);
             }
@@ -144,6 +145,7 @@ public class PulsarFrame extends javax.swing.JFrame {
 
         foldingCheckBox.setText("show folding");
         foldingCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 foldingCheckBoxActionPerformed(evt);
             }
@@ -155,41 +157,45 @@ public class PulsarFrame extends javax.swing.JFrame {
 
         javax.swing.GroupLayout pulseProfilePanelLayout = new javax.swing.GroupLayout(pulseProfilePanel);
         pulseProfilePanel.setLayout(pulseProfilePanelLayout);
-        pulseProfilePanelLayout.setHorizontalGroup(pulseProfilePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 0,
-                Short.MAX_VALUE));
-        pulseProfilePanelLayout.setVerticalGroup(pulseProfilePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 230,
-                Short.MAX_VALUE));
+        pulseProfilePanelLayout.setHorizontalGroup(pulseProfilePanelLayout.createParallelGroup(
+                javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 0, Short.MAX_VALUE));
+        pulseProfilePanelLayout.setVerticalGroup(pulseProfilePanelLayout.createParallelGroup(
+                javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 230, Short.MAX_VALUE));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(
-                        layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(
-                                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                .addGroup(
-                                                        layout.createSequentialGroup()
-                                                                .addGroup(
-                                                                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                                                .addGroup(
-                                                                                        layout.createSequentialGroup().addComponent(dedisperseCheckBox)
-                                                                                                .addGap(18, 18, 18).addComponent(foldingCheckBox))
-                                                                                .addGroup(
-                                                                                        layout.createSequentialGroup().addGap(6, 6, 6)
-                                                                                                .addComponent(pulseProfileLabel)))
-                                                                .addGap(0, 137, Short.MAX_VALUE))
-                                                .addComponent(pulseProfilePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                        Short.MAX_VALUE)).addContainerGap()));
+        layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
+                layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(
+                                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(
+                                                layout.createSequentialGroup()
+                                                        .addGroup(
+                                                                layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addGroup(
+                                                                                layout.createSequentialGroup()
+                                                                                        .addComponent(dedisperseCheckBox)
+                                                                                        .addGap(18, 18, 18)
+                                                                                        .addComponent(foldingCheckBox))
+                                                                        .addGroup(
+                                                                                layout.createSequentialGroup().addGap(6, 6, 6)
+                                                                                        .addComponent(pulseProfileLabel)))
+                                                        .addGap(0, 137, Short.MAX_VALUE))
+                                        .addComponent(pulseProfilePanel, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)).addContainerGap()));
         layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
                 layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(
-                                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(dedisperseCheckBox)
-                                        .addComponent(foldingCheckBox)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(pulseProfileLabel).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(pulseProfilePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap()));
+                                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(dedisperseCheckBox).addComponent(foldingCheckBox))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pulseProfileLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pulseProfilePanel, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addContainerGap()));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

@@ -18,7 +18,6 @@ import nl.esciencecenter.eastroviz.dataformats.DataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 // TODO calculate stats on entire dataset, but only create and draw the image that is actually visible.
 // The difference may be large due to zoom levels, and the number of channels/subbands may be in the thoustands.
 // Moreover, swing crashes or draws corrupted images if the image is too large.
@@ -43,7 +42,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
 
     private float[][] scaledData;
     private float[] rawData;
-    
+
     private int zoomX = 1;
     private int zoomY = 1;
 
@@ -142,8 +141,9 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     }
 
     /**
-     * Compute percentile values of the visualized data. Depends on the data itself, and on the scale that is set.
-     * So, if the scale changes, we have to re-invoke this method.
+     * Compute percentile values of the visualized data. Depends on the data itself, and on the scale that is set. So, if the
+     * scale changes, we have to re-invoke this method.
+     * 
      * @param rawData
      */
     private void computePercentile() {
@@ -159,8 +159,8 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         } else {
             percentileValHigh = rawData[rawData.length - 1];
         }
-        logger.trace("index of " + scale + "th percentile low = " + lowIndex + ", high = " + highIndex + ", low val = " + percentileValLow + ", high val = "
-                + percentileValHigh);
+        logger.trace("index of " + scale + "th percentile low = " + lowIndex + ", high = " + highIndex + ", low val = "
+                + percentileValLow + ", high val = " + percentileValHigh);
     }
 
     // generate a new image, assuming the underlying data itself has not changed. If it has, call setData.
@@ -210,7 +210,8 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         if (zoomX == 1 && zoomY == 1) {
             g.drawImage(image, 0, 0, null);
         } else {
-            g.drawImage(image.getScaledInstance(data.getSizeX() * zoomX, data.getSizeY() * zoomY, Image.SCALE_DEFAULT), 0, 0, null);
+            g.drawImage(image.getScaledInstance(data.getSizeX() * zoomX, data.getSizeY() * zoomY, Image.SCALE_DEFAULT), 0, 0,
+                    null);
         }
     }
 
@@ -286,8 +287,8 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         data.setFlaggerSensitivity(sensitivity);
         final long end = System.currentTimeMillis();
 
-        parentFrame.setStatusBarText("Flagging with " + data.getFlagger() + ", sensitivity " + data.getFlaggerSensitivity() + ", took " + (end - start)
-                + " ms.");
+        parentFrame.setStatusBarText("Flagging with " + data.getFlagger() + ", sensitivity " + data.getFlaggerSensitivity()
+                + ", took " + (end - start) + " ms.");
 
         generateImage();
     }
@@ -307,7 +308,8 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
         final long end = System.currentTimeMillis();
 
         if (!flagger.equals("none")) {
-            parentFrame.setStatusBarText("Flagging with " + flagger + ", sensitivity " + data.getFlaggerSensitivity() + ", took " + (end - start) + " ms.");
+            parentFrame.setStatusBarText("Flagging with " + flagger + ", sensitivity " + data.getFlaggerSensitivity() + ", took "
+                    + (end - start) + " ms.");
         }
 
         generateImage();
@@ -343,7 +345,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
             return oldVal;
         }
         int s = data.setStation1(newVal);
-        if(s != oldVal) {
+        if (s != oldVal) {
             setData(data);
         }
         return s;

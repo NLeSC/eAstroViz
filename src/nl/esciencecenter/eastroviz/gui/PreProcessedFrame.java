@@ -6,7 +6,7 @@ import nl.esciencecenter.eastroviz.dataformats.DataProvider;
 public final class PreProcessedFrame extends GUIFrame {
     public PreProcessedFrame(final DataProvider data) {
         super(data);
-        
+
         disableStation2Spinner();
     }
 

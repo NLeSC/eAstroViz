@@ -10,7 +10,8 @@ public class PostCorrelationHistorySmoothedSumThresholdFlagger extends PostCorre
     private final PostCorrelationFlaggerHistory history;
     private final float historyFlaggingThreshold = 7.0f;
 
-    public PostCorrelationHistorySmoothedSumThresholdFlagger(final int nrChannels, final float sensitivity, final float SIREtaValue) {
+    public PostCorrelationHistorySmoothedSumThresholdFlagger(final int nrChannels, final float sensitivity,
+            final float SIREtaValue) {
         super(nrChannels, sensitivity, SIREtaValue);
         history = new PostCorrelationFlaggerHistory(nrChannels);
     }
@@ -55,8 +56,8 @@ public class PostCorrelationHistorySmoothedSumThresholdFlagger extends PostCorre
             final float stdDevOfMedians = history.getStdDevOfMedians(pol);
             final boolean flagSecond = getMedian() > (meanMedian + historyFlaggingThreshold * stdDevOfMedians);
 
-            logger.trace("median = " + getMedian() + ", meanMedian = " + meanMedian + ", factor = " + (getMedian() / meanMedian) + ", stddev = " + stdDevOfMedians
-                    + (flagSecond ? " FLAGGED" : ""));
+            logger.trace("median = " + getMedian() + ", meanMedian = " + meanMedian + ", factor = " + (getMedian() / meanMedian)
+                    + ", stddev = " + stdDevOfMedians + (flagSecond ? " FLAGGED" : ""));
             if (flagSecond) {
                 for (int i = 0; i < getNrChannels(); i++) {
                     flagged[i] = true;
