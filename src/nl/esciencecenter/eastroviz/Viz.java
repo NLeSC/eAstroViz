@@ -72,7 +72,7 @@ public final class Viz {
         this.maxSequenceNr = maxSeqNo;
         this.maxSubbands = maxSubbands;
 
-        //Use the Java look and feel.
+        // Use the platform's native look and feel.
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -156,7 +156,7 @@ public final class Viz {
                     final PreProcessedFrame filteredFrame = new PreProcessedFrame(filteredData);
                     for (int pol = 0; pol < NR_POLARIZATIONS; pol++) {
                         filteredFrame.setPolarization(pol);
-                        filteredFrame.save("outputFiltered-station-" + s + "-polarization-" + pol + ".bmp");
+                        filteredFrame.save("outputFiltered-station-" + s + "-polarization-" + filteredData.polarizationToString(pol) + ".bmp");
                     }
                 }
                 System.exit(0);
