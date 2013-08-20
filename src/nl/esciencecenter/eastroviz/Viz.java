@@ -156,7 +156,8 @@ public final class Viz {
                     final PreProcessedFrame filteredFrame = new PreProcessedFrame(filteredData);
                     for (int pol = 0; pol < NR_POLARIZATIONS; pol++) {
                         filteredFrame.setPolarization(pol);
-                        filteredFrame.save("outputFiltered-station-" + s + "-polarization-" + filteredData.polarizationToString(pol) + ".bmp");
+                        filteredFrame.save("outputFiltered-station-" + s + "-polarization-"
+                                + filteredData.polarizationToString(pol) + ".bmp");
                     }
                 }
                 System.exit(0);

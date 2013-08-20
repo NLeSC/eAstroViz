@@ -37,6 +37,5 @@ public class TestBeamFormedData {
         assertEquals(NR_TIMES, data.length);
         assertEquals(NR_SUBBANDS, data[0].length);
         assertEquals(NR_CHANNELS, data[0][0].length);
-
     }
 }

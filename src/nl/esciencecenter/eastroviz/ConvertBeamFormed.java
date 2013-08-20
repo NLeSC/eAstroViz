@@ -40,7 +40,7 @@ public class ConvertBeamFormed {
         nrSubbands = bfd.getNrSubbands();
         nrChannels = bfd.getNrChannels();
         nrTimes = bfd.getSizeX();
-        nrSamplesPerSecond = bfd.getNrSamplesPerSecond();
+        nrSamplesPerSecond = bfd.getNrSamplesPerTimeStep();
     }
 
     void write() throws IOException {

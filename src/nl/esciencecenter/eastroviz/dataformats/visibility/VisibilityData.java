@@ -18,10 +18,9 @@ import org.slf4j.LoggerFactory;
  * Represents all time samples and frequencies of a given baseline.
  */
 public final class VisibilityData extends DataProvider {
-    static final boolean PRINT_STATS = false;
-    static final boolean REMOVE_CHANNEL_0_FROM_VIEW = true;
+    public static final boolean REMOVE_CHANNEL_0_FROM_VIEW = true;
 
-    private static final Logger logger = LoggerFactory.getLogger(VisibilityData.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VisibilityData.class);
 
     private final MSReader r;
     private final float[][][][] powers; // [time][nrSubbands][nrChannels][nrCrossPolarizations]
@@ -70,7 +69,7 @@ public final class VisibilityData extends DataProvider {
             throw new IOException("illegal baseline");
         }
 
-        logger.info("nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels + ", nrBaseLines = " + nrBaselines
+        LOGGER.info("nrSubbands = " + nrSubbands + ", nrChannels = " + nrChannels + ", nrBaseLines = " + nrBaselines
                 + ", integrationTime = " + integrationTime + ", pols = " + nrCrossPolarizations + ", nrStations = " + nrStations
                 + ", nrSeconds = " + nrSeconds);
     }
@@ -80,24 +79,19 @@ public final class VisibilityData extends DataProvider {
         return station2 * (station2 + 1) / 2 + station1;
     }
 
-    // TODO
-    /*
-     *  from c++ code:
-    inline void Correlator::baselineToStations(const unsigned baseline, unsigned& station1, unsigned& station2)
-    {
-    station2 = (unsigned) (sqrtf(2 * baseline + .25f) - .5f);
-    station1 = baseline - station2 * (station2 + 1) / 2;
+    public static int baselineToStation1(final int baseline) {
+        int station2 = baselineToStation2(baseline);
+        return baseline - station2 * (station2 + 1) / 2;
+    }
+    
+    public static int baselineToStation2(final int baseline) {
+        return (int) (Math.sqrt(2 * baseline + .25f) - .5f);
     }
 
-    inline bool Correlator::baselineIsAutoCorrelation(const unsigned baseline)
-    {
-    unsigned station1, station2;
-    baselineToStations(baseline, station1, station2);
-    return station1 == station2;
+    public static boolean baselineIsAutoCorrelation(final int baseline) {
+        return baselineToStation1(baseline) == baselineToStation2(baseline);
     }
-
-     */
-
+    
     public static MSMetaData getMetaData(final String fileName) {
         MSReader r = null;
         try {
@@ -133,7 +127,7 @@ public final class VisibilityData extends DataProvider {
             e.printStackTrace();
         }
 
-        logger.info("Reading data for stations (" + station1 + ", " + station2 + "), baseline " + baseline + ", subband "
+        LOGGER.info("Reading data for stations (" + station1 + ", " + station2 + "), baseline " + baseline + ", subband "
                 + subband + "...");
         long start = System.currentTimeMillis();
 
@@ -150,7 +144,7 @@ public final class VisibilityData extends DataProvider {
         }
         long end = System.currentTimeMillis();
         nrSeconds = timeIndex;
-        logger.info("Read " + nrSeconds + " time samples of data. Read took " + ((end - start) / 1000.0) + " seconds.");
+        LOGGER.info("Read " + nrSeconds + " time samples of data. Read took " + ((end - start) / 1000.0) + " seconds.");
     }
 
     private long readSecond(final int subband, final int timeIndex) {
@@ -171,13 +165,13 @@ public final class VisibilityData extends DataProvider {
 
         // for now, we assume there are no seconds missing...
         if (sequenceNr != timeIndex) {
-            logger.warn("WARNING, DATA WAS DROPPED, seq no = " + sequenceNr + " expected = " + timeIndex);
+            LOGGER.warn("WARNING, DATA WAS DROPPED, seq no = " + sequenceNr + " expected = " + timeIndex);
         }
 
-        if (logger.isTraceEnabled()) {
+        if (LOGGER.isTraceEnabled()) {
             for (int channel = 1; channel < nrChannels; channel++) {
                 if (nrValidSamplesIn[channel] != integrationTime) {
-                    logger.trace("WARNING, DATA WAS FLAGGED, sequenceNr = " + sequenceNr + ", baseline = " + baseline
+                    LOGGER.trace("WARNING, DATA WAS FLAGGED, sequenceNr = " + sequenceNr + ", baseline = " + baseline
                             + ", channel = " + channel + ", samples is only " + nrValidSamplesIn[channel] + ", expected "
                             + integrationTime);
                 }
@@ -232,7 +226,7 @@ public final class VisibilityData extends DataProvider {
                 throw new RuntimeException("illegal flagger selected: " + getFlaggerType());
             }
         }
-        logger.info("Selected " + getFlaggerType().getClass().getName());
+        LOGGER.info("Selected " + getFlaggerType().getClass().getName());
 
         for (int time = 0; time < nrSeconds; time++) {
             for (int subband = 0; subband < nrSubbands; subband++) {
@@ -241,30 +235,37 @@ public final class VisibilityData extends DataProvider {
         }
 
         final long end = System.currentTimeMillis();
-        logger.info("Flagging with " + getFlaggerType() + ", sensitivity " + getFlaggerSensitivity() + " took " + (end - start)
+        LOGGER.info("Flagging with " + getFlaggerType() + ", sensitivity " + getFlaggerSensitivity() + " took " + (end - start)
                 + " ms.");
     }
 
-    public int getNrFrequencies() {
+    @Override
+    public int getNrChannels() {
         if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
-            return nrSubbands * (nrChannels - 1);
+            return nrChannels - 1;
         } else {
-            return nrSubbands * nrChannels;
+            return 1;
+        }
+    }
+
+    private int getSubbandIndex(int frequency) {
+        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
+            return frequency / (nrChannels - 1);
+        } else {
+            return frequency / nrChannels;
+        }
+    }
+
+    private int getChannelIndex(int frequency) {
+        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
+            return frequency % (nrChannels - 1) + 1;
+        } else {
+            return frequency % nrChannels;
         }
     }
 
     public float getPower(final int time, final int frequency) {
-        int subband;
-        int channel;
-        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
-            subband = frequency / (nrChannels - 1);
-            channel = frequency % (nrChannels - 1) + 1;
-        } else {
-            subband = frequency / nrChannels;
-            channel = frequency % nrChannels;
-        }
-
-        return powers[time][subband][channel][pol];
+        return powers[time][getSubbandIndex(frequency)][getChannelIndex(frequency)][pol];
     }
 
     @Override
@@ -272,38 +273,18 @@ public final class VisibilityData extends DataProvider {
         if (flagged == null) {
             return false;
         }
-
-        int subband;
-        int channel;
-        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
-            subband = frequency / (nrChannels - 1);
-            channel = frequency % (nrChannels - 1) + 1;
-        } else {
-            subband = frequency / nrChannels;
-            channel = frequency % nrChannels;
-        }
-
-        return flagged[time][subband][channel];
+        return flagged[time][getSubbandIndex(frequency)][getChannelIndex(frequency)];
     }
 
     public int getNrValidSamples(final int time, final int frequency) {
-        int subband;
-        int channel;
-        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
-            subband = frequency / (nrChannels - 1);
-            channel = frequency % (nrChannels - 1) + 1;
-        } else {
-            subband = frequency / nrChannels;
-            channel = frequency % nrChannels;
-        }
-
-        return nrValidSamples[time][subband][channel];
+        return nrValidSamples[time][getSubbandIndex(frequency)][getChannelIndex(frequency)];
     }
 
     public String getSummaryString(final int pol1) {
         return "TODO";
     }
 
+    @Override
     public int getNrSubbands() {
         return nrSubbands;
     }
@@ -319,7 +300,15 @@ public final class VisibilityData extends DataProvider {
 
     @Override
     public int getSizeY() {
-        return getNrFrequencies();
+        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
+            return nrSubbands * (nrChannels - 1);
+        } else {
+            return nrSubbands * nrChannels;
+        }
+    }
+
+    public float[][][][] getData() {
+        return powers;
     }
 
     @Override
@@ -353,7 +342,7 @@ public final class VisibilityData extends DataProvider {
         try {
             read();
         } catch (IOException e) {
-            logger.error("" + e);
+            LOGGER.error("" + e);
             throw new RuntimeException(e);
         }
         return this.station1;
@@ -370,7 +359,7 @@ public final class VisibilityData extends DataProvider {
         try {
             read();
         } catch (IOException e) {
-            logger.error("" + e);
+            LOGGER.error("" + e);
             throw new RuntimeException(e);
         }
         return this.station2;
@@ -403,7 +392,7 @@ public final class VisibilityData extends DataProvider {
         } else if (polString.equals("YY")) {
             return 3;
         } else {
-            logger.warn("illegal polarization: " + polString);
+            LOGGER.warn("illegal polarization: " + polString);
             return 0;
         }
     }

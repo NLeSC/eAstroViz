@@ -26,18 +26,20 @@ import org.slf4j.LoggerFactory;
 public final class BeamFormedData extends DataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(BeamFormedData.class);
 
-    static final boolean COLLAPSE_DEDISPERSED_DATA = false;
-    static final int NR_PERIODS_IN_FOLD = 1;
-    static final boolean CORRECT_ANTENNA_BANDPASS = false;
+    public static final boolean REMOVE_CHANNEL_0_FROM_VIEW = true;
+
+    public static final boolean COLLAPSE_DEDISPERSED_DATA = false;
+    public static final int NR_PERIODS_IN_FOLD = 1;
+    public static final boolean CORRECT_ANTENNA_BANDPASS = false;
 
     private float[][][] data; // [second][subband][channel]
     private boolean[][][] flagged;
 
     private int nrStokes;
     private int nrChannels;
-    private int nrSamples;
     private int nrSubbands;
     private int nrStations;
+    private int totalNrSamples;
     private double totalIntegrationTime;
     private int bitsPerSample;
     private double clockFrequency;
@@ -46,8 +48,8 @@ public final class BeamFormedData extends DataProvider {
     private double minFrequency;
     private double maxFrequency;
 
-    private int nrSamplesPerSecond;
-    private int nrSeconds;
+    private int nrSamplesPerTimeStep;
+    private int nrTimes;
 
     private float maxVal = -10000000.0f;
     private float minVal = 1.0E20f;
@@ -89,20 +91,19 @@ public final class BeamFormedData extends DataProvider {
     public void read() {
         readMetaData();
 
-        totalIntegrationTime *= zoomFactor;
-        nrSamplesPerSecond = (int) (nrSamples / totalIntegrationTime);
-        nrSeconds = (int) totalIntegrationTime;
-        if (getMaxSequenceNr() < nrSeconds) {
-            nrSeconds = getMaxSequenceNr();
+        nrSamplesPerTimeStep = (int) (totalNrSamples / (totalIntegrationTime * zoomFactor));
+        nrTimes = (int) (totalIntegrationTime * zoomFactor);
+        if (getMaxSequenceNr() < nrTimes) {
+            nrTimes = getMaxSequenceNr();
         }
 
-        LOGGER.info("nrSeconds = " + nrSeconds + ", nrSamplesPerSecond = " + nrSamplesPerSecond);
+        LOGGER.info("nrSeconds = " + nrTimes + ", nrSamplesPerSecond = " + nrSamplesPerTimeStep);
 
-        data = new float[nrSeconds][nrSubbands][nrChannels];
-        flagged = new boolean[nrSeconds][nrSubbands][nrChannels];
+        data = new float[nrTimes][nrSubbands][nrChannels];
+        flagged = new boolean[nrTimes][nrSubbands][nrChannels];
         int second = 0;
 
-        final ByteBuffer bb = ByteBuffer.allocateDirect(nrSamplesPerSecond * nrSubbands * nrChannels * 4);
+        final ByteBuffer bb = ByteBuffer.allocateDirect(nrSamplesPerTimeStep * nrSubbands * nrChannels * 4);
         bb.order(ByteOrder.LITTLE_ENDIAN);
         final FloatBuffer fb = bb.asFloatBuffer();
 
@@ -116,11 +117,11 @@ public final class BeamFormedData extends DataProvider {
 
             // boost::extents[nrSamples | 2][nrSubbands][nrChannels] 
             // the | 2 extra samples are not written to disk, only kept in memory!
-            for (second = 0; second < nrSeconds; second++) {
+            for (second = 0; second < nrTimes; second++) {
                 if (second > getMaxSequenceNr()) {
                     break;
                 }
-                final double size = (nrSamplesPerSecond * nrSubbands * nrChannels * 4) / (1024.0 * 1024.0);
+                final double size = (nrSamplesPerTimeStep * nrSubbands * nrChannels * 4) / (1024.0 * 1024.0);
                 LOGGER.debug("reading second " + second + ", size = " + size + " MB");
                 final long start = System.currentTimeMillis();
 
@@ -128,11 +129,11 @@ public final class BeamFormedData extends DataProvider {
                 fb.rewind();
                 final int res = ch.read(bb);
                 if (res < 0) {
-                    nrSeconds = second;
+                    nrTimes = second;
                     break;
                 }
 
-                for (int sample = 0; sample < nrSamplesPerSecond; sample++) {
+                for (int sample = 0; sample < nrSamplesPerTimeStep; sample++) {
                     for (int subband = 0; subband < nrSubbands; subband++) {
                         for (int channel = 0; channel < nrChannels; channel++) {
                             final float val = fb.get();
@@ -148,7 +149,7 @@ public final class BeamFormedData extends DataProvider {
                 LOGGER.debug("read rook " + time + " s, speed = " + speed + " MB/s, min = " + minVal + ", max = " + maxVal);
             }
         } catch (final IOException e) {
-            nrSeconds = second; // oops, we read less data...
+            nrTimes = second; // oops, we read less data...
         } finally {
             if (fin != null) {
                 try {
@@ -172,7 +173,7 @@ public final class BeamFormedData extends DataProvider {
             }
             LOGGER.info("END correction");
 
-            for (int s = 0; s < nrSeconds; s++) {
+            for (int s = 0; s < nrTimes; s++) {
                 for (int subband = 0; subband < nrSubbands; subband++) {
                     for (int channel = 0; channel < nrChannels; channel++) {
                         float frequency = getStartFrequency(subband, channel);
@@ -254,8 +255,8 @@ public final class BeamFormedData extends DataProvider {
         final H5Group beam0 = (H5Group) l2.get(0);
         printAttributes(beam0);
 
-        nrSamples = getAttribute(beam0, "NOF_SAMPLES").getPrimitiveIntVal();
-        LOGGER.info("nrSamples = " + nrSamples);
+        totalNrSamples = getAttribute(beam0, "NOF_SAMPLES").getPrimitiveIntVal();
+        LOGGER.info("nrSamples = " + totalNrSamples);
 
         nrChannels = getAttribute(beam0, "CHANNELS_PER_SUBBAND").getPrimitiveIntVal();
         LOGGER.info("nrChannels = " + nrChannels);
@@ -328,7 +329,7 @@ public final class BeamFormedData extends DataProvider {
 
     private void calculateStatistics() {
         // calc min and max for scaling
-        for (int second = 0; second < nrSeconds; second++) {
+        for (int second = 0; second < nrTimes; second++) {
             for (int subband = 0; subband < nrSubbands; subband++) {
                 for (int channel = 0; channel < nrChannels; channel++) {
                     if (data[second][subband][channel] < minVal) {
@@ -522,33 +523,59 @@ public final class BeamFormedData extends DataProvider {
         return nrStokes;
     }
 
-    public int getNrChannels() {
-        return nrChannels;
-    }
-
+    @Override
     public int getNrSubbands() {
         return nrSubbands;
     }
 
     public int getNrSamples() {
-        return nrSamples;
+        return totalNrSamples;
     }
 
-    public int getNrSamplesPerSecond() {
-        return nrSamplesPerSecond;
+    public int getNrSamplesPerTimeStep() {
+        return nrSamplesPerTimeStep;
     }
 
     @Override
     public int getSizeX() {
-        if (getMaxSequenceNr() > 0 && getMaxSequenceNr() < nrSeconds) {
+        if (getMaxSequenceNr() > 0 && getMaxSequenceNr() < nrTimes) {
             return getMaxSequenceNr();
         }
-        return nrSeconds;
+        return nrTimes;
     }
 
     @Override
     public int getSizeY() {
-        return nrSubbands * nrChannels;
+        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
+            return nrSubbands * (nrChannels - 1);
+        } else {
+            return nrSubbands * nrChannels;
+        }
+    }
+    
+    @Override
+    public int getNrChannels() {
+        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
+            return nrChannels - 1;
+        } else {
+            return 1;
+        }
+    }
+
+    private int getSubbandIndex(int frequency) {
+        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
+            return frequency / (nrChannels - 1);
+        } else {
+            return frequency / nrChannels;
+        }
+    }
+
+    private int getChannelIndex(int frequency) {
+        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
+            return frequency % (nrChannels - 1) + 1;
+        } else {
+            return frequency % nrChannels;
+        }
     }
 
     @Override
@@ -558,9 +585,7 @@ public final class BeamFormedData extends DataProvider {
 
     @Override
     public float getRawValue(final int x, final int y) {
-        final int subband = y / nrChannels;
-        final int channel = y % nrChannels;
-        return data[x][subband][channel];
+        return data[x][getSubbandIndex(y)][getChannelIndex(y)];
     }
 
     @Override

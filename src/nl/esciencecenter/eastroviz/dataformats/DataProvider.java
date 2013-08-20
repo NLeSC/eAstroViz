@@ -2,7 +2,7 @@ package nl.esciencecenter.eastroviz.dataformats;
 
 /**
  * @author rob
- *
+ * 
  */
 public abstract class DataProvider {
 
@@ -24,11 +24,11 @@ public abstract class DataProvider {
             final String[] flaggerList) {
         this.fileName = fileName;
         this.maxSequenceNr = maxSequenceNr;
-        if(this.maxSequenceNr <= 0) {
+        if (this.maxSequenceNr <= 0) {
             this.maxSequenceNr = Integer.MAX_VALUE;
         }
         this.maxSubbands = maxSubbands;
-        if(this.maxSubbands <= 0) {
+        if (this.maxSubbands <= 0) {
             this.maxSubbands = Integer.MAX_VALUE;
         }
         this.polList = polList.clone();
@@ -46,6 +46,16 @@ public abstract class DataProvider {
      *         to them both, to the total number of frequency channels is returned (e.g., nrSubbands * nrChannels).
      */
     public abstract int getSizeY();
+
+    /**
+     * @return The number of frequenycy subbands in the data set.
+     */
+    public abstract int getNrSubbands();
+
+    /**
+     * @return the number of frequency channels per subband.
+     */
+    public abstract int getNrChannels();
 
     /**
      * @param x
@@ -87,7 +97,9 @@ public abstract class DataProvider {
 
     /**
      * Set the current flagger to a new flagger type.
-     * @param name the name of the flagger. For a list of valid names, see getFlaggerNames().
+     * 
+     * @param name
+     *            the name of the flagger. For a list of valid names, see getFlaggerNames().
      */
     public void setFlagger(final String name) {
         if (name.equals(flaggerType)) {
@@ -113,10 +125,6 @@ public abstract class DataProvider {
         return flaggerList;
     }
 
-    public String[] getPolarizationNames() {
-        return polList;
-    }
-
     public float getFlaggerSensitivity() {
         return flaggerSensitivity;
     }
@@ -127,6 +135,10 @@ public abstract class DataProvider {
         }
         this.flaggerSensitivity = flaggerSensitivity;
         flag();
+    }
+
+    public String[] getPolarizationNames() {
+        return polList;
     }
 
     public final String getFileName() {
@@ -141,10 +153,28 @@ public abstract class DataProvider {
         return maxSubbands;
     }
 
+    public abstract int getStation1();
+
+    public abstract int setStation1(int station1);
+
+    public abstract int getStation2();
+
+    public abstract int setStation2(int station2);
+
+    public abstract int getPolarization();
+
+    public abstract int setPolarization(int newValue);
+
+    public abstract String polarizationToString(final int pol);
+
+    public abstract int StringToPolarization(final String polString);
+
     /**
-     * This is a utility function that takes an array of values (floats), and scales them, so all values are between 0 and 1.
-     * The scaling is done in-place.
-     * @param in the array that should be scaled.
+     * This is a utility function that takes an array of values (floats), and scales them, so all values are between 0 and 1. The
+     * scaling is done in-place.
+     * 
+     * @param in
+     *            the array that should be scaled.
      */
     public static final void scale(final float[] in) {
         float max = -10000000.0f;
@@ -164,17 +194,18 @@ public abstract class DataProvider {
     }
 
     /**
-     * This is a utility function that takes an array of values (floats), and scales them, so all values are between 0 and 1.
-     * The scaling is done in-place.
-     * @param in the array that should be scaled.
+     * This is a utility function that takes an array of values (floats), and scales them, so all values are between 0 and 1. The
+     * scaling is done in-place.
+     * 
+     * @param in
+     *            the array that should be scaled.
      */
     public static final void scale(final float[][] in) {
         float max = -10000000.0f;
         float min = 1.0E20f;
 
         for (float[] element2 : in) {
-            for (int x = 0; x < element2.length; x++) {
-                float element = element2[x];
+            for (float element : element2) {
                 if (element < min) {
                     min = element;
                 }
@@ -190,22 +221,6 @@ public abstract class DataProvider {
             }
         }
     }
-
-    public abstract int getStation1();
-
-    public abstract int setStation1(int station1);
-
-    public abstract int getStation2();
-
-    public abstract int setStation2(int station2);
-
-    public abstract int getPolarization();
-
-    public abstract int setPolarization(int newValue);
-
-    public abstract String polarizationToString(final int pol);
-
-    public abstract int StringToPolarization(final String polString);
 
     protected String getFlaggerType() {
         return flaggerType;

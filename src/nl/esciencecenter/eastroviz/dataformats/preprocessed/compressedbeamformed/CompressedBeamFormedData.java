@@ -186,10 +186,12 @@ public final class CompressedBeamFormedData extends DataProvider {
         return nrSubbands * nrChannels;
     }
 
+    @Override
     public final int getNrChannels() {
         return nrChannels;
     }
 
+    @Override
     public final int getNrSubbands() {
         return nrSubbands;
     }
