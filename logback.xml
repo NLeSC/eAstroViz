@@ -6,7 +6,7 @@
     <target>System.err</target>
   </appender>
 
-  <root level="warn">
+  <root level="debug">
     <appender-ref ref="STDERR" />
   </root>
 

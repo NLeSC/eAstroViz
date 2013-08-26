@@ -16,6 +16,7 @@
 package nl.esciencecenter.eastroviz.dataformats.beamformed;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 
 import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.Datatype;
@@ -115,7 +116,14 @@ public class Hdf5Attribute {
         if (isPrimitive()) {
             return (Array.get(a.getValue(), 0)).toString();
         } else {
-            return a.getValue().toString();
+            Object res = a.getValue();
+            if (res instanceof String[]) {
+                return Arrays.toString((String[]) res);
+            } else if (res instanceof int[]) {
+                    return Arrays.toString((int[]) res);
+            } else {
+                return res.toString();
+            }
         }
     }
 

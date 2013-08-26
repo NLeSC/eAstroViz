@@ -227,9 +227,9 @@ public final class BeamFormedData extends DataProvider {
 
         final H5Group root = (H5Group) ((javax.swing.tree.DefaultMutableTreeNode) fileFormat.getRootNode()).getUserObject();
         LOGGER.info("root object: " + root + " type is: " + root.getClass() + " full name = " + root.getFullName());
-        final java.util.List<HObject> l = root.getMemberList();
-        for (int i = 0; i < l.size(); i++) {
-            LOGGER.info("member " + i + " = " + l.get(i));
+        final java.util.List<HObject> rootMemberList = root.getMemberList();
+        for (int i = 0; i < rootMemberList.size(); i++) {
+            LOGGER.info("root member " + i + " = " + rootMemberList.get(i));
         }
         printAttributes(root);
 
@@ -257,19 +257,28 @@ public final class BeamFormedData extends DataProvider {
         LOGGER.info("max frequency = " + maxFrequency);
 
         // first member is pointing 0
-        final H5Group pointing0 = (H5Group) l.get(0);
-        LOGGER.info("-----");
+        final H5Group pointing0 = (H5Group) rootMemberList.get(0);
+        LOGGER.info("-- start pointing 0 --");
         printAttributes(pointing0);
-        LOGGER.info("-----");
+        LOGGER.info("-- end pointing 0 --");
 
         nrBeams = getAttribute(pointing0, "NOF_BEAMS").getPrimitiveIntVal();
         LOGGER.info("nrBeams = " + nrBeams);
 
         // first member of the pointing is beam 0
-        final java.util.List<HObject> l2 = pointing0.getMemberList();
-        final H5Group beam0 = (H5Group) l2.get(0);
+        final java.util.List<HObject> pointing0MemberList = pointing0.getMemberList();
+        for (int i = 0; i < pointing0MemberList.size(); i++) {
+            LOGGER.info("pointing 0 member " + i + " = " + pointing0MemberList.get(i));
+        }
+
+        final H5Group beam0 = (H5Group) pointing0MemberList.get(0);
         printAttributes(beam0);
 
+        final java.util.List<HObject> beam0MemberList = beam0.getMemberList();
+        for (int i = 0; i < beam0MemberList.size(); i++) {
+            LOGGER.info("beam 0 member " + i + " = " + beam0MemberList.get(i));
+        }
+        
         totalNrSamples = getAttribute(beam0, "NOF_SAMPLES").getPrimitiveIntVal();
         LOGGER.info("nrSamples = " + totalNrSamples);
 
@@ -298,11 +307,13 @@ public final class BeamFormedData extends DataProvider {
         }
 
         // Third member of the beam is the first stoke. First is "COORDINATES", 2nd = PROCESS_HISTORY
-        final java.util.List<HObject> l3 = beam0.getMemberList();
-        final H5ScalarDS stoke0 = (H5ScalarDS) l3.get(2);
-        printAttributes(stoke0);
+        final H5ScalarDS stokes0 = (H5ScalarDS) beam0MemberList.get(2);
+        
+        System.err.println("stokes0 = " + stokes0);
+        
+        printAttributes(stokes0);
 
-        final int[] nrChannelsArray = getAttribute(stoke0, "NOF_CHANNELS").get1DIntArrayVal();
+        final int[] nrChannelsArray = getAttribute(stokes0, "NOF_CHANNELS").get1DIntArrayVal();
         nrSubbands = nrChannelsArray.length;
         LOGGER.info("nrSubbands = " + nrSubbands);
     }
@@ -333,7 +344,7 @@ public final class BeamFormedData extends DataProvider {
             for (int i = 0; i < metaList.size(); i++) {
                 final Attribute a = metaList.get(i);
                 final Hdf5Attribute a2 = new Hdf5Attribute(a);
-                LOGGER.info("meta " + i + " = " + a.getName() + ", type = " + a.getType().getDatatypeDescription()
+                LOGGER.info("node: " + node.toString() + ": meta " + i + " = " + a.getName() + ", type = " + a.getType().getDatatypeDescription()
                         + ", nrDims = " + a.getRank() + ", size = " + a.getType().getDatatypeSize() + ", val = "
                         + a2.getValueString());
             }
