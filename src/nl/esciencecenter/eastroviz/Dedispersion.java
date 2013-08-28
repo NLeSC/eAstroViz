@@ -13,26 +13,36 @@ public class Dedispersion {
 
     private static int maximumShift;
 
-    public static int[] computeShifts(int nrSubbands, int nrChannels, float nrSamplesPerSecond, double lowFreq, double freqStep,
-            float dm) {
+    public static int[] computeShiftsInSamples(int nrSubbands, int nrChannels, double nrSamplesPerSecond, double lowFreq, double freqStep,
+            double dm) {
+        double[] shifts = computeShiftsInSeconds(nrSubbands, nrChannels, nrSamplesPerSecond, lowFreq, freqStep, dm);
+        int[] res = new int[shifts.length];
+        for(int i=0; i<res.length; i++) {
+            res[i] = (int) (shifts[i] * nrSamplesPerSecond);
+        }
+        return res;
+    }
+
+    public static double[] computeShiftsInSeconds(int nrSubbands, int nrChannels, double nrSamplesPerSecond, double lowFreq, double freqStep,
+            double dm) {
         int nrFrequencies = nrSubbands * nrChannels;
 
-        int[] shifts = new int[nrFrequencies];
+        double[] shifts = new double[nrFrequencies];
 
         double highFreq = (lowFreq + ((nrFrequencies - 1) * freqStep));
-        double inverseHighFreq = 1.0f / (highFreq * highFreq);
+        double inverseHighFreq = 1.0 / (highFreq * highFreq);
 
-        double kDM = 4148.808f * dm;
+        double kDM = 4148.808 * dm;
 
         for (int freq = 0; freq < nrFrequencies; freq++) {
-            double inverseFreq = 1.0f / ((lowFreq + (freq * freqStep)) * (lowFreq + (freq * freqStep)));
+            double inverseFreq = 1.0 / ((lowFreq + (freq * freqStep)) * (lowFreq + (freq * freqStep)));
             double delta = kDM * (inverseFreq - inverseHighFreq);
-            shifts[freq] = (int) (delta * nrSamplesPerSecond);
+            shifts[freq] = delta;
             LOGGER.debug("inverseFreq = " + inverseFreq + ", delta = " + delta + ", shift = " + shifts[freq]);
         }
         return shifts;
     }
-
+    
     public static void dedisperse(float[][][] data, boolean[][][] flagged, float nrSamplesPerSecond, double lowFreq,
             double freqStep, float dm) {
         int nrTimes = data.length;
@@ -40,7 +50,7 @@ public class Dedispersion {
         int nrChannels = data[0][0].length;
         int nrFrequencies = nrSubbands * nrChannels;
 
-        int[] shifts = computeShifts(nrSubbands, nrChannels, nrSamplesPerSecond, lowFreq, freqStep, dm);
+        int[] shifts = computeShiftsInSamples(nrSubbands, nrChannels, nrSamplesPerSecond, lowFreq, freqStep, dm);
         maximumShift = 0;
         for (int shift : shifts) {
             if (shift > maximumShift) {

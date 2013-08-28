@@ -27,64 +27,33 @@ public final class BeamFormedData extends DataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(BeamFormedData.class);
 
     public static final boolean REMOVE_CHANNEL_0_FROM_VIEW = true;
-
     public static final boolean CORRECT_ANTENNA_BANDPASS = false;
 
     private float[][][] data; // [second][subband][channel]
     private boolean[][][] initialFlagged; // [second][subband][channel]
 
-    private int nrStokes;
-    private int nrSubbands;
-    private int nrChannels;
-    private int nrStations;
-    private int totalNrSamples;
-    private int bitsPerSample;
-    private double clockFrequency;
-    private int nrBeams;
-    private int nrSamplesPerTimeStep;
-    private double minFrequency;
-    private double maxFrequency;
-    private int nrTimes;
-    private double totalIntegrationTime; // in seconds
+    private final int zoomFactor;
+    private BeamFormedMetaData m;
+
     private float maxVal = -10000000.0f;
     private float minVal = 1.0E20f;
-    private double subbandWidth; // MHz
-    private double channelWidth; // MHz
-    private double beamCenterFrequency; // MHz
-    private final int zoomFactor;
 
     private int stoke = 0;
 
-    public BeamFormedData(final String fileName, final int maxSequenceNr, final int maxSubbands, float[][][] data,
-            boolean[][][] initialFlagged, int nrStokes, int nrSubbands, int nrChannels, int nrStations, int totalNrSamples,
-            int bitsPerSample, double clockFrequency, int nrBeams, int nrSamplesPerTimeStep, double minFrequency,
-            double maxFrequency, int nrTimes, double totalIntegrationTime, float maxVal, float minVal, double subbandWidth,
-            double channelWidth, double beamCenterFrequency, int zoomFactor) {
+    public BeamFormedData(final String fileName, final int maxSequenceNr, final int maxSubbands, int zoomFactor,
+            float[][][] data, boolean[][][] initialFlagged, BeamFormedMetaData m) {
 
         super();
         init(fileName, maxSequenceNr, maxSubbands, new String[] { "I" }, new String[] { "none" });
 
         this.data = data;
         this.initialFlagged = initialFlagged;
-        this.nrStokes = nrStokes;
-        this.nrSubbands = nrSubbands;
-        this.nrChannels = nrChannels;
-        this.nrStations = nrStations;
-        this.totalNrSamples = totalNrSamples;
-        this.bitsPerSample = bitsPerSample;
-        this.clockFrequency = clockFrequency;
-        this.nrBeams = nrBeams;
-        this.nrSamplesPerTimeStep = nrSamplesPerTimeStep;
-        this.minFrequency = minFrequency;
-        this.maxFrequency = maxFrequency;
-        this.nrTimes = nrTimes;
-        this.totalIntegrationTime = totalIntegrationTime;
-        this.maxVal = maxVal;
-        this.minVal = minVal;
-        this.subbandWidth = subbandWidth;
-        this.channelWidth = channelWidth;
-        this.beamCenterFrequency = beamCenterFrequency;
         this.zoomFactor = zoomFactor;
+        this.m = m;
+
+        if (data == null || initialFlagged == null) {
+            return;
+        }
 
         if (CORRECT_ANTENNA_BANDPASS) {
             correctBandPass();
@@ -96,9 +65,9 @@ public final class BeamFormedData extends DataProvider {
     private void correctBandPass() {
         AntennaBandpass bandPass = new AntennaBandpass();
 
-        for (int s = 0; s < nrTimes; s++) {
-            for (int subband = 0; subband < nrSubbands; subband++) {
-                for (int channel = 0; channel < nrChannels; channel++) {
+        for (int s = 0; s < m.nrTimes; s++) {
+            for (int subband = 0; subband < m.nrSubbands; subband++) {
+                for (int channel = 0; channel < m.nrChannels; channel++) {
                     double frequency = getStartFrequency(subband, channel);
                     double correctionFactor = bandPass.getBandPassCorrectionFactor(AntennaType.HBA_LOW, frequency);
                     data[s][subband][channel] *= correctionFactor;
@@ -111,9 +80,9 @@ public final class BeamFormedData extends DataProvider {
         long initialFlaggedCount = 0;
 
         // calc min and max for scaling
-        for (int second = 0; second < nrTimes; second++) {
-            for (int subband = 0; subband < nrSubbands; subband++) {
-                for (int channel = 0; channel < nrChannels; channel++) {
+        for (int second = 0; second < m.nrTimes; second++) {
+            for (int subband = 0; subband < m.nrSubbands; subband++) {
+                for (int channel = 0; channel < m.nrChannels; channel++) {
                     if (initialFlagged[second][subband][channel]) {
                         initialFlaggedCount++;
                     } else {
@@ -128,14 +97,14 @@ public final class BeamFormedData extends DataProvider {
             }
         }
 
-        long nrSamples = nrTimes * nrSubbands * nrChannels;
+        long nrSamples = m.nrTimes * m.nrSubbands * m.nrChannels;
         float percent = ((float) initialFlaggedCount / nrSamples) * 100.0f;
 
         LOGGER.info("samples already flagged in data set: " + initialFlaggedCount + "(" + percent + "%)");
     }
 
     public void dedisperse(float dm) {
-        Dedispersion.dedisperse(data, initialFlagged, zoomFactor, minFrequency, channelWidth, dm);
+        Dedispersion.dedisperse(data, initialFlagged, zoomFactor, m.minFrequency, m.channelWidth, dm);
         calculateStatistics();
     }
 
@@ -144,46 +113,62 @@ public final class BeamFormedData extends DataProvider {
     }
 
     public double getStartFrequency(int subband, int channel) {
-        double startFreq = beamCenterFrequency - Math.floor(nrSubbands / 2.0) * subbandWidth;
-        return startFreq + subband * subbandWidth + channel * channelWidth;
+        double startFreq = m.beamCenterFrequency - Math.floor(m.nrSubbands / 2.0) * m.subbandWidth;
+        return startFreq + subband * m.subbandWidth + channel * m.channelWidth;
     }
 
     public int getNrStokes() {
-        return nrStokes;
+        return m.nrStokes;
     }
 
     @Override
     public int getNrSubbands() {
-        return nrSubbands;
+        return m.nrSubbands;
     }
 
     public int getNrSamples() {
-        return totalNrSamples;
+        return m.totalNrSamples;
     }
 
     @Override
     public int getSizeX() {
-        if (getMaxSequenceNr() > 0 && getMaxSequenceNr() < nrTimes) {
+        if (getMaxSequenceNr() > 0 && getMaxSequenceNr() < m.nrTimes) {
             return getMaxSequenceNr();
         }
-        return nrTimes;
+        return m.nrTimes;
     }
 
     @Override
     public int getSizeY() {
-        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
-            return nrSubbands * (nrChannels - 1);
+        if (REMOVE_CHANNEL_0_FROM_VIEW && m.nrChannels > 1) {
+            return m.nrSubbands * (m.nrChannels - 1);
         } else {
-            return nrSubbands * nrChannels;
+            return m.nrSubbands * m.nrChannels;
         }
     }
 
     @Override
     public int getNrChannels() {
-        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
-            return nrChannels - 1;
+        if (REMOVE_CHANNEL_0_FROM_VIEW && m.nrChannels > 1) {
+            return m.nrChannels - 1;
         } else {
             return 1;
+        }
+    }
+
+    private int getSubbandIndex(int frequency) {
+        if (REMOVE_CHANNEL_0_FROM_VIEW && m.nrChannels > 1) {
+            return frequency / (m.nrChannels - 1);
+        } else {
+            return frequency / m.nrChannels;
+        }
+    }
+
+    private int getChannelIndex(int frequency) {
+        if (REMOVE_CHANNEL_0_FROM_VIEW && m.nrChannels > 1) {
+            return frequency % (m.nrChannels - 1) + 1;
+        } else {
+            return frequency % m.nrChannels;
         }
     }
 
@@ -212,15 +197,15 @@ public final class BeamFormedData extends DataProvider {
     }
 
     public double getSubbandWidth() {
-        return subbandWidth;
+        return m.subbandWidth;
     }
 
     public double getChannelWidth() {
-        return channelWidth;
+        return m.channelWidth;
     }
 
     public double getBeamCenterFrequency() {
-        return beamCenterFrequency;
+        return m.beamCenterFrequency;
     }
 
     @Override
@@ -274,31 +259,31 @@ public final class BeamFormedData extends DataProvider {
     }
 
     public int getNrStations() {
-        return nrStations;
+        return m.nrStations;
     }
 
     public int getBitsPerSample() {
-        return bitsPerSample;
+        return m.bitsPerSample;
     }
 
     public double getClockFrequency() {
-        return clockFrequency;
+        return m.clockFrequency;
     }
 
     public int getNrBeams() {
-        return nrBeams;
+        return m.nrBeams;
     }
 
     public double getMinFrequency() {
-        return minFrequency;
+        return m.minFrequency;
     }
 
     public double getMaxFrequency() {
-        return maxFrequency;
+        return m.maxFrequency;
     }
 
     public int getNrSamplesPerTimeStep() {
-        return nrSamplesPerTimeStep;
+        return m.nrSamplesPerTimeStep;
     }
 
     public int getZoomFactor() {
@@ -306,22 +291,6 @@ public final class BeamFormedData extends DataProvider {
     }
 
     public double getTotalIntegrationTime() {
-        return totalIntegrationTime;
-    }
-
-    private int getSubbandIndex(int frequency) {
-        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
-            return frequency / (nrChannels - 1);
-        } else {
-            return frequency / nrChannels;
-        }
-    }
-
-    private int getChannelIndex(int frequency) {
-        if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
-            return frequency % (nrChannels - 1) + 1;
-        } else {
-            return frequency % nrChannels;
-        }
+        return m.totalIntegrationTime;
     }
 }

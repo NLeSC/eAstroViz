@@ -31,24 +31,7 @@ public class BeamFormedDataReader {
     final int maxSubbands;
     final int zoomFactor;
 
-    private int nrStokes;
-    private int nrSubbands;
-    private int nrChannels;
-    private int nrStations;
-    private int totalNrSamples;
-    private int bitsPerSample;
-    private double clockFrequency;
-    private int nrBeams;
-    private int nrSamplesPerTimeStep;
-    private double minFrequency;
-    private double maxFrequency;
-    private int nrTimes;
-    private double totalIntegrationTime; // in seconds
-    private float maxVal = -10000000.0f;
-    private float minVal = 1.0E20f;
-    private double subbandWidth; // MHz
-    private double channelWidth; // MHz
-    private double beamCenterFrequency; // MHz
+    BeamFormedMetaData m = new BeamFormedMetaData();
 
     public BeamFormedDataReader(final String fileName, final int maxSequenceNr, final int maxSubbands, final int zoomFactor) {
         this.fileName = fileName;
@@ -71,7 +54,7 @@ public class BeamFormedDataReader {
         LOGGER.info("hdf5 file = " + hdf5FileName + ", raw file = " + rawFileName);
     }
 
-    private void readMetaData() {
+    public BeamFormedMetaData readMetaData() {
         // retrieve an instance of H5File
         final FileFormat fileFormat1 = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF5);
         if (fileFormat1 == null) {
@@ -106,23 +89,23 @@ public class BeamFormedDataReader {
             throw new RuntimeException("file type is not bf!");
         }
 
-        nrStations = getAttribute(root, "OBSERVATION_NOF_STATIONS").getPrimitiveIntVal();
-        LOGGER.info("nrStations = " + nrStations);
+        m.nrStations = getAttribute(root, "OBSERVATION_NOF_STATIONS").getPrimitiveIntVal();
+        LOGGER.info("nrStations = " + m.nrStations);
 
-        totalIntegrationTime = getAttribute(root, "TOTAL_INTEGRATION_TIME").getPrimitiveDoubleVal();
-        LOGGER.info("total integration time = " + totalIntegrationTime);
+        m.totalIntegrationTime = getAttribute(root, "TOTAL_INTEGRATION_TIME").getPrimitiveDoubleVal();
+        LOGGER.info("total integration time = " + m.totalIntegrationTime);
 
-        bitsPerSample = getAttribute(root, "OBSERVATION_NOF_BITS_PER_SAMPLE").getPrimitiveIntVal();
-        LOGGER.info("bits per sample = " + bitsPerSample);
+        m.bitsPerSample = getAttribute(root, "OBSERVATION_NOF_BITS_PER_SAMPLE").getPrimitiveIntVal();
+        LOGGER.info("bits per sample = " + m.bitsPerSample);
 
-        clockFrequency = getAttribute(root, "CLOCK_FREQUENCY").getPrimitiveDoubleVal();
-        LOGGER.info("clock frequency = " + clockFrequency + " MHz");
+        m.clockFrequency = getAttribute(root, "CLOCK_FREQUENCY").getPrimitiveDoubleVal();
+        LOGGER.info("clock frequency = " + m.clockFrequency + " MHz");
 
-        minFrequency = getAttribute(root, "OBSERVATION_FREQUENCY_MIN").getPrimitiveDoubleVal();
-        LOGGER.info("min frequency = " + minFrequency);
+        m.minFrequency = getAttribute(root, "OBSERVATION_FREQUENCY_MIN").getPrimitiveDoubleVal();
+        LOGGER.info("min frequency = " + m.minFrequency);
 
-        maxFrequency = getAttribute(root, "OBSERVATION_FREQUENCY_MAX").getPrimitiveDoubleVal();
-        LOGGER.info("max frequency = " + maxFrequency);
+        m.maxFrequency = getAttribute(root, "OBSERVATION_FREQUENCY_MAX").getPrimitiveDoubleVal();
+        LOGGER.info("max frequency = " + m.maxFrequency);
 
         // first member is pointing 0
         final H5Group pointing0 = (H5Group) rootMemberList.get(0);
@@ -130,8 +113,8 @@ public class BeamFormedDataReader {
         printAttributes(pointing0);
         LOGGER.info("-- end pointing 0 --");
 
-        nrBeams = getAttribute(pointing0, "NOF_BEAMS").getPrimitiveIntVal();
-        LOGGER.info("nrBeams = " + nrBeams);
+        m.nrBeams = getAttribute(pointing0, "NOF_BEAMS").getPrimitiveIntVal();
+        LOGGER.info("nrBeams = " + m.nrBeams);
 
         // first member of the pointing is beam 0
         final java.util.List<HObject> pointing0MemberList = pointing0.getMemberList();
@@ -147,23 +130,23 @@ public class BeamFormedDataReader {
             LOGGER.info("beam 0 member " + i + " = " + beam0MemberList.get(i));
         }
 
-        totalNrSamples = getAttribute(beam0, "NOF_SAMPLES").getPrimitiveIntVal();
-        LOGGER.info("totalNrSamples = " + totalNrSamples);
+        m.totalNrSamples = getAttribute(beam0, "NOF_SAMPLES").getPrimitiveIntVal();
+        LOGGER.info("totalNrSamples = " + m.totalNrSamples);
 
-        nrChannels = getAttribute(beam0, "CHANNELS_PER_SUBBAND").getPrimitiveIntVal();
-        LOGGER.info("nrChannels = " + nrChannels);
+        m.nrChannels = getAttribute(beam0, "CHANNELS_PER_SUBBAND").getPrimitiveIntVal();
+        LOGGER.info("nrChannels = " + m.nrChannels);
 
-        nrStokes = getAttribute(beam0, "NOF_STOKES").getPrimitiveIntVal();
-        LOGGER.info("nrStokes = " + nrStokes);
-        if (nrStokes != 1) {
+        m.nrStokes = getAttribute(beam0, "NOF_STOKES").getPrimitiveIntVal();
+        LOGGER.info("nrStokes = " + m.nrStokes);
+        if (m.nrStokes != 1) {
             throw new UnsupportedOperationException("only 1 stoke supported for now.");
         }
 
-        subbandWidth = getAttribute(beam0, "SUBBAND_WIDTH").getPrimitiveDoubleVal() / 1000000.0f;
-        channelWidth = getAttribute(beam0, "CHANNEL_WIDTH").getPrimitiveDoubleVal() / 1000000.0f;
-        beamCenterFrequency = getAttribute(beam0, "BEAM_FREQUENCY_CENTER").getPrimitiveDoubleVal();
-        LOGGER.info("subbandWidth = " + subbandWidth + ", channelWidth = " + channelWidth + ", beam center frequency = "
-                + beamCenterFrequency);
+        m.subbandWidth = getAttribute(beam0, "SUBBAND_WIDTH").getPrimitiveDoubleVal() / 1000000.0f;
+        m.channelWidth = getAttribute(beam0, "CHANNEL_WIDTH").getPrimitiveDoubleVal() / 1000000.0f;
+        m.beamCenterFrequency = getAttribute(beam0, "BEAM_FREQUENCY_CENTER").getPrimitiveDoubleVal();
+        LOGGER.info("subbandWidth = " + m.subbandWidth + ", channelWidth = " + m.channelWidth + ", beam center frequency = "
+                + m.beamCenterFrequency);
 
         final String stokesComponents = getAttribute(beam0, "STOKES_COMPONENTS").getPrimitiveStringVal();
         LOGGER.info("Stokes components = " + stokesComponents);
@@ -173,32 +156,49 @@ public class BeamFormedDataReader {
 
         // Third member of the beam is the first stoke. First is "COORDINATES", 2nd = PROCESS_HISTORY
         final H5ScalarDS stokes0 = (H5ScalarDS) beam0MemberList.get(2);
-
-        System.err.println("stokes0 = " + stokes0);
-
         printAttributes(stokes0);
 
         final int[] nrChannelsArray = getAttribute(stokes0, "NOF_CHANNELS").get1DIntArrayVal();
-        nrSubbands = nrChannelsArray.length;
-        LOGGER.info("nrSubbands = " + nrSubbands);
+        m.nrSubbands = nrChannelsArray.length;
+        LOGGER.info("nrSubbands = " + m.nrSubbands);
 
-        nrSamplesPerTimeStep = (int) (totalNrSamples / (totalIntegrationTime * zoomFactor));
 
-        nrTimes = (int) (totalIntegrationTime * zoomFactor);
-        if (maxSequenceNr < nrTimes) {
-            nrTimes = maxSequenceNr;
+        if (zoomFactor >= 1) {
+            m.nrTimes = (int) (m.totalIntegrationTime * zoomFactor);
+            m.nrSamplesPerTimeStep = (int) (m.totalNrSamples / (m.totalIntegrationTime * zoomFactor));
+        } else {
+            // full resolution
+            m.nrTimes = m.totalNrSamples;
+            m.nrSamplesPerTimeStep = (int) (m.totalNrSamples / m.totalIntegrationTime);
         }
-        LOGGER.info("nrSeconds = " + nrTimes + ", nrSamplesPerTimeStep = " + nrSamplesPerTimeStep);
+        if (maxSequenceNr < m.nrTimes) {
+            m.nrTimes = maxSequenceNr;
+        }
+        LOGGER.info("nrSeconds = " + m.nrTimes + ", nrSamplesPerTimeStep = " + m.nrSamplesPerTimeStep);
+
+        return m;
     }
 
     public BeamFormedData read() {
-        readMetaData();
+        return read(null, null);
+    }
 
-        float[][][] samples = new float[nrTimes][nrSubbands][nrChannels];
-        boolean[][][] initialFlagged = new boolean[nrTimes][nrSubbands][nrChannels];
+    public BeamFormedData read(BeamFormedMetaData m, BeamFormedSampleHandler handler) {
+        if (m == null) {
+            m = readMetaData();
+        }
+
+        float[][][] samples = null;
+        boolean[][][] initialFlagged = null;
+
+        if (handler == null) {
+            samples = new float[m.nrTimes][m.nrSubbands][m.nrChannels];
+            initialFlagged = new boolean[m.nrTimes][m.nrSubbands][m.nrChannels];
+        }
+
         int second = 0;
 
-        final ByteBuffer bb = ByteBuffer.allocateDirect(nrSamplesPerTimeStep * nrSubbands * nrChannels * 4);
+        final ByteBuffer bb = ByteBuffer.allocateDirect(m.nrSamplesPerTimeStep * m.nrSubbands * m.nrChannels * 4);
         bb.order(ByteOrder.LITTLE_ENDIAN);
         final FloatBuffer fb = bb.asFloatBuffer();
 
@@ -212,11 +212,11 @@ public class BeamFormedDataReader {
 
             // boost::extents[nrSamples | 2][nrSubbands][nrChannels] 
             // the | 2 extra samples are not written to disk, only kept in memory!
-            for (second = 0; second < nrTimes; second++) {
+            for (second = 0; second < m.nrTimes; second++) {
                 if (second > maxSequenceNr) {
                     break;
                 }
-                final double size = (nrSamplesPerTimeStep * nrSubbands * nrChannels * 4) / (1024.0 * 1024.0);
+                final double size = (m.nrSamplesPerTimeStep * m.nrSubbands * m.nrChannels * 4) / (1024.0 * 1024.0);
                 LOGGER.debug("reading second " + second + ", size = " + size + " MB");
                 final long start = System.currentTimeMillis();
 
@@ -224,21 +224,26 @@ public class BeamFormedDataReader {
                 fb.rewind();
                 final int res = ch.read(bb);
                 if (res < 0) {
-                    nrTimes = second;
+                    m.nrTimes = second;
                     break;
                 }
 
-                for (int sample = 0; sample < nrSamplesPerTimeStep; sample++) {
-                    for (int subband = 0; subband < nrSubbands; subband++) {
-                        for (int channel = 0; channel < nrChannels; channel++) {
+                for (int sample = 0; sample < m.nrSamplesPerTimeStep; sample++) {
+                    for (int subband = 0; subband < m.nrSubbands; subband++) {
+                        for (int channel = 0; channel < m.nrChannels; channel++) {
                             final float val = fb.get();
-                            if (val <= 0.0f) {
-                                // we integrate; if one sample in the integration time was flagged, flag everything.
-                                initialFlagged[second][subband][channel] = true;
+                            if (handler != null) {
+                                handler.handleSample(second, sample, subband, channel, val);
+                            } else {
+                                if (!initialFlagged[second][subband][channel]) {
+                                    if (val <= 0.0f) {
+                                        // we integrate; if one sample in the integration time was flagged, flag everything.
+                                        initialFlagged[second][subband][channel] = true;
+                                    } else {
+                                        samples[second][subband][channel] += val;
+                                    }
+                                }
                             }
-                            samples[second][subband][channel] += val;
-                            //                            logger.info("sample at time " + sample + ", subband " + subband + ", channel " + channel + " = " + val);
-
                         }
                     }
                 }
@@ -248,7 +253,7 @@ public class BeamFormedDataReader {
                 LOGGER.debug("read rook " + time + " s, speed = " + speed + " MB/s");
             }
         } catch (final IOException e) {
-            nrTimes = second; // oops, we read less data...
+            m.nrTimes = second; // oops, we read less data...
         } finally {
             if (fin != null) {
                 try {
@@ -268,10 +273,7 @@ public class BeamFormedDataReader {
             }
         }
 
-        return new BeamFormedData(fileName, maxSequenceNr, maxSubbands, samples, initialFlagged, nrStokes, nrSubbands,
-                nrChannels, nrStations, totalNrSamples, bitsPerSample, clockFrequency, nrBeams, nrSamplesPerTimeStep,
-                minFrequency, maxFrequency, nrTimes, totalIntegrationTime, maxVal, minVal, subbandWidth, channelWidth,
-                beamCenterFrequency, zoomFactor);
+        return new BeamFormedData(fileName, maxSequenceNr, maxSubbands, zoomFactor, samples, initialFlagged, m);
     }
 
     @SuppressWarnings("unchecked")
