@@ -120,7 +120,7 @@ public class Hdf5Attribute {
             if (res instanceof String[]) {
                 return Arrays.toString((String[]) res);
             } else if (res instanceof int[]) {
-                    return Arrays.toString((int[]) res);
+                return Arrays.toString((int[]) res);
             } else {
                 return res.toString();
             }

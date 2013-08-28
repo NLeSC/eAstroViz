@@ -98,7 +98,7 @@ public final class VisibilityData extends DataProvider {
         int station2 = baselineToStation2(baseline);
         return baseline - station2 * (station2 + 1) / 2;
     }
-    
+
     public static int baselineToStation2(final int baseline) {
         return (int) (Math.sqrt(2 * baseline + .25f) - .5f);
     }
@@ -106,7 +106,7 @@ public final class VisibilityData extends DataProvider {
     public static boolean baselineIsAutoCorrelation(final int baseline) {
         return baselineToStation1(baseline) == baselineToStation2(baseline);
     }
-    
+
     public void read() throws IOException {
         for (int i = 0; i < nrSubbands; i++) {
             readSubband(i);

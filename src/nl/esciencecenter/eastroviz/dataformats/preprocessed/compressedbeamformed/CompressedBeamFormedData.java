@@ -26,7 +26,6 @@ import java.nio.channels.FileChannel;
 import nl.esciencecenter.eastroviz.Dedispersion;
 import nl.esciencecenter.eastroviz.dataformats.DataProvider;
 import nl.esciencecenter.eastroviz.dataformats.MinMaxVals;
-import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedData;
 import nl.esciencecenter.eastroviz.flaggers.BeamFormedFlagger;
 
 import org.slf4j.Logger;

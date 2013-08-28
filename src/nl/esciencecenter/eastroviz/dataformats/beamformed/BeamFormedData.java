@@ -53,14 +53,14 @@ public final class BeamFormedData extends DataProvider {
     private double beamCenterFrequency; // MHz
     private final int zoomFactor;
 
-
     private int stoke = 0;
 
-    public BeamFormedData(final String fileName, final int maxSequenceNr, final int maxSubbands, float[][][] data, boolean[][][] initialFlagged, int nrStokes, int nrSubbands, int nrChannels,
-            int nrStations, int totalNrSamples, int bitsPerSample, double clockFrequency, int nrBeams, int nrSamplesPerTimeStep,
-            double minFrequency, double maxFrequency, int nrTimes, double totalIntegrationTime, float maxVal, float minVal,
-            double subbandWidth, double channelWidth, double beamCenterFrequency, int zoomFactor) {
-        
+    public BeamFormedData(final String fileName, final int maxSequenceNr, final int maxSubbands, float[][][] data,
+            boolean[][][] initialFlagged, int nrStokes, int nrSubbands, int nrChannels, int nrStations, int totalNrSamples,
+            int bitsPerSample, double clockFrequency, int nrBeams, int nrSamplesPerTimeStep, double minFrequency,
+            double maxFrequency, int nrTimes, double totalIntegrationTime, float maxVal, float minVal, double subbandWidth,
+            double channelWidth, double beamCenterFrequency, int zoomFactor) {
+
         super();
         init(fileName, maxSequenceNr, maxSubbands, new String[] { "I" }, new String[] { "none" });
 

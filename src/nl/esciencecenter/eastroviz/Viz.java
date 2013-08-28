@@ -106,7 +106,7 @@ public final class Viz {
         final int station = 0;
 
         if (beamFormed) {
-            final BeamFormedDataReader reader = 
+            final BeamFormedDataReader reader =
                     new BeamFormedDataReader(fileName, maxSequenceNr, maxSubbands, integrationFactor /* really the zoom factor in this case*/);
             BeamFormedData beamFormedData = reader.read();
             final BeamFormedFrame beamFormedFrame = new BeamFormedFrame(beamFormedData);
