@@ -48,7 +48,8 @@ public final class BeamFormedData extends DataProvider {
     public static final boolean CORRECT_ANTENNA_BANDPASS = false;
 
     private float[][][] data; // [second][subband][channel]
-    private boolean[][][] flagged;
+    private boolean[][][] flagged; // [second][subband][channel]
+    private boolean[][][] initialFlagged; // [second][subband][channel]
 
     private int nrStokes;
     private int nrChannels;
@@ -115,6 +116,7 @@ public final class BeamFormedData extends DataProvider {
         LOGGER.info("nrSeconds = " + nrTimes + ", nrSamplesPerSecond = " + nrSamplesPerTimeStep);
 
         data = new float[nrTimes][nrSubbands][nrChannels];
+        initialFlagged = new boolean[nrTimes][nrSubbands][nrChannels];
         flagged = new boolean[nrTimes][nrSubbands][nrChannels];
         int second = 0;
 
@@ -152,6 +154,10 @@ public final class BeamFormedData extends DataProvider {
                     for (int subband = 0; subband < nrSubbands; subband++) {
                         for (int channel = 0; channel < nrChannels; channel++) {
                             final float val = fb.get();
+                            if (val <= 0.0f) {
+                                // we integrate; if one sample in the integration time was flagged, flag everything.
+                                initialFlagged[second][subband][channel] = true;
+                            }
                             data[second][subband][channel] += val;
                             //                            logger.info("sample at time " + sample + ", subband " + subband + ", channel " + channel + " = " + val);
 
@@ -278,7 +284,7 @@ public final class BeamFormedData extends DataProvider {
         for (int i = 0; i < beam0MemberList.size(); i++) {
             LOGGER.info("beam 0 member " + i + " = " + beam0MemberList.get(i));
         }
-        
+
         totalNrSamples = getAttribute(beam0, "NOF_SAMPLES").getPrimitiveIntVal();
         LOGGER.info("nrSamples = " + totalNrSamples);
 
@@ -296,8 +302,7 @@ public final class BeamFormedData extends DataProvider {
         channelWidth = (float) getAttribute(beam0, "CHANNEL_WIDTH").getPrimitiveDoubleVal() / 1000000.0f;
         beamCenterFrequency = (float) getAttribute(beam0, "BEAM_FREQUENCY_CENTER").getPrimitiveDoubleVal();
 
-        LOGGER.info("subbandWidth = " + subbandWidth + ", channelWidth = " + channelWidth + ", beam center frequency = "
-                + beamCenterFrequency);
+        LOGGER.info("subbandWidth = " + subbandWidth + ", channelWidth = " + channelWidth + ", beam center frequency = " + beamCenterFrequency);
 
         final String stokesComponents = getAttribute(beam0, "STOKES_COMPONENTS").getPrimitiveStringVal();
         LOGGER.info("Stokes components = " + stokesComponents);
@@ -308,9 +313,9 @@ public final class BeamFormedData extends DataProvider {
 
         // Third member of the beam is the first stoke. First is "COORDINATES", 2nd = PROCESS_HISTORY
         final H5ScalarDS stokes0 = (H5ScalarDS) beam0MemberList.get(2);
-        
+
         System.err.println("stokes0 = " + stokes0);
-        
+
         printAttributes(stokes0);
 
         final int[] nrChannelsArray = getAttribute(stokes0, "NOF_CHANNELS").get1DIntArrayVal();
@@ -345,8 +350,7 @@ public final class BeamFormedData extends DataProvider {
                 final Attribute a = metaList.get(i);
                 final Hdf5Attribute a2 = new Hdf5Attribute(a);
                 LOGGER.info("node: " + node.toString() + ": meta " + i + " = " + a.getName() + ", type = " + a.getType().getDatatypeDescription()
-                        + ", nrDims = " + a.getRank() + ", size = " + a.getType().getDatatypeSize() + ", val = "
-                        + a2.getValueString());
+                        + ", nrDims = " + a.getRank() + ", size = " + a.getType().getDatatypeSize() + ", val = " + a2.getValueString());
             }
         } catch (final Exception e1) {
             e1.printStackTrace();
@@ -354,19 +358,30 @@ public final class BeamFormedData extends DataProvider {
     }
 
     private void calculateStatistics() {
+        long initialFlaggedCount = 0;
+
         // calc min and max for scaling
         for (int second = 0; second < nrTimes; second++) {
             for (int subband = 0; subband < nrSubbands; subband++) {
                 for (int channel = 0; channel < nrChannels; channel++) {
-                    if (data[second][subband][channel] < minVal) {
-                        minVal = data[second][subband][channel];
-                    }
-                    if (data[second][subband][channel] > maxVal) {
-                        maxVal = data[second][subband][channel];
+                    if (initialFlagged[second][subband][channel]) {
+                        initialFlaggedCount++;
+                    } else {
+                        if (data[second][subband][channel] < minVal) {
+                            minVal = data[second][subband][channel];
+                        }
+                        if (data[second][subband][channel] > maxVal) {
+                            maxVal = data[second][subband][channel];
+                        }
                     }
                 }
             }
         }
+        
+        long nrSamples = nrTimes * nrSubbands *nrChannels;
+        float percent = ((float) initialFlaggedCount / nrSamples) * 100.0f;
+
+        LOGGER.info("samples already flagged in data set: " + initialFlaggedCount + "(" + percent + "%)");
     }
 
     public void close() {
@@ -387,8 +402,7 @@ public final class BeamFormedData extends DataProvider {
         return fold(data, flagged, zoomFactor, period);
     }
 
-    public static int[] computeShifts(int nrSubbands, int nrChannels, float nrSamplesPerSecond, double lowFreq, double freqStep,
-            float dm) {
+    public static int[] computeShifts(int nrSubbands, int nrChannels, float nrSamplesPerSecond, double lowFreq, double freqStep, float dm) {
         int nrFrequencies = nrSubbands * nrChannels;
 
         int[] shifts = new int[nrFrequencies];
@@ -407,8 +421,7 @@ public final class BeamFormedData extends DataProvider {
         return shifts;
     }
 
-    public static void dedisperse(float[][][] data, boolean[][][] flagged, float nrSamplesPerSecond, double lowFreq,
-            double freqStep, float dm) {
+    public static void dedisperse(float[][][] data, boolean[][][] flagged, float nrSamplesPerSecond, double lowFreq, double freqStep, float dm) {
         int nrTimes = data.length;
         int nrSubbands = data[0].length;
         int nrChannels = data[0][0].length;
@@ -490,8 +503,8 @@ public final class BeamFormedData extends DataProvider {
         float[] res = new float[(int) Math.ceil(nrSamplesToFold)];
         int[] count = new int[res.length];
 
-        LOGGER.info("nrTimes = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrSamplesPerSecond = " + nrSamplesPerSecond
-                + ", length of folded output = " + res.length);
+        LOGGER.info("nrTimes = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrSamplesPerSecond = " + nrSamplesPerSecond + ", length of folded output = "
+                + res.length);
 
         for (int time = maximumShift; time < nrTimes - maximumShift; time++) {
             int mod = Math.round(time % nrSamplesToFold);
@@ -578,7 +591,7 @@ public final class BeamFormedData extends DataProvider {
             return nrSubbands * nrChannels;
         }
     }
-    
+
     @Override
     public int getNrChannels() {
         if (REMOVE_CHANNEL_0_FROM_VIEW && nrChannels > 1) {
@@ -616,7 +629,7 @@ public final class BeamFormedData extends DataProvider {
 
     @Override
     public boolean isFlagged(final int x, final int y) {
-        return false; // not stored in file format yet.
+        return initialFlagged[x][getSubbandIndex(y)][getChannelIndex(y)];
     }
 
     public float[][][] getData() {
