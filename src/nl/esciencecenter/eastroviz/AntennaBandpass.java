@@ -198,7 +198,7 @@ public class AntennaBandpass {
         }
     }
 
-    public float getBandPassCorrectionFactor(AntennaType type, float frequency) {
+    public float getBandPassCorrectionFactor(AntennaType type, double frequency) {
         float[] freqs;
         float first;
         float last;

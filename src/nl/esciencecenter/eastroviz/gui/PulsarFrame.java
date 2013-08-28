@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import nl.esciencecenter.eastroviz.dataformats.DataProvider;
 import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedData;
+import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedDataReader;
 import nl.esciencecenter.eastroviz.dataformats.preprocessed.compressedbeamformed.CompressedBeamFormedData;
 
 /**
@@ -121,7 +122,8 @@ public class PulsarFrame extends javax.swing.JFrame {
         // disabled
         if (data instanceof BeamFormedData) {
             BeamFormedData bf = (BeamFormedData) data;
-            bf.read();
+            BeamFormedDataReader r = new BeamFormedDataReader(bf.getFileName(), bf.getMaxSequenceNr(), bf.getMaxSubbands(), bf.getZoomFactor());
+            data = r.read();
         } else if (data instanceof CompressedBeamFormedData) {
             CompressedBeamFormedData bf = (CompressedBeamFormedData) data;
             try {

@@ -23,6 +23,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.channels.FileChannel;
 
+import nl.esciencecenter.eastroviz.Dedispersion;
 import nl.esciencecenter.eastroviz.dataformats.DataProvider;
 import nl.esciencecenter.eastroviz.dataformats.MinMaxVals;
 import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedData;
@@ -250,12 +251,12 @@ public final class CompressedBeamFormedData extends DataProvider {
     }
 
     public void dedisperse(float nrSamplesPerSecond, float lowFreq, float freqStep, float dm) {
-        BeamFormedData.dedisperse(getData(), flagged, nrSamplesPerSecond, lowFreq, freqStep, dm);
+        Dedispersion.dedisperse(getData(), flagged, nrSamplesPerSecond, lowFreq, freqStep, dm);
         calculateStatistics();
     }
 
     public float[] fold(float nrSamplesPerSecond, float period) {
-        return BeamFormedData.fold(getData(), flagged, nrSamplesPerSecond, period);
+        return Dedispersion.fold(getData(), flagged, nrSamplesPerSecond, period);
     }
 
     @Override

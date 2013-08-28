@@ -47,6 +47,27 @@ public final class MSReader {
     private long maxSecondsOfData;
     private int sizePerSecond;
 
+    public static MSMetaData getMetaData(final String fileName) {
+        MSReader r = null;
+        try {
+            r = new MSReader(fileName);
+            r.openSubband(0);
+            final MSMetaData m = r.getMetaData();
+            r.close();
+            return m;
+        } catch (final IOException e) {
+            return null;
+        } finally {
+            if (r != null) {
+                try {
+                    r.close();
+                } catch (final IOException e) {
+                    // Ignore.
+                }
+            }
+        }
+    }
+
     public MSReader(final String filename) throws IOException {
         this.filename = filename;
 

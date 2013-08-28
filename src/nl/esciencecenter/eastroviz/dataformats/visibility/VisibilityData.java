@@ -107,27 +107,6 @@ public final class VisibilityData extends DataProvider {
         return baselineToStation1(baseline) == baselineToStation2(baseline);
     }
     
-    public static MSMetaData getMetaData(final String fileName) {
-        MSReader r = null;
-        try {
-            r = new MSReader(fileName);
-            r.openSubband(0);
-            final MSMetaData m = r.getMetaData();
-            r.close();
-            return m;
-        } catch (final IOException e) {
-            return null;
-        } finally {
-            if (r != null) {
-                try {
-                    r.close();
-                } catch (final IOException e) {
-                    // Ignore.
-                }
-            }
-        }
-    }
-
     public void read() throws IOException {
         for (int i = 0; i < nrSubbands; i++) {
             readSubband(i);
@@ -135,7 +114,6 @@ public final class VisibilityData extends DataProvider {
     }
 
     private void readSubband(final int subband) {
-
         try {
             r.openSubband(subband);
         } catch (final IOException e) {

@@ -22,6 +22,7 @@ import java.io.IOException;
 import javax.swing.UIManager;
 
 import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedData;
+import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedDataReader;
 import nl.esciencecenter.eastroviz.dataformats.preprocessed.compressedbeamformed.CompressedBeamFormedData;
 import nl.esciencecenter.eastroviz.dataformats.preprocessed.filtered.FilteredData;
 import nl.esciencecenter.eastroviz.dataformats.preprocessed.intermediate.IntermediateData;
@@ -29,6 +30,7 @@ import nl.esciencecenter.eastroviz.dataformats.raw.RawData;
 import nl.esciencecenter.eastroviz.dataformats.raw.RawDataFrame;
 import nl.esciencecenter.eastroviz.dataformats.raw.RawDataReader;
 import nl.esciencecenter.eastroviz.dataformats.visibility.MSMetaData;
+import nl.esciencecenter.eastroviz.dataformats.visibility.MSReader;
 import nl.esciencecenter.eastroviz.dataformats.visibility.VisibilityData;
 import nl.esciencecenter.eastroviz.gui.BeamFormedFrame;
 import nl.esciencecenter.eastroviz.gui.PreProcessedFrame;
@@ -104,9 +106,9 @@ public final class Viz {
         final int station = 0;
 
         if (beamFormed) {
-            final BeamFormedData beamFormedData =
-                    new BeamFormedData(fileName, maxSequenceNr, maxSubbands, integrationFactor /* really the zoom factor in this case*/);
-            beamFormedData.read();
+            final BeamFormedDataReader reader = 
+                    new BeamFormedDataReader(fileName, maxSequenceNr, maxSubbands, integrationFactor /* really the zoom factor in this case*/);
+            BeamFormedData beamFormedData = reader.read();
             final BeamFormedFrame beamFormedFrame = new BeamFormedFrame(beamFormedData);
             beamFormedFrame.pack();
 
@@ -211,7 +213,7 @@ public final class Viz {
         if (visibilities) {
             if (batch) {
                 // batch processing mode
-                final MSMetaData meta = VisibilityData.getMetaData(fileName);
+                final MSMetaData meta = MSReader.getMetaData(fileName);
                 final int nrStations = meta.getNrStations();
                 for (int station2 = 0; station2 < nrStations; station2++) {
                     for (int station1 = 0; station1 < nrStations; station1++) {

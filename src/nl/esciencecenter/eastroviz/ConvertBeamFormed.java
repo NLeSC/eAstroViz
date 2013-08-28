@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedData;
+import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedDataReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +50,8 @@ public class ConvertBeamFormed {
     }
 
     void read() {
-        final BeamFormedData bfd = new BeamFormedData(fileName, Integer.MAX_VALUE, Integer.MAX_VALUE, zoomFactor);
-        bfd.read();
+        final BeamFormedDataReader bfdr = new BeamFormedDataReader(fileName, Integer.MAX_VALUE, Integer.MAX_VALUE, zoomFactor);
+        final BeamFormedData bfd = bfdr.read();
         data = bfd.getData();
         nrSubbands = bfd.getNrSubbands();
         nrChannels = bfd.getNrChannels();

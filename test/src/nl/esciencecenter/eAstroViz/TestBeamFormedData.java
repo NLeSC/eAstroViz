@@ -17,6 +17,7 @@ package nl.esciencecenter.eAstroViz;
 
 import static org.junit.Assert.assertEquals;
 import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedData;
+import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedDataReader;
 
 import org.junit.After;
 import org.junit.Test;
@@ -38,8 +39,8 @@ public class TestBeamFormedData {
 
     @Test
     public void testRead() {
-        BeamFormedData bfd = new BeamFormedData(INPUT_FILE_NAME, -1, -1, 1);
-        bfd.read();
+        BeamFormedDataReader bfdr = new BeamFormedDataReader(INPUT_FILE_NAME, -1, -1, 1);
+        BeamFormedData bfd = bfdr.read();
 
         assertEquals(INPUT_FILE_NAME, bfd.getFileName());
         assertEquals(NR_CHANNELS, bfd.getNrChannels());
