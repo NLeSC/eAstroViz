@@ -26,7 +26,8 @@ public final class PulseProfile implements BeamFormedSampleHandler {
     private double[] shifts;
     
     private double[] bins = new double[NR_BINS];
-
+    private long[] counts = new long[NR_BINS];
+    
     public PulseProfile(String fileName, int maxSequenceNr, int maxSubbands) {
         this.fileName = fileName;
         this.maxSequenceNr = maxSequenceNr;
@@ -37,7 +38,7 @@ public final class PulseProfile implements BeamFormedSampleHandler {
         read();
         
         for(int i=0; i<NR_BINS; i++) {
-            System.out.println(bins[i]);
+            System.out.println(bins[i] / counts[i]);
         }
     }
     
@@ -91,7 +92,10 @@ public final class PulseProfile implements BeamFormedSampleHandler {
 
     @Override
     public void handleSample(int second, int minorTime, int subband, int channel, float sample) {
-
+        if(sample < 0.0f) {
+            return;
+        }
+        
         int freq = subband * m.nrChannels + channel;
         double sampleRate = m.totalNrSamples / m.totalIntegrationTime;
         
@@ -102,10 +106,12 @@ public final class PulseProfile implements BeamFormedSampleHandler {
         double phase = shiftedTime / period;
         phase -= Math.floor(phase);
         
+        // TODO round, not clip
         int bin = (int) (phase * NR_BINS);
 
 //        System.out.println("handle, second = " + second + ", minor = " + minorTime + ", subband = " + subband +  ", channel = " + channel + ", freq = "+ freq + ", time = " + time + ", shifted = " + shiftedTime);
 
         bins[bin] += sample;
+        counts[bin]++;
     }
 }
