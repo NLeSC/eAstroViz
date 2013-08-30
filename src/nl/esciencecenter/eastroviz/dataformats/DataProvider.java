@@ -35,8 +35,7 @@ public abstract class DataProvider {
     protected DataProvider() {
     }
 
-    protected void init(final String fileName, final int maxSequenceNr, final int maxSubbands, final String[] polList,
-            final String[] flaggerList) {
+    protected void init(final String fileName, final int maxSequenceNr, final int maxSubbands, final String[] polList, final String[] flaggerList) {
         this.fileName = fileName;
         this.maxSequenceNr = maxSequenceNr;
         if (this.maxSequenceNr <= 0) {
@@ -192,9 +191,33 @@ public abstract class DataProvider {
      *            the array that should be scaled.
      */
     public static final void scale(final float[] in) {
-        float max = -10000000.0f;
-        float min = 1.0E20f;
+        float max = Float.MIN_VALUE;
+        float min = Float.MAX_VALUE;
         for (final float element : in) {
+            if (element < min) {
+                min = element;
+            }
+            if (element > max) {
+                max = element;
+            }
+        }
+
+        for (int i = 0; i < in.length; i++) {
+            in[i] = (in[i] - min) / (max - min);
+        }
+    }
+
+    /**
+     * This is a utility function that takes an array of values (doubles), and scales them, so all values are between 0 and 1. The
+     * scaling is done in-place.
+     * 
+     * @param in
+     *            the array that should be scaled.
+     */
+    public static final void scale(final double[] in) {
+        double max = Double.MIN_VALUE;
+        double min = Double.MAX_VALUE;
+        for (final double element : in) {
             if (element < min) {
                 min = element;
             }

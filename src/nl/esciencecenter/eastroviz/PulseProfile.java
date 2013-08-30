@@ -2,6 +2,7 @@ package nl.esciencecenter.eastroviz;
 
 import java.io.File;
 
+import nl.esciencecenter.eastroviz.dataformats.DataProvider;
 import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedDataReader;
 import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedMetaData;
 import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedSampleHandler;
@@ -21,8 +22,8 @@ public final class PulseProfile implements BeamFormedSampleHandler {
     int maxSubbands;
     
     // pulsar parameters.
-    private final double dm = 12.455f;
-    private final double period = 1.3373f;
+    private final double dm = 12.455;
+    private final double period = 1.3373021601895;
     private double[] shifts;
     
     private double[] bins = new double[NR_BINS];
@@ -36,9 +37,15 @@ public final class PulseProfile implements BeamFormedSampleHandler {
     
     void start() {
         read();
+
+//        DataProvider.scale(bins);
         
         for(int i=0; i<NR_BINS; i++) {
             System.out.println(bins[i] / counts[i]);
+        }
+
+        for(int i=0; i<NR_BINS; i++) {
+            System.err.println(counts[i]);
         }
     }
     
@@ -106,10 +113,16 @@ public final class PulseProfile implements BeamFormedSampleHandler {
         double phase = shiftedTime / period;
         phase -= Math.floor(phase);
         
-        // TODO round, not clip
         int bin = (int) (phase * NR_BINS);
-
-//        System.out.println("handle, second = " + second + ", minor = " + minorTime + ", subband = " + subband +  ", channel = " + channel + ", freq = "+ freq + ", time = " + time + ", shifted = " + shiftedTime);
+        
+        
+        if(bin < 0) {
+            bin = 0;
+        } else if(bin>=NR_BINS) {
+            bin = NR_BINS -1;
+        }
+        
+ //       System.out.println("handle, second = " + second + ", minor = " + minorTime + ", subband = " + subband +  ", channel = " + channel + ", freq = "+ freq + ", time = " + time + ", shifted = " + shiftedTime);
 
         bins[bin] += sample;
         counts[bin]++;
