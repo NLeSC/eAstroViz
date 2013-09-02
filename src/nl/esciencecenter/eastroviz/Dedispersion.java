@@ -9,22 +9,22 @@ public class Dedispersion {
     public static final boolean COLLAPSE_DEDISPERSED_DATA = false;
     public static final int NR_PERIODS_IN_FOLD = 1;
 
+    public static final double MAGIC_DM_CONSTANT = 4148.808;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Dedispersion.class);
 
     private static int maximumShift;
 
-    public static int[] computeShiftsInSamples(int nrSubbands, int nrChannels, double nrSamplesPerSecond, double lowFreq, double freqStep,
-            double dm) {
+    public static int[] computeShiftsInSamples(int nrSubbands, int nrChannels, double nrSamplesPerSecond, double lowFreq, double freqStep, double dm) {
         double[] shifts = computeShiftsInSeconds(nrSubbands, nrChannels, nrSamplesPerSecond, lowFreq, freqStep, dm);
         int[] res = new int[shifts.length];
-        for(int i=0; i<res.length; i++) {
+        for (int i = 0; i < res.length; i++) {
             res[i] = (int) (shifts[i] * nrSamplesPerSecond);
         }
         return res;
     }
 
-    public static double[] computeShiftsInSeconds(int nrSubbands, int nrChannels, double nrSamplesPerSecond, double lowFreq, double freqStep,
-            double dm) {
+    public static double[] computeShiftsInSeconds(int nrSubbands, int nrChannels, double nrSamplesPerSecond, double lowFreq, double freqStep, double dm) {
         int nrFrequencies = nrSubbands * nrChannels;
 
         double[] shifts = new double[nrFrequencies];
@@ -32,7 +32,7 @@ public class Dedispersion {
         double highFreq = (lowFreq + ((nrFrequencies - 1) * freqStep));
         double inverseHighFreq = 1.0 / (highFreq * highFreq);
 
-        double kDM = 4148.808 * dm;
+        double kDM = MAGIC_DM_CONSTANT * dm;
 
         for (int freq = 0; freq < nrFrequencies; freq++) {
             double inverseFreq = 1.0 / ((lowFreq + (freq * freqStep)) * (lowFreq + (freq * freqStep)));
@@ -42,9 +42,8 @@ public class Dedispersion {
         }
         return shifts;
     }
-    
-    public static void dedisperse(float[][][] data, boolean[][][] flagged, float nrSamplesPerSecond, double lowFreq,
-            double freqStep, float dm) {
+
+    public static void dedisperse(float[][][] data, boolean[][][] flagged, float nrSamplesPerSecond, double lowFreq, double freqStep, float dm) {
         int nrTimes = data.length;
         int nrSubbands = data[0].length;
         int nrChannels = data[0][0].length;
@@ -128,8 +127,8 @@ public class Dedispersion {
         float[] res = new float[(int) Math.ceil(nrSamplesToFold)];
         int[] count = new int[res.length];
 
-        LOGGER.info("nrTimes = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrSamplesPerSecond = " + nrSamplesPerSecond
-                + ", length of folded output = " + res.length);
+        LOGGER.info("nrTimes = " + nrTimes + ", nrSubbands = " + nrSubbands + ", nrSamplesPerSecond = " + nrSamplesPerSecond + ", length of folded output = "
+                + res.length);
 
         for (int time = maximumShift; time < nrTimes - maximumShift; time++) {
             int mod = Math.round(time % nrSamplesToFold);
@@ -161,19 +160,38 @@ public class Dedispersion {
 
     public static float computeSNR(float[] res) {
         // SNR = (max – mean) / RMS
-        float max = -1;
+        float max = Float.MIN_VALUE;
         float mean = 0;
         float rms = 0;
-        for (float re : res) {
-            if (re > max) {
-                max = re;
+        for (float sample : res) {
+            if (sample > max) {
+                max = sample;
             }
-            mean += re;
-            rms += re * re;
+            mean += sample;
+            rms += sample * sample;
         }
         mean /= res.length;
         rms /= res.length;
         rms = (float) Math.sqrt(rms);
+
+        return (max - mean) / rms;
+    }
+
+    public static double computeSNR(double[] res) {
+        // SNR = (max – mean) / RMS
+        double max = Double.MIN_VALUE;
+        double mean = 0;
+        double rms = 0;
+        for (double sample : res) {
+            if (sample > max) {
+                max = sample;
+            }
+            mean += sample;
+            rms += sample * sample;
+        }
+        mean /= res.length;
+        rms /= res.length;
+        rms = Math.sqrt(rms);
 
         return (max - mean) / rms;
     }

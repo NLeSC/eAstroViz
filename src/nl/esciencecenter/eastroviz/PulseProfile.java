@@ -28,6 +28,8 @@ public final class PulseProfile implements BeamFormedSampleHandler {
     
     private double[] bins = new double[NR_BINS];
     private long[] counts = new long[NR_BINS];
+
+    private long flaggedSamples;
     
     public PulseProfile(String fileName, int maxSequenceNr, int maxSubbands) {
         this.fileName = fileName;
@@ -38,15 +40,22 @@ public final class PulseProfile implements BeamFormedSampleHandler {
     void start() {
         read();
 
-//        DataProvider.scale(bins);
-        
         for(int i=0; i<NR_BINS; i++) {
-            System.out.println(bins[i] / counts[i]);
+            bins[i] /= counts[i];
+        }
+        DataProvider.scale(bins);
+
+        for(int i=0; i<NR_BINS; i++) {
+            System.out.println(bins[i]);
         }
 
         for(int i=0; i<NR_BINS; i++) {
             System.err.println(counts[i]);
         }
+  
+        System.err.println("flagged samples: " + flaggedSamples);
+        double snr = Dedispersion.computeSNR(bins);
+        System.err.println("SNR = " + snr);
     }
     
     void read() {
@@ -99,7 +108,9 @@ public final class PulseProfile implements BeamFormedSampleHandler {
 
     @Override
     public void handleSample(int second, int minorTime, int subband, int channel, float sample) {
-        if(sample < 0.0f) {
+        if(sample <= 0.0f) {
+            // flagged sample
+            flaggedSamples++;
             return;
         }
         
@@ -108,8 +119,12 @@ public final class PulseProfile implements BeamFormedSampleHandler {
         
         long samplePos = second * m.nrSamplesPerTimeStep + minorTime;
         double time = samplePos / sampleRate;
-        double shiftedTime = time + shifts[freq];
+        double shiftedTime = time - shifts[freq];
 
+        if(time < 0.0) {
+//            return;
+        }
+        
         double phase = shiftedTime / period;
         phase -= Math.floor(phase);
         
