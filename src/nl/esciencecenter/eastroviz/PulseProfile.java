@@ -20,49 +20,54 @@ public final class PulseProfile implements BeamFormedSampleHandler {
     String fileName;
     int maxSequenceNr;
     int maxSubbands;
-    
+
     // pulsar parameters.
     private final double dm = 12.455;
     private final double period = 1.3373021601895;
     private double[] shifts;
-    
+
     private double[] bins = new double[NR_BINS];
     private long[] counts = new long[NR_BINS];
 
+    private long totalSamples;
     private long flaggedSamples;
-    
+
     public PulseProfile(String fileName, int maxSequenceNr, int maxSubbands) {
         this.fileName = fileName;
         this.maxSequenceNr = maxSequenceNr;
         this.maxSubbands = maxSubbands;
     }
-    
+
     void start() {
         read();
 
-        for(int i=0; i<NR_BINS; i++) {
+        double totalPower = 0.0;
+
+        for (int i = 0; i < NR_BINS; i++) {
+            totalPower += bins[i];
+        }
+
+        for (int i = 0; i < NR_BINS; i++) {
             bins[i] /= counts[i];
         }
-        DataProvider.scale(bins);
 
-        for(int i=0; i<NR_BINS; i++) {
+        for (int i = 0; i < NR_BINS; i++) {
             System.out.println(bins[i]);
         }
 
-        for(int i=0; i<NR_BINS; i++) {
-            System.err.println(counts[i]);
-        }
-  
-        System.err.println("flagged samples: " + flaggedSamples);
+        DataProvider.scale(bins);
         double snr = Dedispersion.computeSNR(bins);
-        System.err.println("SNR = " + snr);
+        double percent = ((double)flaggedSamples / totalSamples) * 100.0;
+
+        System.err.println("total samples: " + totalSamples + ", flagged samples: " + flaggedSamples + " (" + percent + " %)" +
+        ", total power: " + totalPower + ", SNR: " + snr);
     }
-    
+
     void read() {
         BeamFormedDataReader reader = new BeamFormedDataReader(fileName, maxSequenceNr, maxSubbands, 1);
         m = reader.readMetaData();
         double sampleRate = m.totalNrSamples / m.totalIntegrationTime;
-        
+
         shifts = Dedispersion.computeShiftsInSeconds(m.nrSubbands, m.nrChannels, sampleRate, m.minFrequency, m.channelWidth, dm);
         reader.read(m, this);
     }
@@ -87,8 +92,7 @@ public final class PulseProfile implements BeamFormedSampleHandler {
             } else {
                 // it must be the filename
                 if (fileName != null) {
-                    System.err.println("You cannot specify the file name twice. The first one was: " + fileName
-                            + ", the second one was: " + args[i]);
+                    System.err.println("You cannot specify the file name twice. The first one was: " + fileName + ", the second one was: " + args[i]);
                     System.exit(1);
                 }
 
@@ -108,36 +112,37 @@ public final class PulseProfile implements BeamFormedSampleHandler {
 
     @Override
     public void handleSample(int second, int minorTime, int subband, int channel, float sample) {
-        if(sample <= 0.0f) {
+        totalSamples++;
+
+        if (sample <= 0.0f) {
             // flagged sample
             flaggedSamples++;
             return;
         }
-        
+
         int freq = subband * m.nrChannels + channel;
         double sampleRate = m.totalNrSamples / m.totalIntegrationTime;
-        
+
         long samplePos = second * m.nrSamplesPerTimeStep + minorTime;
         double time = samplePos / sampleRate;
         double shiftedTime = time - shifts[freq];
 
-        if(time < 0.0) {
-//            return;
+        if (time < 0.0) {
+            //            return;
         }
-        
+
         double phase = shiftedTime / period;
         phase -= Math.floor(phase);
-        
+
         int bin = (int) (phase * NR_BINS);
-        
-        
-        if(bin < 0) {
+
+        if (bin < 0) {
             bin = 0;
-        } else if(bin>=NR_BINS) {
-            bin = NR_BINS -1;
+        } else if (bin >= NR_BINS) {
+            bin = NR_BINS - 1;
         }
-        
- //       System.out.println("handle, second = " + second + ", minor = " + minorTime + ", subband = " + subband +  ", channel = " + channel + ", freq = "+ freq + ", time = " + time + ", shifted = " + shiftedTime);
+
+        //       System.out.println("handle, second = " + second + ", minor = " + minorTime + ", subband = " + subband +  ", channel = " + channel + ", freq = "+ freq + ", time = " + time + ", shifted = " + shiftedTime);
 
         bins[bin] += sample;
         counts[bin]++;
