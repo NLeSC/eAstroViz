@@ -179,6 +179,8 @@ public final class VisibilityData extends DataProvider {
                 powers[timeIndex][subband][channel][pol] = power;
             }
             nrValidSamples[timeIndex][subband][channel] = nrValidSamplesIn[channel];
+            // TODO set flagged 
+            // FIXME
         }
     }
 
