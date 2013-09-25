@@ -179,17 +179,24 @@ public final class VisibilityData extends DataProvider {
                 powers[timeIndex][subband][channel][pol] = power;
             }
             nrValidSamples[timeIndex][subband][channel] = nrValidSamplesIn[channel];
-            // TODO set flagged 
-            // FIXME
+
+            if(nrValidSamplesIn[channel] == 0) {
+                flagged[timeIndex][subband][channel] = true;
+            }
         }
     }
 
     @Override
     public void flag() {
+        // Reset flags to the initial flags in the data set.
         for (int time = 0; time < nrSeconds; time++) {
             for (int subband = 0; subband < nrSubbands; subband++) {
                 for (int channel = 0; channel < nrChannels; channel++) {
-                    flagged[time][subband][channel] = false;
+                    if(nrValidSamples[time][subband][channel] == 0) {
+                        flagged[time][subband][channel] = true;
+                    } else {
+                        flagged[time][subband][channel] = false;
+                    }
                 }
             }
         }
@@ -225,7 +232,7 @@ public final class VisibilityData extends DataProvider {
 
         for (int time = 0; time < nrSeconds; time++) {
             for (int subband = 0; subband < nrSubbands; subband++) {
-                flaggers[subband].flag(powers[time][subband], nrValidSamples[time][subband], flagged[time][subband]);
+                flaggers[subband].flag(powers[time][subband], flagged[time][subband]);
             }
         }
 

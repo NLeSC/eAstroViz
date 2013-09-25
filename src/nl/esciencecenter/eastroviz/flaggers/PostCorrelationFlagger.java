@@ -35,13 +35,13 @@ public abstract class PostCorrelationFlagger extends Flagger {
         this.nrChannels = nrChannels;
     }
 
-    public void flag(final float[][] samples, final int[] nrValidSamples, final boolean[] flagged) {// copy is [nrChannels][nrCrossPolasrizations];
+    public void flag(final float[][] samples, final boolean[] flagged) {
 
-        boolean[][] flags = new boolean[samples[0].length][samples.length];
-
+        boolean[][] flags = new boolean[samples[0].length][];
+        
         for (int pol = 0; pol < samples[0].length; pol++) {
-            initFlags(nrValidSamples, flags[pol]);
-
+            flags[pol] = flagged.clone(); // start with flags that are passed in.
+            
             final float[] powers = calculatePowers(samples, pol);
             flag(powers, flags[pol], pol);
         }
@@ -49,7 +49,7 @@ public abstract class PostCorrelationFlagger extends Flagger {
         // calculate union of flags
         for (int pol = 0; pol < samples[0].length; pol++) {
             for (int i = 0; i < samples.length; i++) {
-                flagged[i] = flags[pol][i];
+                flagged[i] |= flags[pol][i];
             }
         }
 
@@ -57,16 +57,6 @@ public abstract class PostCorrelationFlagger extends Flagger {
     }
 
     protected abstract void flag(final float[] powers, boolean[] flagged, int pol);
-
-    private void initFlags(final int[] nrValidSamples, final boolean[] flagged) {
-        for (int i = 0; i < nrChannels; i++) {
-            if (nrValidSamples[i] == 0) {
-                flagged[i] = true;
-            } else {
-                flagged[i] = false;
-            }
-        }
-    }
 
     private float[] calculatePowers(final float[][] samples, final int pol) {
         final float[] power = new float[nrChannels];
