@@ -982,7 +982,7 @@ public abstract class GUIFrame extends javax.swing.JFrame {
 
     private void sensitivitySliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sensitivitySliderStateChanged
         final float newSensitivity = sensitivitySlider.getValue() / 100.0f;
-        if (Math.abs(newSensitivity - samplePanel.getSensitivity()) < .0000001) {
+        if (Math.abs(newSensitivity - samplePanel.getSensitivity()) > .0000001) {
             samplePanel.setSensitivity(newSensitivity);
             sensitivityLabel.setText(String.format("%2.2f", newSensitivity));
             repaint();
@@ -993,7 +993,7 @@ public abstract class GUIFrame extends javax.swing.JFrame {
         final String newFlaggerType = (String) flaggerTypeComboBox.getSelectedItem();
         if (!newFlaggerType.equals(samplePanel.getFlagger())) {
             final float newSensitivity = sensitivitySlider.getValue() / 100.0f;
-            if (Math.abs(newSensitivity - samplePanel.getSensitivity()) < .0000001) {
+            if (Math.abs(newSensitivity - samplePanel.getSensitivity()) > .0000001) {
                 samplePanel.setSensitivity(newSensitivity);
             }
 
