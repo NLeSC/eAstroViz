@@ -188,6 +188,7 @@ public final class VisibilityData extends DataProvider {
 
     @Override
     public void flag() {
+        /*
         // Reset flags to the initial flags in the data set.
         for (int time = 0; time < nrSeconds; time++) {
             for (int subband = 0; subband < nrSubbands; subband++) {
@@ -200,7 +201,15 @@ public final class VisibilityData extends DataProvider {
                 }
             }
         }
-
+*/
+        for (int time = 0; time < nrSeconds; time++) {
+            for (int subband = 0; subband < nrSubbands; subband++) {
+                for (int channel = 0; channel < nrChannels; channel++) {
+                    flagged[time][subband][channel] = false;
+                }
+            }
+        }
+        
         if (getFlaggerType() == null || getFlaggerType().equals("none")) {
             return;
         }
