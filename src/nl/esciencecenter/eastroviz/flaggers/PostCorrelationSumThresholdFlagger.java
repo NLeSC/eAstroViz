@@ -21,6 +21,42 @@ public class PostCorrelationSumThresholdFlagger extends PostCorrelationFlagger {
         super(nrChannels, baseSensitivity, SIREtaValue);
     }
 
+    
+    
+    /*
+     *         // initalize flags of both polarizations with initial flags
+        boolean[][] flags = new boolean[nrPols][flagged.length];
+        for (int pol = 0; pol < nrPols; pol++) {
+            flags[pol] = flagged.clone();
+        }
+
+        for (int pol = 0; pol < nrPols; pol++) {
+            calculateWinsorizedStatistics(samples[pol], flags[pol]); // sets mean, median, stdDev
+            sumThreshold1D(samples[pol], flags[pol]);
+
+            calculateWinsorizedStatistics(samples[pol], flags[pol]); // sets mean, median, stdDev
+            sumThreshold1D(samples[pol], flags[pol]);
+        }
+
+        // take union of flags of both polarizations
+
+        for (int pol = 0; pol < nrPols; pol++) {
+            for (int i = 0; i < flagged.length; i++) {
+                flagged[i] |= flags[pol][i];
+            }
+        }
+
+        SIROperator(flagged);
+     */
+    
+    
+// FIXME maak weer consistent met BG/p code TODO    
+    
+    
+    
+    
+    
+    
     // we have the data for one second, all frequencies in a subband.
     // if one of the polarizations exceeds the threshold, flag them all.
     @Override
