@@ -65,7 +65,7 @@ public class PulsarFrame extends javax.swing.JFrame {
         int background = pulseProfilePanel.getBackground().getRGB();
 
         // calculate min and max, so we can scale
-        float max = -1;
+        float max = Float.MIN_VALUE;
         float min = Float.MAX_VALUE;
         for (float element : foldedData) {
             if (element > max) {
@@ -85,7 +85,7 @@ public class PulsarFrame extends javax.swing.JFrame {
             }
 
             for (int y = height - lineHeight; y < height; y++) {
-                profileImage.setRGB(i, y, 100);
+                profileImage.setRGB(i, y, i /*100*/);
             }
         }
 
@@ -106,7 +106,7 @@ public class PulsarFrame extends javax.swing.JFrame {
             } else if (data instanceof CompressedBeamFormedData) {
                 // observation params, should be in hdf5 / compressed file
                 float lowFreq = 138.96484375f;
-                float freqStep = 0.1955f / 256; // TODO COMPUTE! // 256 is nrCahnnesl
+                float freqStep = 0.1955f / 256; // TODO COMPUTE! // 256 is nrChannels
                 CompressedBeamFormedData bf = (CompressedBeamFormedData) data;
                 final int nrSamplesPerSecond = 64;
                 bf.dedisperse(nrSamplesPerSecond /*195312.5f*/, lowFreq, freqStep, dm);

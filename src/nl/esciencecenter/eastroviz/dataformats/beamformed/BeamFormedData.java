@@ -19,6 +19,7 @@ import nl.esciencecenter.eastroviz.AntennaBandpass;
 import nl.esciencecenter.eastroviz.AntennaType;
 import nl.esciencecenter.eastroviz.Dedispersion;
 import nl.esciencecenter.eastroviz.dataformats.DataProvider;
+import nl.esciencecenter.eastroviz.flaggers.BeamFormedFlagger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ public final class BeamFormedData extends DataProvider {
 
     private float[][][] data; // [second][subband][channel]
     private boolean[][][] initialFlagged; // [second][subband][channel]
+    private boolean[][][] flagged; // [second][nrSubbands][nrChannels]
 
     private final int zoomFactor;
     private BeamFormedMetaData m;
@@ -44,10 +46,19 @@ public final class BeamFormedData extends DataProvider {
             float[][][] data, boolean[][][] initialFlagged, BeamFormedMetaData m) {
 
         super();
-        init(fileName, maxSequenceNr, maxSubbands, new String[] { "I" }, new String[] { "none" });
+        init(fileName, maxSequenceNr, maxSubbands, new String[] { "I" }, new String[] { "none", "BeamFormed" });
 
         this.data = data;
         this.initialFlagged = initialFlagged;
+        flagged = new boolean[m.nrTimes][m.nrSubbands][m.nrChannels];
+        for (int second = 0; second < m.nrTimes; second++) {
+            for (int subband = 0; subband < m.nrSubbands; subband++) {
+                for (int channel = 0; channel < m.nrChannels; channel++) {
+                    flagged[second][subband][channel] = initialFlagged[second][subband][channel]; 
+                }
+            }
+        }
+        
         this.zoomFactor = zoomFactor;
         this.m = m;
 
@@ -104,12 +115,12 @@ public final class BeamFormedData extends DataProvider {
     }
 
     public void dedisperse(float dm) {
-        Dedispersion.dedisperse(data, initialFlagged, zoomFactor, m.minFrequency, m.channelWidth, dm);
+        Dedispersion.dedisperse(data, flagged, zoomFactor, m.minFrequency, m.channelWidth, dm);
         calculateStatistics();
     }
 
     public float[] fold(float period) {
-        return Dedispersion.fold(data, initialFlagged, zoomFactor, period);
+        return Dedispersion.fold(data, flagged, zoomFactor, period);
     }
 
     public double getStartFrequency(int subband, int channel) {
@@ -184,16 +195,54 @@ public final class BeamFormedData extends DataProvider {
 
     @Override
     public boolean isFlagged(final int x, final int y) {
-        return initialFlagged[x][getSubbandIndex(y)][getChannelIndex(y)];
+        return flagged[x][getSubbandIndex(y)][getChannelIndex(y)];
     }
 
     public float[][][] getData() {
         return data;
     }
 
+    // TODO the code below is identical to compressedBeamFormedData.flag
     @Override
     public void flag() {
-        // We do not have a beam formed data flagger at the moment.
+        for (int time = 0; time < m.nrTimes; time++) {
+            for (int sb = 0; sb < m.nrSubbands; sb++) {
+                for (int ch = 0; ch < m.nrChannels; ch++) {
+                    flagged[time][sb][ch] = initialFlagged[time][sb][ch];
+                }
+            }
+        }
+
+        if (getFlaggerType().equals("none")) {
+            return;
+        }
+
+        if (m.nrChannels > 1) {
+            final BeamFormedFlagger[] flaggers = new BeamFormedFlagger[m.nrSubbands];
+            for (int i = 0; i < m.nrSubbands; i++) {
+                flaggers[i] = new BeamFormedFlagger(getFlaggerSensitivity(), getFlaggerSIRValue());
+            }
+
+            for (int time = 0; time < m.nrTimes; time++) {
+                for (int sb = 0; sb < m.nrSubbands; sb++) {
+                    flaggers[sb].flag(data[time][sb], flagged[time][sb]);
+                }
+            }
+        } else {
+            final BeamFormedFlagger flagger = new BeamFormedFlagger(getFlaggerSensitivity(), getFlaggerSIRValue());
+            for (int time = 0; time < m.nrTimes; time++) {
+                final float[] tmp = new float[m.nrSubbands];
+                final boolean[] tmpFlags = new boolean[m.nrSubbands];
+                for (int sb = 0; sb < m.nrSubbands; sb++) {
+                    tmp[sb] = data[time][sb][0];
+                }
+
+                flagger.flag(tmp, tmpFlags);
+                for (int sb = 0; sb < m.nrSubbands; sb++) {
+                    flagged[time][sb][0] = tmpFlags[sb];
+                }
+            }
+        }
     }
 
     public double getSubbandWidth() {

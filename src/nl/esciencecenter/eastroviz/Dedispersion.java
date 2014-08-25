@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Dedispersion {
-    public static final boolean COLLAPSE_DEDISPERSED_DATA = false;
+    public static final boolean COLLAPSE_DEDISPERSED_DATA = true;
     public static final int NR_PERIODS_IN_FOLD = 1;
 
     public static final double MAGIC_DM_CONSTANT = 4148.808;

@@ -19,8 +19,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 
-import javax.swing.UIManager;
-
 import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedData;
 import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedDataReader;
 import nl.esciencecenter.eastroviz.dataformats.preprocessed.compressedbeamformed.CompressedBeamFormedData;
@@ -88,7 +86,7 @@ public final class Viz {
         this.integrationFactor = integrationFactor;
         this.maxSequenceNr = maxSeqNo;
         this.maxSubbands = maxSubbands;
-
+/*
         // Use the platform's native look and feel.
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -96,7 +94,7 @@ public final class Viz {
             LOGGER.info("Could not set look and feel: " + e);
             // Ignore.
         }
-
+*/
         //Make sure we have nice window decorations.
         //        JFrame.setDefaultLookAndFeelDecorated(true);
         //        JDialog.setDefaultLookAndFeelDecorated(true);

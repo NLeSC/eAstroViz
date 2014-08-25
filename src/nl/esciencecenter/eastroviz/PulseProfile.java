@@ -16,7 +16,7 @@ import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedSampleHandle
 public final class PulseProfile implements BeamFormedSampleHandler {
     private BeamFormedMetaData m;
 
-    public static final int NR_BINS = 256;
+    public static final int NR_BINS = 512;
     String fileName;
     int maxSequenceNr;
     int maxSubbands;

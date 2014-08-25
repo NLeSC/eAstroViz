@@ -54,7 +54,7 @@ public final class CompressedBeamFormedData extends DataProvider {
             final int maxSubbands) {
         // for now, we only have stokes I
         super();
-        init(fileName, maxSequenceNr, maxSubbands, new String[] { "I" }, new String[] { "none", "Intermediate" });
+        init(fileName, maxSequenceNr, maxSubbands, new String[] { "I" }, new String[] { "none", "BeamFormed" });
         this.integrationFactor = integrationFactor;
     }
 

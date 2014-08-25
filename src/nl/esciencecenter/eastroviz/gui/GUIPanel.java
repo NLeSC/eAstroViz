@@ -62,6 +62,7 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
     private int zoomY = 1;
 
     private int COLOR_WHITE = colorToRGB(1.0f, 1.0f, 1.0f);
+    private int COLOR_RED = colorToRGB(1.0f, 0.0f, 0.0f);
     private ColorMapInterpreter colorMaps;
     private ColorMap colorMap;
     private String colorMapName = "default";
@@ -205,7 +206,11 @@ public abstract class GUIPanel extends JPanel implements MouseMotionListener {
                     image.setRGB(x, data.getSizeY() - y - 1, colorMap.getColor(0.0f, 1.0f, sampleVal));
                 } else {
                     samplesFlagged++;
-                    image.setRGB(x, data.getSizeY() - y - 1, COLOR_WHITE);
+                    if(colorMap.isBlandAndWhite()) {
+                        image.setRGB(x, data.getSizeY() - y - 1, COLOR_RED);
+                    } else {
+                        image.setRGB(x, data.getSizeY() - y - 1, COLOR_WHITE);
+                    }
                 }
             }
         }

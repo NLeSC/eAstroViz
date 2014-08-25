@@ -17,7 +17,6 @@ package nl.esciencecenter.eastroviz.gui;
 
 public class ColorMap {
     private int[] colorMap;
-    @SuppressWarnings("unused")
     private String name;
 
     public ColorMap(String name, int[] map) {
@@ -25,6 +24,14 @@ public class ColorMap {
         this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+    
+    public boolean isBlandAndWhite() {
+        return name.equals("bw");
+    }
+    
     public int getColor(float min, float max, float var) {
         int cmEntries = colorMap.length;
 
