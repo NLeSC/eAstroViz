@@ -1,0 +1,47 @@
+HBA's only, 1 HBA
+stations used:
+CS005
+CS006
+RS205
+RS406
+UK608
+
+J2000
+RA:  19:21:44:81
+DEC: +21:53:02.2
+pulsar B1919+21
+
+subbands 200-231 (142 MHz)
+
+nrStations: 5
+nrChannels: 16
+nrSubbands: 32
+integration time: 12208
+
+---
+
+It is the subbands 200..231
+
+You can calculate the frequencies as follows:
+
+center freq = (512 + subbandId) * (clockFreq/1024)
+
+In our case, the clock frequency is 200 MHz.
+
+center freq first subband = (512 + 200) * (200/1024) = 139.0625 MHz
+center freq 2nd subband   = (512 + 201) * (200/1024) = 139.258  MHz
+etc.
+
+So, the width of a suband is 200/1024 = 195.3125 KHz.
+We have 16 channels per subband, so the width of a channel is 12.207 KHz...
+
+However, the frequencies above are the CENTER frequencies of a subband.
+So, the start frequency = centerFrequency - ((nrChannels / 2) * channelBandwidth)
+
+So, the start freq channel 0, subband 200 = 138.96484375 MHz
+and the end freq of channel 15 subband 31 = 145.21484375 MHz
+So, the entire frequency range for this observation is 6.25 MHz
+
+
+It is pulsar B1919+21, with a period of 1.3373 seconds and a pulse width of 0.04 second, and DM = 12.455.
+See also http://en.wikipedia.org/wiki/PSR_B1919%2B21

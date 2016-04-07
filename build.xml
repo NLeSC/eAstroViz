@@ -1,57 +1,80 @@
-<project name="lofar-viz" default="build" basedir=".">
+<project name="eAstroViz" default="build" basedir=".">
 	<description>
-      Build file for abacus
+	Build file for eAstroViz
     </description>
 
-	<!-- Global properties -->
-	<property name="src" location="src" />
-	<property name="tmp" location="tmp" />
-	<property name="lib" location="lib" />
-	<property name="external" location="external" />
-	<property name="jar" location="${lib}/lofar-viz.jar" />
+	<property name="build.sysclasspath" value="ignore" />
 
-	<property name="java.debug.value" value="true" />
+	<property name="version" value="" />
 
-	<path id="external_jars">
-		<fileset dir="${external}">
+	<path id="lib.jars">
+		<fileset dir="lib">
 			<include name="*.jar" />
-			<include name="*/*.jar" />
-			<include name="*/*/*.jar" />
-			<include name="*/*/*/*.jar" />
+			<!-- Exclude library used to generate graphs in javadoc -->
+			<exclude name="apiviz-*.jar" />
 		</fileset>
 	</path>
 
-	<target name="init">
-		<!-- Create the build directory structure used by compile -->
-		<mkdir dir="${tmp}" />
-		<mkdir dir="${lib}" />
+	<target name="build" depends="clean, compile" description="build everything" />
+
+	<target name="test" description="run the unit tests with coverage" depends="build">
+		<ant dir="test" target="test" />
 	</target>
 
-	<target name="compile" depends="init" description="compile the source ">
-		<!-- Compile the java code from ${src} into ${tmp} -->
-		<javac srcdir="${src}" destdir="${tmp}" debug="on" deprecation="on">
-			<classpath refid="external_jars" />
+	<target name="test-integration" description="run the integration tests" depends="build">
+		<ant dir="test" target="test-integration" />
+	</target>
+
+	<target name="examples" description="compile the examples" depends="build">
+		<ant dir="examples" target="build" />
+	</target>
+
+	<target name="compile" description="compile the source ">
+		<mkdir dir="build/classes" />
+		<mkdir dir="dist" />
+
+		<!-- Compile the java code from src into classes -->
+		<javac srcdir="src" destdir="build/classes" debug="on">
+			<classpath refid="lib.jars" />
 		</javac>
+
+		<!-- Put everything in classes into the jar file -->
+		<jar jarfile="dist/eAstroViz${version}.jar" basedir="build/classes" />
+
+		<!-- Copy external dependancies to dist directory -->
+		<copy todir="dist">
+			<fileset dir="lib" />
+		</copy>
+		<copy todir="dist/colormaps">
+			<fileset dir="colormaps" />
+		</copy>
 	</target>
 
-	<target name="build" depends="compile" description="build the JAR file">
-		<!-- Put everything in ${tmp} into the jar file -->
-		<jar jarfile="${jar}">
-            <manifest>
-                <attribute name="Main-Class" value="lofar.Viz" />
-            </manifest>
-			<fileset dir="tmp" />
-			<fileset dir="." includes="log4j.properties" />
-			<fileset dir="src" includes="**/*.properties" />
-		</jar>
+	<target name="javadoc" description="generate javadoc for users">
+		<delete dir="doc/javadoc" />
+		<javadoc destdir="doc/javadoc" access="public" use="true" notree="false" nonavbar="false" sourcepath="src" noindex="false" splitindex="true" version="true" nodeprecatedlist="false" nodeprecated="false" verbose="false" doclet="org.jboss.apiviz.APIviz" docletpath="lib/apiviz-1.3.2.GA.jar" additionalparam="-author -version -keywords -sourceclasspath build/classes">
+			<link href="http://docs.oracle.com/javase/7/docs/api/" />
+			<classpath refid="lib.jars" />
+		</javadoc>
+	</target>
 
-		<!-- And delete the build dir -->
-		<delete dir="${tmp}" />
+	<target name="javadoc-devel" description="generate javadoc for developers">
+		<delete dir="doc/javadoc-devel" />
+		<javadoc destdir="doc/javadoc-devel" access="private" use="true" notree="false" nonavbar="false" sourcepath="src" noindex="false" splitindex="true" version="true" nodeprecatedlist="false" nodeprecated="false" verbose="false" doclet="org.jboss.apiviz.APIviz" additionalparam="-author -version -keywords -sourceclasspath build/classes" docletpath="lib/apiviz-1.3.2.GA.jar">
+			<link href="http://docs.oracle.com/javase/7/docs/api/" />
+			<classpath refid="lib.jars" />
+		</javadoc>
 	</target>
 
 	<target name="clean" description="clean up">
-		<delete dir="${lib}" />
-		<delete dir="${tmp}" />
+		<delete dir="build" />
+		<delete dir="dist" />
+
+		<ant dir="test" target="clean" />
+	</target>
+
+	<target name="allclean" depends="clean" description="clean up everything">
+		<delete dir="doc/javadoc" />
 	</target>
 
 </project>
