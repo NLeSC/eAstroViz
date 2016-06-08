@@ -135,7 +135,7 @@ public abstract class Flagger {
 
         int window = 1;
         for (int iter = 1; iter <= MAX_ITERS; iter++) {
-            final float thresholdI = median + calcThresholdI(FIRST_THRESHOLD, iter, 1.5f) * factor;
+            final float thresholdI = median + calcThresholdI(FIRST_THRESHOLD, window, 1.5f) * factor;
 
             sumThreshold(samples, flags, window, thresholdI);
             window *= 2;
