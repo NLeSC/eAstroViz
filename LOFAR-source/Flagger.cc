@@ -521,8 +521,8 @@ unsigned Flagger::sumThresholdFlagger2D(MultiDimArray<float,2> &powers, MultiDim
 
   unsigned window = 1;
   for (unsigned iter = 1; iter <= MAX_SUM_THRESHOLD_ITERS; iter++) {
-    float thresholdI = median + calcThresholdI(itsCutoffThreshold, iter, 1.5f) * factor;
-//    LOG_DEBUG_STR("THRESHOLD in iter " << iter <<", window " << window << " = " << calcThresholdI(itsCutoffThreshold, iter, 1.5f) << ", becomes = " << thresholdI);
+    float thresholdI = median + calcThresholdI(itsCutoffThreshold, window, 1.5f) * factor;
+//    LOG_DEBUG_STR("THRESHOLD in iter " << iter <<", window " << window << " = " << calcThresholdI(itsCutoffThreshold, window, 1.5f) << ", becomes = " << thresholdI);
 
     extraFlagged += sumThreshold2DHorizontal(powers, flags, window, thresholdI);
     extraFlagged += sumThreshold2DVertical(powers, flags, window, thresholdI);
@@ -594,8 +594,8 @@ unsigned Flagger::sumThresholdFlagger1D(std::vector<float>& powers, std::vector<
   unsigned extraFlagged = 0;
   unsigned window = 1;
   for (unsigned iter = 1; iter <= MAX_SUM_THRESHOLD_ITERS; iter++) {
-    float thresholdI = median + calcThresholdI(itsCutoffThreshold, iter, 1.5f) * factor;
-//    LOG_DEBUG_STR("THRESHOLD in iter " << iter <<", window " << window << " = " << calcThresholdI(itsCutoffThreshold, iter, 1.5f) << ", becomes = " << thresholdI);
+    float thresholdI = median + calcThresholdI(itsCutoffThreshold, window, 1.5f) * factor;
+//    LOG_DEBUG_STR("THRESHOLD in iter " << iter <<", window " << window << " = " << calcThresholdI(itsCutoffThreshold, window, 1.5f) << ", becomes = " << thresholdI);
     extraFlagged += sumThreshold1D(powers, flags, window, thresholdI);
     window *= 2;
   }
