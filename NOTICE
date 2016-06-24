@@ -1,6 +1,20 @@
-The Netherlands eScience center eAstronomy visualization tool.
+This is a visualization and RFI mitigation tool of the Netherlands eScience center eAstronomy project.
 
-Copyright 2013 The Netherlands eScience Center
+This tool can convert and visualize radio astronomy measurement sets
+(i.e. visibilities), as well as most LOFAR intermediate data products,
+such as raw voltages, filtered data and beam formed data. In addition,
+this tool can perform RFI mitigation.
+
+Please cite as:
+
+Rob V. van Nieuwpoort and the LOFAR team:
+Exascale Real-Time Radio Frequency Interference Mitigation
+Exascale Radio Astronomy, AAS Topical Conference Series
+Vol. 2. Proceedings of the conference held 30 March - 4 April, 2014 in
+Monterey, California. Bulletin of the American Astronomical Society,
+Vol. 46, #3, #403.01
+
+Copyright 2016 The Netherlands eScience Center
 
 Written by Rob van Nieuwpoort, R.vanNieuwpoort@esciencecenter.nl
 
