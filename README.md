@@ -14,12 +14,16 @@ Vol. 2. Proceedings of the conference held 30 March - 4 April, 2014 in
 Monterey, California. Bulletin of the American Astronomical Society,
 Vol. 46, #3, #403.01
 
+The slides used at the conference are available in the doc directory
+in this package, and are available online here:
+
+http://rvannieuwpoort.synology.me/papers/Exascale-Astronomy-2014-Monterey-RFI.pdf
+
 The abstract of this article is here: 
 
 http://adsabs.harvard.edu/abs/2014era..conf40301V
 
-The slides used at the conference are available in the doc directory
-in this package, and is shown below as well:
+The abstract is shown below as well:
 
 
 
