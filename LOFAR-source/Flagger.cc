@@ -17,8 +17,6 @@
 namespace LOFAR {
 namespace RTCP {
 
-//using boost::lexical_cast;
-
 static NSTimer RFIStatsTimer("RFI post statistics calculations", true, true);
 
 Flagger::Flagger(const Parset& parset, const unsigned nrStations, const unsigned nrSubbands, const unsigned nrChannels, const float cutoffThreshold, 
