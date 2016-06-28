@@ -49,7 +49,7 @@ public class ConvertBeamFormed {
         }
     }
 
-    void read() {
+    void read() throws IOException {
         final BeamFormedDataReader bfdr = new BeamFormedDataReader(fileName, Integer.MAX_VALUE, Integer.MAX_VALUE, zoomFactor);
         final BeamFormedData bfd = bfdr.read();
         data = bfd.getData();

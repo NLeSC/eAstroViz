@@ -124,7 +124,11 @@ public class PulsarFrame extends javax.swing.JFrame {
             BeamFormedData bf = (BeamFormedData) data;
             BeamFormedDataReader r =
                     new BeamFormedDataReader(bf.getFileName(), bf.getMaxSequenceNr(), bf.getMaxSubbands(), bf.getZoomFactor());
-            data = r.read();
+            try {
+				data = r.read();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
         } else if (data instanceof CompressedBeamFormedData) {
             CompressedBeamFormedData bf = (CompressedBeamFormedData) data;
             try {

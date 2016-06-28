@@ -19,6 +19,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedData;
 import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedDataReader;
 import nl.esciencecenter.eastroviz.dataformats.preprocessed.compressedbeamformed.CompressedBeamFormedData;
@@ -34,9 +37,6 @@ import nl.esciencecenter.eastroviz.gui.BeamFormedFrame;
 import nl.esciencecenter.eastroviz.gui.PreProcessedFrame;
 import nl.esciencecenter.eastroviz.gui.RawFrame;
 import nl.esciencecenter.eastroviz.gui.VisibilityFrame;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class Viz {
     private static final Logger LOGGER = LoggerFactory.getLogger(Viz.class);
