@@ -1,6 +1,7 @@
 package nl.esciencecenter.eastroviz;
 
 import java.io.File;
+import java.io.IOException;
 
 import nl.esciencecenter.eastroviz.dataformats.DataProvider;
 import nl.esciencecenter.eastroviz.dataformats.beamformed.BeamFormedDataReader;
@@ -39,7 +40,11 @@ public final class PulseProfile implements BeamFormedSampleHandler {
     }
 
     void start() {
-        read();
+        try {
+			read();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
         double totalPower = 0.0;
 
@@ -63,7 +68,7 @@ public final class PulseProfile implements BeamFormedSampleHandler {
         ", total power: " + totalPower + ", SNR: " + snr);
     }
 
-    void read() {
+    void read() throws IOException {
         BeamFormedDataReader reader = new BeamFormedDataReader(fileName, maxSequenceNr, maxSubbands, 1);
         m = reader.readMetaData();
         double sampleRate = m.totalNrSamples / m.totalIntegrationTime;

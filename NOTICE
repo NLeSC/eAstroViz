@@ -14,9 +14,38 @@ Vol. 2. Proceedings of the conference held 30 March - 4 April, 2014 in
 Monterey, California. Bulletin of the American Astronomical Society,
 Vol. 46, #3, #403.01
 
+
 Copyright 2016 The Netherlands eScience Center
 
 Written by Rob van Nieuwpoort, R.vanNieuwpoort@esciencecenter.nl
 
-This product includes the SLF4J library, which is Copyright (c) 2004-2013 QOS.ch
+------------------------------------------------------------------------------
+This project includes the NetCDF-Java Library, which is Copyright (c) 2004-2013 QOS.ch
+See "notices/LICENSE.slf4j.txt" for the licence information of the SLF4J library.
+
+This project includes the SLF4J library, which is Copyright (c) 2004-2013 QOS.ch
 See "notices/LICENSE.slf4j.txt" for the licence information of the SLF4J library. 
+
+This project includes the Logback library, which is Copyright (c)
+1999-2012, QOS.ch. See "notices/LICENSE.logback.txt" for the licence
+information of the Logback library.
+
+This project includes the JaCoCo library, which is Copyright
+(c) 2009, 2013 Mountainminds GmbH & Co. KG and Contributors. See
+"notices/LICENSE.jacoco.txt" for the licence information of the JaCoCo
+library.
+
+This project includes the JUnit library. See "notices/LICENSE.junit.txt"
+for the licence information of the JUnit library.
+
+This project includes the Mockito library, which is Copyright (c) 2007
+Mockito contributors. See "notices/LICENSE.mockito.txt" for the licence
+information of the Mockito library.
+
+This project includes the Commons-logging library, which is Copyright (c)
+Apache Software Foundation. See "notices/LICENSE.commons-logging.txt"
+for the licence information of the Commons-logging library.
+
+This project includes the log4j library, which is Copyright (c) Apache 
+Software Foundation. See "notices/LICENSE.log4j.txt" for the licence 
+information of the log4j library.
