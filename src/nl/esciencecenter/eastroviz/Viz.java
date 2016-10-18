@@ -58,7 +58,8 @@ public final class Viz {
     private boolean compressedBeamFormed = false;
     private boolean visibilities = false;
     private final int integrationFactor;
-
+    private String flaggingType = "none";
+    
     public static final class ExtFilter implements FilenameFilter {
         private final String ext;
 
@@ -74,7 +75,7 @@ public final class Viz {
 
     public Viz(final String fileName, final boolean batch, final boolean raw, boolean visibilities, final boolean beamFormed,
             final boolean intermediate, final boolean filtered, final boolean compressedBeamFormed, final int integrationFactor,
-            final int maxSeqNo, final int maxSubbands) {
+            final int maxSeqNo, final int maxSubbands, final String flaggingType) {
         this.fileName = fileName;
         this.batch = batch;
         this.raw = raw;
@@ -86,6 +87,7 @@ public final class Viz {
         this.integrationFactor = integrationFactor;
         this.maxSequenceNr = maxSeqNo;
         this.maxSubbands = maxSubbands;
+        this.flaggingType = flaggingType;
 /*
         // Use the platform's native look and feel.
         try {
@@ -103,6 +105,8 @@ public final class Viz {
     public void start() throws IOException {
         final int station = 0;
 
+        // TODO set flagging type for all data formats
+        
         if (beamFormed) {
             final BeamFormedDataReader reader =
                     new BeamFormedDataReader(fileName, maxSequenceNr, maxSubbands, integrationFactor /* really the zoom factor in this case*/);
@@ -115,7 +119,6 @@ public final class Viz {
                 System.exit(0);
             }
 
-            // TODO ook doen voor andere frames
             java.awt.EventQueue.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -138,7 +141,12 @@ public final class Viz {
                 System.exit(0);
             }
 
-            beamFormedFrame.setVisible(true);
+            java.awt.EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    beamFormedFrame.setVisible(true);
+                }
+            });
             return;
         }
 
@@ -155,7 +163,12 @@ public final class Viz {
                 System.exit(0);
             }
 
-            intermediateFrame.setVisible(true);
+            java.awt.EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    intermediateFrame.setVisible(true);
+                }
+            });
             return;
         }
 
@@ -167,7 +180,9 @@ public final class Viz {
 
                 for (int s = 0; s < nrStations; s++) {
                     filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, s, 0);
+                    filteredData.setFlagger(flaggingType);
                     filteredData.read();
+                    filteredData.flag();
                     final PreProcessedFrame filteredFrame = new PreProcessedFrame(filteredData);
                     for (int pol = 0; pol < NR_POLARIZATIONS; pol++) {
                         filteredFrame.setPolarization(pol);
@@ -179,12 +194,19 @@ public final class Viz {
             } else {
                 final FilteredData filteredData =
                         new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station, 0);
+                filteredData.setFlagger(flaggingType);
                 filteredData.read();
+//                filteredData.flag();
 
                 final PreProcessedFrame filteredFrame = new PreProcessedFrame(filteredData);
                 filteredFrame.pack();
 
-                filteredFrame.setVisible(true);
+                java.awt.EventQueue.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        filteredFrame.setVisible(true);
+                    }
+                });
                 return;
             }
         }
@@ -204,7 +226,12 @@ public final class Viz {
 
             final RawFrame rawFrame = new RawFrame(this, rawData);
             rawFrame.pack();
-            rawFrame.setVisible(true);
+            java.awt.EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    rawFrame.setVisible(true);
+                }
+            });
             return;
         }
 
@@ -235,7 +262,12 @@ public final class Viz {
                 visibilityData.read();
                 final VisibilityFrame vizFrame = new VisibilityFrame(this, visibilityData, 0 /*pol*/);
                 vizFrame.pack();
-                vizFrame.setVisible(true);
+                java.awt.EventQueue.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        vizFrame.setVisible(true);
+                    }
+                });
                 return;
             }
         }
@@ -255,9 +287,10 @@ public final class Viz {
         int maxSeqNo = Integer.MAX_VALUE;
         int maxSubbands = Integer.MAX_VALUE;
         int integrationFactor = 1;
+        String flaggingType = "none";
 
         if (args.length < 1) {
-            LOGGER.info("Usage: Viz [-batch] [-maxSeqNo] [-data format] <dataset directory or raw file>");
+            LOGGER.info("Usage: Viz [-batch] [-maxSeqNo] [-flaggingType] [-data format] <dataset directory or raw file>");
             System.exit(1);
         }
 
@@ -275,6 +308,9 @@ public final class Viz {
             } else if (args[i].equals("-integration")) {
                 i++;
                 integrationFactor = Integer.parseInt(args[i]);
+            } else if (args[i].equals("-flaggingType")) {
+                i++;
+                flaggingType = args[i];
             } else {
                 // it must be the filename
                 if (fileName != null) {
@@ -304,7 +340,7 @@ public final class Viz {
 
         try {
             new Viz(fileName, batch, raw, visibilities, beamFormed, intermediate, filtered, compressedBeamFormed,
-                    integrationFactor, maxSeqNo, maxSubbands).start();
+                    integrationFactor, maxSeqNo, maxSubbands, flaggingType).start();
         } catch (final IOException e) {
             e.printStackTrace();
             System.exit(1);

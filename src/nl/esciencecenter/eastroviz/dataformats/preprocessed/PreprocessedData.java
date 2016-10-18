@@ -73,7 +73,7 @@ public abstract class PreprocessedData extends DataProvider {
     public void read() throws IOException {
         final FileInputStream fin = new FileInputStream(getFileName());
         final DataInputStream din = new DataInputStream(fin);
-
+        
         nrStations = din.readInt();
         nrTimes = din.readInt() / integrationFactor;
         final int nrSubbandsInFile = din.readInt();
@@ -85,7 +85,7 @@ public abstract class PreprocessedData extends DataProvider {
             nrSubbands = getMaxSubbands();
         }
 
-        logger.info("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes + ", nrSubbands = " + nrSubbandsInFile
+        logger.info("nrTimes = " + (nrTimes * integrationFactor) + ", with integration " + integrationFactor + ", time = " + nrTimes + ", nrSubbands = " + nrSubbandsInFile
                 + ", nrChannels = " + nrChannels);
 
         if (getMaxSequenceNr() < nrTimes) {

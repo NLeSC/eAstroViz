@@ -29,14 +29,13 @@ public abstract class Flagger {
     private static StatisticsType statisticsType = StatisticsType.STDDEV_MAD;
     private static final int MAX_ITERS = 5;
     private static final float FIRST_THRESHOLD = 6.0f; // from Andre's code: 6.0f
-    private static final float GAUSSIAN_SCALE_FACTOR = 1.4826f; // See https://en.wikipedia.org/wiki/Median_absolute_deviation
+    private static final float GAUSSIAN_SCALE_FACTOR = 1.4826f; // Scale value to estimate stddev from the MAD. See https://en.wikipedia.org/wiki/Median_absolute_deviation
 
     private static final Logger logger = LoggerFactory.getLogger(Flagger.class);
 
     private float mean;
     private float stdDev;
     private float median;
-
     private float baseSensitivity;
     private float SIREtaValue;
 

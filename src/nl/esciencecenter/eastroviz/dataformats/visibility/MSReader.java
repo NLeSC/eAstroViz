@@ -112,7 +112,7 @@ public final class MSReader {
             LOGGER.debug("reading file: " + f.getCanonicalPath());
         }
         final FileInputStream fin = new FileInputStream(f);
-        final BufferedInputStream bin = new BufferedInputStream(fin, 512);
+        final BufferedInputStream bin = new BufferedInputStream(fin, 10*1024*1024);
         in = new DataInputStream(bin);
     }
 

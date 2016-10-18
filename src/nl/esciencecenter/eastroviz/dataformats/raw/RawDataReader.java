@@ -130,7 +130,7 @@ public class RawDataReader {
 
         final File f = new File(fileName);
         final FileInputStream fin = new FileInputStream(f);
-        final BufferedInputStream bin = new BufferedInputStream(fin, 512);
+        final BufferedInputStream bin = new BufferedInputStream(fin, 10*1024*1024);
         din = new DataInputStream(bin);
     }
 

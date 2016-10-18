@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.eastroviz.dataformats;
 
+import java.util.Arrays;
+
 /**
  * @author rob
  * 
@@ -128,7 +130,7 @@ public abstract class DataProvider {
             }
         }
 
-        throw new RuntimeException("illegal flagger type");
+        throw new RuntimeException("Illegal flagger type. Options are: " + Arrays.toString(flaggerList));
     }
 
     public String getFlagger() {
