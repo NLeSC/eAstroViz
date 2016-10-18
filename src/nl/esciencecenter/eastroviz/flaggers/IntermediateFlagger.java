@@ -35,10 +35,10 @@ public final class IntermediateFlagger extends Flagger {
         }
 
         for (int pol = 0; pol < nrPols; pol++) {
-            calculateWinsorizedStatistics(samples[pol], flags[pol]); // sets mean, median, stdDev
+            calculateStatistics(samples[pol], flags[pol]); // sets mean, median, stdDev
             sumThreshold1D(samples[pol], flags[pol]);
 
-            calculateWinsorizedStatistics(samples[pol], flags[pol]); // sets mean, median, stdDev
+            calculateStatistics(samples[pol], flags[pol]); // sets mean, median, stdDev
             sumThreshold1D(samples[pol], flags[pol]);
         }
 
@@ -59,12 +59,12 @@ public final class IntermediateFlagger extends Flagger {
 
         //      float[] tmp = new float[samples.length];
 
-        calculateWinsorizedStatistics(samples, flagged); // sets mean, median, stdDev
+        calculateStatistics(samples, flagged); // sets mean, median, stdDev
         sumThreshold1D(samples, flagged);
 
         logger.debug("samples flagged after 1st iter: " + getNrFlaggedSamples(flagged));
 
-        calculateWinsorizedStatistics(samples, flagged); // sets mean, median, stdDev
+        calculateStatistics(samples, flagged); // sets mean, median, stdDev
         sumThreshold1D(samples, flagged);
 
         logger.debug("samples flagged after 2nd iter: " + getNrFlaggedSamples(flagged));
@@ -81,7 +81,7 @@ public final class IntermediateFlagger extends Flagger {
             diff[i] = samples[i] - smoothed[i];
         }
 
-        calculateWinsorizedStatistics(diff, flagged); // sets mean, median, stdDev
+        calculateStatistics(diff, flagged); // sets mean, median, stdDev
         sumThreshold1D(diff, flagged);
 
         SIROperator(flagged);

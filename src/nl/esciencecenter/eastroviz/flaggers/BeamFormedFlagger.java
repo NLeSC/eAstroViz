@@ -22,10 +22,10 @@ public final class BeamFormedFlagger extends Flagger {
     }
 
     public void flag(final float[] samples, final boolean[] flagged) {
-        calculateWinsorizedStatistics(samples, flagged); // sets mean, median, stdDev
+        calculateStatistics(samples, flagged); // sets mean, median, stdDev
         sumThreshold1D(samples, flagged);
 
-        calculateWinsorizedStatistics(samples, flagged); // sets mean, median, stdDev
+        calculateStatistics(samples, flagged); // sets mean, median, stdDev
         sumThreshold1D(samples, flagged);
 
         SIROperator(flagged);
@@ -37,10 +37,10 @@ public final class BeamFormedFlagger extends Flagger {
 
         //      float[] tmp = new float[samples.length];
 
-        calculateWinsorizedStatistics(samples, flagged); // sets mean, median, stdDev
+        calculateStatistics(samples, flagged); // sets mean, median, stdDev
         sumThreshold1D(samples, flagged);
 
-        calculateWinsorizedStatistics(samples, flagged); // sets mean, median, stdDev
+        calculateStatistics(samples, flagged); // sets mean, median, stdDev
         sumThreshold1D(samples, flagged);
 
         float[] tmp = samples.clone();
@@ -55,7 +55,7 @@ public final class BeamFormedFlagger extends Flagger {
             diff[i] = samples[i] - smoothed[i];
         }
 
-        calculateWinsorizedStatistics(diff, flagged); // sets mean, median, stdDev
+        calculateStatistics(diff, flagged); // sets mean, median, stdDev
         sumThreshold1D(diff, flagged);
 
         SIROperator(flagged);

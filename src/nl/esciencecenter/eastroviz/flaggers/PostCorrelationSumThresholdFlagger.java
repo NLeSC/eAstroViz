@@ -31,10 +31,10 @@ public class PostCorrelationSumThresholdFlagger extends PostCorrelationFlagger {
         }
 
         for (int pol = 0; pol < nrPols; pol++) {
-            calculateWinsorizedStatistics(samples[pol], flags[pol]); // sets mean, median, stdDev
+            calculateStatistics(samples[pol], flags[pol]); // sets mean, median, stdDev
             sumThreshold1D(samples[pol], flags[pol]);
 
-            calculateWinsorizedStatistics(samples[pol], flags[pol]); // sets mean, median, stdDev
+            calculateStatistics(samples[pol], flags[pol]); // sets mean, median, stdDev
             sumThreshold1D(samples[pol], flags[pol]);
         }
 
@@ -61,10 +61,10 @@ public class PostCorrelationSumThresholdFlagger extends PostCorrelationFlagger {
     // if one of the polarizations exceeds the threshold, flag them all.
     @Override
     protected void flag(final float[] powers, final boolean[] flagged, final int pol) {
-        calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
+        calculateStatistics(powers, flagged); // sets mean, median, stdDev
         sumThreshold1D(powers, flagged);
 
-        calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
+        calculateStatistics(powers, flagged); // sets mean, median, stdDev
         sumThreshold1D(powers, flagged);
 
         SIROperator(flagged);

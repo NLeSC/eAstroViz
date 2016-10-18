@@ -45,7 +45,7 @@ public class PostCorrelationSmoothedSumThresholdFlagger extends PostCorrelationS
     @Override
     protected void flag(final float[] powers, final boolean[] flagged, final int pol) {
 
-        calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
+        calculateStatistics(powers, flagged); // sets mean, median, stdDev
 
         logger.trace("mean = " + getMean() + ", median = " + getMedian() + ", stdDev = " + getStdDev());
 
@@ -64,12 +64,12 @@ public class PostCorrelationSmoothedSumThresholdFlagger extends PostCorrelationS
         }
 
         // flag based on difference
-        calculateWinsorizedStatistics(diff, flagged); // sets mean, median, stdDev                
+        calculateStatistics(diff, flagged); // sets mean, median, stdDev                
         setBaseSensitivity(originalSensitivity * 1.0f); // higher number is less sensitive!
         sumThreshold1D(diff, flagged);
 
         // and one final pass on the flagged power
-        calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
+        calculateStatistics(powers, flagged); // sets mean, median, stdDev
         setBaseSensitivity(originalSensitivity * 0.80f); // higher number is less sensitive!
         sumThreshold1D(powers, flagged);
 

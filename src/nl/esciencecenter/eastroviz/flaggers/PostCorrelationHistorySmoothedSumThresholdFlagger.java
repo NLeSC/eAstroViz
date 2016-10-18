@@ -36,7 +36,7 @@ public class PostCorrelationHistorySmoothedSumThresholdFlagger extends PostCorre
     @Override
     protected void flag(final float[] powers, final boolean[] flagged, final int pol) {
         final float originalSensitivity = getBaseSensitivity();
-        calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
+        calculateStatistics(powers, flagged); // sets mean, median, stdDev
 
         logger.trace("mean = " + getMean() + ", median = " + getMedian() + ", stdDev = " + getStdDev());
 
@@ -54,17 +54,17 @@ public class PostCorrelationHistorySmoothedSumThresholdFlagger extends PostCorre
         }
 
         // flag based on difference
-        calculateWinsorizedStatistics(diff, flagged); // sets mean, median, stdDev                
+        calculateStatistics(diff, flagged); // sets mean, median, stdDev                
         setBaseSensitivity(originalSensitivity * 1.0f); // higher number is less sensitive!
         sumThreshold1D(diff, flagged);
 
         // and one final pass on the flagged power
-        calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
+        calculateStatistics(powers, flagged); // sets mean, median, stdDev
         setBaseSensitivity(originalSensitivity * 0.90f); // higher number is less sensitive!
         sumThreshold1D(powers, flagged);
         setBaseSensitivity(originalSensitivity);
 
-        calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
+        calculateStatistics(powers, flagged); // sets mean, median, stdDev
 
         if (history.getSize(pol) >= PostCorrelationFlaggerHistory.MIN_HISTORY_SIZE) {
             final float meanMedian = history.getMeanMedian(pol);
