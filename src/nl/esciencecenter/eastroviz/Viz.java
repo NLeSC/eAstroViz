@@ -180,10 +180,10 @@ public final class Viz {
 
                 for (int s = 0; s < nrStations; s++) {
                     filteredData = new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, s, 0);
-                    filteredData.setFlagger(flaggingType);
                     filteredData.read();
                     filteredData.flag();
                     final PreProcessedFrame filteredFrame = new PreProcessedFrame(filteredData);
+                    filteredFrame.setFlaggerType(flaggingType);
                     for (int pol = 0; pol < NR_POLARIZATIONS; pol++) {
                         filteredFrame.setPolarization(pol);
                         filteredFrame.save("outputFiltered-station-" + s + "-polarization-"
@@ -194,13 +194,12 @@ public final class Viz {
             } else {
                 final FilteredData filteredData =
                         new FilteredData(fileName, integrationFactor, maxSequenceNr, maxSubbands, station, 0);
-                filteredData.setFlagger(flaggingType);
                 filteredData.read();
-//                filteredData.flag();
 
                 final PreProcessedFrame filteredFrame = new PreProcessedFrame(filteredData);
                 filteredFrame.pack();
-
+                filteredFrame.setFlaggerType(flaggingType);
+                
                 java.awt.EventQueue.invokeLater(new Runnable() {
                     @Override
                     public void run() {
