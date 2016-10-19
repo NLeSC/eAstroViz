@@ -34,9 +34,6 @@ http://adsabs.harvard.edu/abs/2014era..conf40301V
 
 The abstract is shown below as well.
 
- .. image:: lib/screenshot.png
-     :alt: Screenshot of the eAstroViz RFI visualization tool
-
 
 Exascale Real-Time Radio Frequency Interference Mitigation
 ----------------------------------------------------------
