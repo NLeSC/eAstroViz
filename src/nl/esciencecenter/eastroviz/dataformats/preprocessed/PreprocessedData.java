@@ -60,8 +60,8 @@ public abstract class PreprocessedData extends DataProvider {
     private int station1;
     private int pol;
 
-    public PreprocessedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands,
-            final String[] polList, final int station, final int pol) {
+    public PreprocessedData(final String fileName, final int integrationFactor, final int maxSequenceNr, final int maxSubbands, final String[] polList,
+            final int station, final int pol) {
         super();
         init(fileName, maxSequenceNr, maxSubbands, polList, new String[] { "none", "Intermediate" });
         this.integrationFactor = integrationFactor;
@@ -73,7 +73,7 @@ public abstract class PreprocessedData extends DataProvider {
     public void read() throws IOException {
         final FileInputStream fin = new FileInputStream(getFileName());
         final DataInputStream din = new DataInputStream(fin);
-
+        
         nrStations = din.readInt();
         nrTimes = din.readInt() / integrationFactor;
         final int nrSubbandsInFile = din.readInt();
@@ -85,8 +85,8 @@ public abstract class PreprocessedData extends DataProvider {
             nrSubbands = getMaxSubbands();
         }
 
-        logger.info("nrTimes = " + (nrTimes * integrationFactor) + ", with integration, time = " + nrTimes + ", nrSubbands = "
-                + nrSubbandsInFile + ", nrChannels = " + nrChannels);
+        logger.info("nrTimes = " + (nrTimes * integrationFactor) + ", with integration " + integrationFactor + ", time = " + nrTimes + ", nrSubbands = " + nrSubbandsInFile
+                + ", nrChannels = " + nrChannels);
 
         if (getMaxSequenceNr() < nrTimes) {
             nrTimes = getMaxSequenceNr();
@@ -222,6 +222,8 @@ public abstract class PreprocessedData extends DataProvider {
             return;
         }
 
+        long start = System.currentTimeMillis();
+
         if (nrChannels > 1) {
             final IntermediateFlagger[] flaggers = new IntermediateFlagger[nrSubbands];
             for (int i = 0; i < nrSubbands; i++) {
@@ -250,6 +252,10 @@ public abstract class PreprocessedData extends DataProvider {
                 }
             }
         }
+
+        long end = System.currentTimeMillis();
+        long time = end - start;
+        logger.info("flagging took: " + time + " ms");
     }
 
     public final int getTotalTime() {

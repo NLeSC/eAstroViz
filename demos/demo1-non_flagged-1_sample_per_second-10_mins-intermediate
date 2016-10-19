@@ -1,3 +1,3 @@
 #! /bin/bash
 
-./viz -maxSeqNo 600 -integration 16 datasets/pulsar-experiment/station_0-non_flagged-10_mins-16_samples_per_second.intermediate
+./viz -maxSeqNo 600 -integration 16 ../LOFAR-datasets/pulsar-experiment/station_0-non_flagged-10_mins-16_samples_per_second.intermediate

@@ -34,19 +34,19 @@ public class PostCorrelationHistorySumThresholdFlagger extends PostCorrelationSu
     @Override
     protected void flag(final float[] powers, final boolean[] flagged, final int pol) {
 
-        calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
+        calculateStatistics(powers, flagged); // sets mean, median, stdDev
 
         logger.trace("mean = " + getMean() + ", median = " + getMedian() + ", stdDev = " + getStdDev());
 
         sumThreshold1D(powers, flagged); // sets flags, and replaces flagged samples with threshold
 
-        calculateWinsorizedStatistics(powers, flagged); // sets mean, median, stdDev
+        calculateStatistics(powers, flagged); // sets mean, median, stdDev
 
         if (history.getSize(pol) >= PostCorrelationFlaggerHistory.MIN_HISTORY_SIZE) {
             final float[] integratedPowers = history.getIntegratedPowers(pol);
             integratedHistoryFlagger(integratedPowers, flagged);
             // we screwed up the stats, just recalculate :-)
-            calculateWinsorizedStatistics(powers, flagged);
+            calculateStatistics(powers, flagged);
         }
 
         if (history.getSize(pol) >= PostCorrelationFlaggerHistory.MIN_HISTORY_SIZE) {
@@ -79,7 +79,7 @@ public class PostCorrelationHistorySumThresholdFlagger extends PostCorrelationSu
     }
 
     void integratedHistoryFlagger(final float[] integratedPowers, final boolean[] flagged) {
-        calculateWinsorizedStatistics(integratedPowers, flagged);
+        calculateStatistics(integratedPowers, flagged);
         sumThreshold1D(integratedPowers, flagged); // sets flags, and replaces flagged samples with threshold
     }
 }

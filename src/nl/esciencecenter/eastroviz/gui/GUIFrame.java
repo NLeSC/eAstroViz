@@ -39,11 +39,13 @@ public abstract class GUIFrame extends javax.swing.JFrame {
     private static final long serialVersionUID = 1L;
     private DataProvider data;
     private GUIPanel samplePanel;
-    private String flaggerType = "none";
+    private String flaggerType;
     private int[] histogram;
 
     public GUIFrame(final DataProvider data) {
         this.data = data;
+        flaggerType = data.getFlaggerNames()[0];
+        
         setTitle("eAstronomy visualizer");
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -53,10 +55,10 @@ public abstract class GUIFrame extends javax.swing.JFrame {
         scrollPane.setViewportView(samplePanel);
 
         flaggerTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel(data.getFlaggerNames()));
-        flaggerTypeComboBox.setSelectedItem("none");
+        flaggerTypeComboBox.setSelectedItem(flaggerType);
 
         polarizationComboBox.setModel(new javax.swing.DefaultComboBoxModel(data.getPolarizationNames()));
-        flaggerTypeComboBox.setSelectedItem(data.getPolarizationNames()[0]);
+        polarizationComboBox.setSelectedItem(data.getPolarizationNames()[0]);
 
         sensitivityLabel.setText(String.format("%2.2f", sensitivitySlider.getValue() / 100.0f));
 
@@ -185,7 +187,9 @@ public abstract class GUIFrame extends javax.swing.JFrame {
             return;
         }
         this.flaggerType = flaggerType;
+        flaggerTypeComboBox.setSelectedItem(flaggerType);
         samplePanel.setFlagger(flaggerType);
+        repaint();
     }
 
     protected void setPanel(final GUIPanel panel) {

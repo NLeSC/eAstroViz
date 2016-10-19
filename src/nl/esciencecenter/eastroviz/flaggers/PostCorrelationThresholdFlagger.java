@@ -27,7 +27,7 @@ public class PostCorrelationThresholdFlagger extends PostCorrelationFlagger {
     @Override
     protected void flag(final float[] powers, final boolean[] flagged, final int pol) {
         //                calculateStatistics();
-        calculateWinsorizedStatistics(powers, flagged);
+        calculateStatistics(powers, flagged);
 
         final float threshold = getMedian() + cutoffThreshold * getBaseSensitivity() * getStdDev();
 

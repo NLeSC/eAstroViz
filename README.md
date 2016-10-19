@@ -5,6 +5,15 @@ This tool can convert and visualize radio astronomy measurement sets
 such as raw voltages, filtered data and beam formed data. In addition,
 this tool can perform RFI mitigation.
 
+In addition, this repository contains the real-time RFI mitigation code developed
+for LOFAR, in the directory LOFAR-source.
+
+Finally, we have developed a GPU prototype version of the code as well.
+This code was developed by Linus Schoemaker in the context of his masters project.
+The code is in the directory GPU-source.
+
+All code is distributed under the Apache 2.0 licence.
+
 Please cite as:
 
 Rob V. van Nieuwpoort and the LOFAR team:

@@ -29,7 +29,7 @@ public class ColorMap {
     }
     
     public boolean isBlandAndWhite() {
-        return name.equals("bw");
+        return name.equals("bw") || name.equals("wb");
     }
     
     public int getColor(float min, float max, float var) {

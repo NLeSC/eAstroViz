@@ -20,16 +20,22 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * There are three options for statistics. 1. Use medians 2. more robust: use winsorized medians. In this case, we are 10% robust
+ * against polluted data. 3. Much better (learned at RFI2016 workshop, talk by Kaushal D. Buch) is to use the STDDEV_MAD. This gives 50%
+ * robustness against polluted data.
+ */
 public abstract class Flagger {
+    private static StatisticsType statisticsType = StatisticsType.STDDEV_MAD;
     private static final int MAX_ITERS = 5;
     private static final float FIRST_THRESHOLD = 6.0f; // from Andre's code: 6.0f
+    private static final float GAUSSIAN_SCALE_FACTOR = 1.4826f; // Scale value to estimate stddev from the MAD. See https://en.wikipedia.org/wiki/Median_absolute_deviation
 
     private static final Logger logger = LoggerFactory.getLogger(Flagger.class);
 
     private float mean;
     private float stdDev;
     private float median;
-
     private float baseSensitivity;
     private float SIREtaValue;
 
@@ -50,38 +56,39 @@ public abstract class Flagger {
         float[] cleanSamples = getCleanSamples(samples, flags, unflaggedCount);
         Arrays.sort(cleanSamples);
 
+        switch (statisticsType) {
+        case STDDEV_MEDIAN:
+            calculateStatisticsNormal(cleanSamples, flags);
+            break;
+        case STDDEV_WINSORIZED_MEDIAN:
+            calculateWinsorizedStatistics(cleanSamples, flags);
+        case STDDEV_MAD:
+            calculateMADStatistics(cleanSamples, flags);
+            break;
+        }
+    }
+
+    private final void calculateStatisticsNormal(final float[] cleanSamples, final boolean[] flags) {
         mean = 0.0f;
         for (float cleanSample : cleanSamples) {
             mean += cleanSample;
         }
-        mean /= unflaggedCount;
+        mean /= cleanSamples.length;
 
-        median = cleanSamples[unflaggedCount / 2];
+        median = cleanSamples[cleanSamples.length / 2];
 
         stdDev = 0.0f;
         for (float cleanSample : cleanSamples) {
             final float diff = cleanSample - mean;
             stdDev += diff * diff;
         }
-        stdDev /= unflaggedCount;
+        stdDev /= cleanSamples.length;
         stdDev = (float) Math.sqrt(stdDev);
     }
 
-    protected final void calculateWinsorizedStatistics(final float[] samples, final boolean[] flags) {
-        int unflaggedCount = getNrUnflaggedSamples(flags);
-
-        if (unflaggedCount == 0) {
-            median = 0.0f;
-            mean = 0.0f;
-            stdDev = 0.0f;
-            return;
-        }
-
-        float[] cleanSamples = getCleanSamples(samples, flags, unflaggedCount);
-        Arrays.sort(cleanSamples);
-
-        int lowIndex = (int) Math.floor(0.1 * unflaggedCount);
-        int highIndex = (int) Math.ceil(0.9 * unflaggedCount);
+    private final void calculateWinsorizedStatistics(final float[] cleanSamples, final boolean[] flags) {
+        int lowIndex = (int) Math.floor(0.1 * cleanSamples.length);
+        int highIndex = (int) Math.ceil(0.9 * cleanSamples.length);
         if (highIndex > 0) {
             highIndex--;
         }
@@ -90,37 +97,52 @@ public abstract class Flagger {
 
         median = cleanSamples[cleanSamples.length / 2];
 
+        // Assume an array of 0 .. 9; low idx = 3; high idx = 7
+        // low vals = 0, 1, 2, 3 -> #= 4
+        // normal:    4, 5, 6    -> #= 3
+        // high vals: 7, 8, 9    -> #= 3
+        
         // Calculate mean
-        mean = 0.0f;
-        for (int i = 0; i < unflaggedCount; i++) {
-            final float value = cleanSamples[i];
-            if (value < lowValue) {
-                mean += lowValue;
-            } else if (value > highValue) {
-                mean += highValue;
-            } else {
-                mean += value;
-            }
+        mean = (lowIndex+1) * lowValue;
+        for (int i = lowIndex+1; i < highIndex; i++) {
+            mean += cleanSamples[i];
         }
-        mean /= unflaggedCount;
-
-        // Calculate variance
-        stdDev = 0.0f;
-        for (int i = 0; i < unflaggedCount; i++) {
-            final float value = cleanSamples[i];
-            if (value < lowValue) {
-                stdDev += (lowValue - mean) * (lowValue - mean);
-            } else if (value > highValue) {
-                stdDev += (highValue - mean) * (highValue - mean);
-            } else {
-                stdDev += (value - mean) * (value - mean);
-            }
+        mean += (cleanSamples.length - highIndex) * highValue;
+        mean /= cleanSamples.length;
+        
+        stdDev = (lowIndex+1) * ((lowValue - mean) * (lowValue - mean)) ;
+        for (int i = lowIndex+1; i < highIndex; i++) {
+            stdDev += (cleanSamples[i] - mean) * (cleanSamples[i] - mean);
         }
-        stdDev = (float) Math.sqrt(1.54 * stdDev / unflaggedCount);
+        stdDev += (cleanSamples.length - highIndex) * ((highValue - mean) * (highValue - mean));
+        stdDev /= cleanSamples.length;
+        stdDev = (float) Math.sqrt(1.54 * stdDev / cleanSamples.length);
 
         if (logger.isTraceEnabled()) {
-            logger.trace("winsorized stats: size = " + samples.length + ", unFlaggedCount = " + unflaggedCount + ", mean = "
-                    + mean + ", median = " + median + ", stddev = " + stdDev);
+            logger.trace("winsorized stats: unFlaggedCount = " + cleanSamples.length + ", mean = " + mean + ", median = " + median
+                    + ", stddev = " + stdDev);
+        }
+    }
+
+    private final void calculateMADStatistics(final float[] cleanSamples, final boolean[] flags) {
+        mean = 0.0f;
+        for (float cleanSample : cleanSamples) {
+            mean += cleanSample;
+        }
+        mean /= cleanSamples.length;
+
+        median = cleanSamples[cleanSamples.length / 2];
+
+        // Calculate STDDEV_MAD
+        float mad = 0.0f;
+        for (int i = 0; i < cleanSamples.length; i++) {
+            mad += Math.abs(cleanSamples[i] - median);
+        }
+        stdDev = GAUSSIAN_SCALE_FACTOR * (mad / cleanSamples.length);
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("winsorized stats: unFlaggedCount = " + cleanSamples.length + ", mean = " + mean + ", median = " + median
+                    + ", stddev = " + stdDev);
         }
     }
 
@@ -217,6 +239,10 @@ public abstract class Flagger {
     }
 
     private static float[] getCleanSamples(float[] samples, boolean[] flags, int destSize) {
+        if (destSize == samples.length) {
+            return samples.clone();
+        }
+
         float[] cleanSamples = new float[destSize];
         int destIndex = 0;
         for (int i = 0; i < samples.length; i++) {
@@ -393,17 +419,5 @@ public abstract class Flagger {
 
     public void setBaseSensitivity(float baseSensitivity) {
         this.baseSensitivity = baseSensitivity;
-    }
-
-    public void setMean(float mean) {
-        this.mean = mean;
-    }
-
-    public void setStdDev(float stdDev) {
-        this.stdDev = stdDev;
-    }
-
-    public void setMedian(float median) {
-        this.median = median;
     }
 }
