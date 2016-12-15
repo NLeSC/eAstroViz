@@ -32,8 +32,7 @@ The abstract of this article is here:
 
 http://adsabs.harvard.edu/abs/2014era..conf40301V
 
-The abstract is shown below as well:
-
+The abstract is shown below as well.
 
 
 Exascale Real-Time Radio Frequency Interference Mitigation
