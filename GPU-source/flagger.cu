@@ -963,13 +963,13 @@ int main(int argc, char** argv){
   get_and_check_arguments(argc, argv, &direction, &reduce, &little_endian, &sir);
 
 
-  /*
-  int a = 50 * 1024;
+
+  int a = 1024;
   int b = 32;
   int c = 256;
   int d = 1;
   h_data_info = fake_data(a,b,c,d);
-  */
+
 
   //printf("analyzing %d samples\n", a * b * c *d);
 
@@ -985,7 +985,7 @@ int main(int argc, char** argv){
   }
 
 
-  h_data_info = read_file(argv[1], meta_data, little_endian);
+  // h_data_info = read_file(argv[1], meta_data, little_endian);
 
   ptrs = malloc_cuda_memory(h_data_info, &d_data);
 
@@ -994,7 +994,7 @@ int main(int argc, char** argv){
 
 
   start_timer();
-  cudaPrintfInit();
+  // cudaPrintfInit();
 
   switch(direction){
     case 0:
@@ -1043,8 +1043,8 @@ int main(int argc, char** argv){
   }
 
 
-  cudaPrintfDisplay(stdout, true);
-  cudaPrintfEnd();
+  // cudaPrintfDisplay(stdout, true);
+  // cudaPrintfEnd();
   cudaDeviceSynchronize();
 
   stop_timer(&time);
@@ -1118,7 +1118,7 @@ int main(int argc, char** argv){
   */
 
   
-  fwrite(h_values, data_size, sizeof(float), stdout);
+  // fwrite(h_values, data_size, sizeof(float), stdout);
 
 
   return 0;

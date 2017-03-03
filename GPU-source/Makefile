@@ -1,5 +1,5 @@
 CC=nvcc
-CFLAGS=-Xcompiler -rdynamic -lineinfo -G -g -gencode arch=compute_35,code=sm_35 --use_fast_math --prec-div=true -O3
+CFLAGS=-Xcompiler -rdynamic -lineinfo -G -g -gencode arch=compute_35,code=sm_35 -gencode arch=compute_52,code=sm_52 --use_fast_math --prec-div=true -O3
 CUDA_LDFLAGS = -lrt -lcudart
 CUDA_LIBS = -L"$(CUDA_INSTALL_PATH)/lib64/"
 
