@@ -26,7 +26,7 @@ Vol. 46, #3, #403.01
 The slides used at the conference are available in the doc directory
 in this package, and are available online here:
 
-http://vannieuwpoort.com/papers/Exascale-Astronomy-2014-Monterey-RFI.pdf
+[http://vannieuwpoort.com/papers/Exascale-Astronomy-2014-Monterey-RFI.pdf](https://vannieuwpoort.com/wp-content/uploads/Exascale-Astronomy-2014-Monterey-RFI.pdf)
 
 The abstract of this article is here: 
 
