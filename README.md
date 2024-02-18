@@ -79,4 +79,4 @@ impact of real-time RFI mitigation, and compare different algorithms.
 
 Copyright 2016 The Netherlands eScience Center
 
-Written by Rob van Nieuwpoort, R.vanNieuwpoort@esciencecenter.nl
+Written by Rob van Nieuwpoort, r.v.van.nieuwpoort@liacs.leidenuniv.nl
