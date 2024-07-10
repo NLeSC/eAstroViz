@@ -16,12 +16,10 @@ All code is distributed under the Apache 2.0 licence.
 
 Please cite as:
 
-Rob V. van Nieuwpoort and the LOFAR team:
-Exascale Real-Time Radio Frequency Interference Mitigation
-Exascale Radio Astronomy, AAS Topical Conference Series
-Vol. 2. Proceedings of the conference held 30 March - 4 April, 2014 in
-Monterey, California. Bulletin of the American Astronomical Society,
-Vol. 46, #3, #403.01
+Rob V. van Nieuwpoort:
+Towards exascale real-time RFI mitigation.
+Proceedings of 2016 Radio Frequency Interference (RFI2016) Coexisting with Radio Frequency Interference, Socorro, New Mexico, USA, Pages 69-74, October 2016.
+DOI: 10.1109/RFINT.2016.7833534, Electronic ISBN: 978-1-5090-6201-0, Print on Demand ISBN: 978-1-5090-6202-7.
 
 The slides used at the conference are available in the doc directory
 in this package, and are available online here:
