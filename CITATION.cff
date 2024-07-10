@@ -1,0 +1,41 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: eAstroViz
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Rob
+    name-particle: van
+    family-names: Nieuwpoort
+    email: r.v.van.nieuwpoort@liacs.leidenuniv.nl
+    affiliation: Leiden University
+    orcid: 'https://orcid.org/0000-0002-2947-9444'
+identifiers:
+  - type: doi
+    value: 10.1109/RFINT.2016.7833534
+    description: Paper describing the software
+repository-code: 'https://github.com/NLeSC/eAstroViz'
+url: 'https://github.com/NLeSC/eAstroViz'
+abstract: >-
+  This is a visualization and RFI mitigation tool of the
+  Netherlands eScience center eAstronomy project. This tool
+  can convert and visualize radio astronomy measurement sets
+  (i.e. visibilities), as well as most LOFAR intermediate
+  data products, such as raw voltages, filtered data and
+  beam formed data. In addition, this tool can perform RFI
+  mitigation. In addition, this repository contains the
+  real-time RFI mitigation code developed for LOFAR, in the
+  directory LOFAR-source. Finally, we have developed a GPU
+  prototype version of the code as well. This code was
+  developed by Linus Schoemaker in the context of his
+  masters project. The code is in the directory GPU-source.
+keywords:
+  - radio astronomy
+  - RFI
+  - visualization
+  - signal processing
+license: Apache-2.0
