@@ -1,5 +1,8 @@
 This is a visualization and RFI mitigation tool of the Netherlands eScience center eAstronomy project.
 
+![image](doc/Picture1.png)
+
+
 This tool can convert and visualize radio astronomy measurement sets
 (i.e. visibilities), as well as most LOFAR intermediate data products,
 such as raw voltages, filtered data and beam formed data. In addition,
